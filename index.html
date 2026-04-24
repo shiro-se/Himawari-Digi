@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HimawariDigi - Empowering Your Digital Future</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS v4 (Compiled via CLI) -->
+    <link rel="stylesheet" href="./css/output.css">
+    
+    <!-- Phosphor Icons (for premium lightweight icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+
+    <!-- Navbar -->
+    <header class="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent border-transparent">
+        <div class="container mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="/" data-link class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-emerald-400 flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform duration-300">
+                    <i class="ph-bold ph-sun text-2xl"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">HimawariDigi</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="/" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Home</a>
+                <a href="/services" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Services</a>
+                <a href="/portfolio" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Portfolio</a>
+                <a href="/contact" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Contact</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-4">
+                <button id="theme-toggle" class="p-2.5 rounded-2xl hover:bg-muted text-foreground transition-colors" aria-label="Toggle Dark Mode">
+                    <i class="ph ph-moon text-xl dark:hidden"></i>
+                    <i class="ph ph-sun text-xl hidden dark:block"></i>
+                </button>
+                <a href="/contact" data-link class="hidden md:flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground font-medium rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300">
+                    Get Started <i class="ph-bold ph-arrow-right"></i>
+                </a>
+                <!-- Mobile Menu Btn -->
+                <button id="mobile-menu-btn" class="md:hidden p-2.5 rounded-md hover:bg-muted text-foreground transition-colors">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-card/95 backdrop-blur-md absolute w-full shadow-lg">
+            <div class="flex flex-col p-4 gap-4">
+                <a href="/" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Home</a>
+                <a href="/services" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Services</a>
+                <a href="/portfolio" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Portfolio</a>
+                <a href="/contact" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Contact</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container (Dynamic) -->
+    <main id="app-content" class="flex-grow min-h-screen transition-opacity duration-300"></main>
+
+    <!-- Footer -->
+    <footer class="bg-card border-t border-border mt-auto">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div class="col-span-1 md:col-span-2">
+                    <a href="/" data-link class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+                            <i class="ph-bold ph-sun text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold">HimawariDigi</span>
+                    </a>
+                    <p class="text-muted-foreground max-w-md">Your trusted technology partner in building scalable digital solutions. We transform complex problems into elegant software.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <div class="flex flex-col gap-2">
+                        <a href="/services" data-link class="text-muted-foreground hover:text-primary transition-colors">Our Services</a>
+                        <a href="/portfolio" data-link class="text-muted-foreground hover:text-primary transition-colors">Portfolio</a>
+                        <a href="/contact" data-link class="text-muted-foreground hover:text-primary transition-colors">Contact Us</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><i class="ph-fill ph-github-logo text-xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-border mt-12 pt-8 text-center text-sm text-muted-foreground">
+                &copy; 2026 HimawariDigi. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom App Script -->
+    <script src="./js/app.js"></script>
+</body>
+</html>

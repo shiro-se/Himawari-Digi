@@ -1,0 +1,8 @@
+.env
+.env.backup
+.env.production
+/.phpunit.cache
+/.vscode
+/node_modules
+/vendor
+

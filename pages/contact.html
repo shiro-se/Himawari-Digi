@@ -1,0 +1,58 @@
+<div class="slide-up container mx-auto px-6 pt-32 pb-20">
+    <div class="max-w-5xl mx-auto bg-card rounded-3xl border border-border overflow-hidden shadow-xl flex flex-col md:flex-row">
+        <!-- Info Side -->
+        <div class="md:w-2/5 bg-zinc-950 text-white p-12 flex flex-col justify-between relative overflow-hidden">
+            <!-- Deco -->
+            <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-primary/30 rounded-2xl blur-3xl pointer-events-none"></div>
+            
+            <div>
+                <h2 class="text-3xl font-bold mb-4 text-white">Let's Talk</h2>
+                <p class="text-zinc-300 mb-12">Whether you have a clear vision or need technical guidance, our team is ready to help.</p>
+                
+                <div class="space-y-6">
+                    <div class="flex items-start gap-4">
+                        <i class="ph-fill ph-envelope-simple text-2xl text-primary"></i>
+                        <div>
+                            <p class="font-medium">Email Us</p>
+                            <p class="text-zinc-400">hello@himawaridigi.com</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <i class="ph-fill ph-map-pin text-2xl text-primary"></i>
+                        <div>
+                            <p class="font-medium">Visit Us</p>
+                            <p class="text-zinc-400">Jakarta, Indonesia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Side -->
+        <div class="md:w-3/5 p-12">
+            <form class="space-y-6" onsubmit="event.preventDefault(); alert('This is a static demo. Message not sent.');">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">First Name</label>
+                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="John">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium">Last Name</label>
+                        <input type="text" class="w-full px-4 py-3 rounded-lg border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Doe">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Email</label>
+                    <input type="email" class="w-full px-4 py-3 rounded-lg border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="john@example.com">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Message</label>
+                    <textarea rows="4" class="w-full px-4 py-3 rounded-lg border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none" placeholder="Tell us about your project..."></textarea>
+                </div>
+                <button type="submit" class="w-full px-8 py-4 bg-primary text-primary-foreground font-medium rounded-lg hover:bg-primary/90 transition-colors">
+                    Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
