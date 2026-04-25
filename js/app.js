@@ -52,10 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const updateNav = (route) => {
     document.querySelectorAll("[data-link]").forEach((link) => {
-      const linkRoute =
-        link.getAttribute("href") === "/"
-          ? "home"
-          : link.getAttribute("href").replace("/", "");
+      const href = link.getAttribute("href");
+      if (!href) return;
+      const linkRoute = href === "/" ? "home" : href.replace("/", "");
 
       if (linkRoute === route) {
         link.classList.add("text-primary", "font-semibold");
@@ -71,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const link = e.target.closest("[data-link]");
     if (link) {
       const href = link.getAttribute("href");
-      if (href.startsWith("/")) {
+      if (href && href.startsWith("/")) {
         e.preventDefault();
         if (window.location.pathname !== href) {
           history.pushState(null, null, href);
@@ -87,53 +86,112 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderPage(window.location.pathname);
 
-  // --- Global UI Components ---
+  // ─── Global UI Components ─────────────────────────────────────────────────
 
   const header = document.querySelector("header");
 
+  // ── Scroll: navbar glass effect ───────────────────────────────────────────
   const handleScroll = () => {
-    if (window.scrollY > 20) {
-      header.classList.remove("bg-transparent", "border-transparent");
-      header.classList.add("glass", "border-border");
-    } else {
-      header.classList.add("bg-transparent", "border-transparent");
-      header.classList.remove("glass", "border-border");
-    }
+    header.classList.toggle("scrolled", window.scrollY > 20);
   };
-
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", handleScroll, { passive: true });
   handleScroll();
 
-  const themeToggleBtn = document.getElementById("theme-toggle");
+  // ── Theme toggle ──────────────────────────────────────────────────────────
+  const themeToggleBtn = document.getElementById("themeToggle");
   if (themeToggleBtn) {
-    if (
+    const applyTheme = (dark) => {
+      document.documentElement.classList.toggle("dark", dark);
+      localStorage.theme = dark ? "dark" : "light";
+    };
+
+    const prefersDark =
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    applyTheme(prefersDark);
 
     themeToggleBtn.addEventListener("click", () => {
-      document.documentElement.classList.toggle("dark");
-      localStorage.theme = document.documentElement.classList.contains("dark")
-        ? "dark"
-        : "light";
+      applyTheme(!document.documentElement.classList.contains("dark"));
     });
   }
 
+  // ── Desktop dropdown menus ────────────────────────────────────────────────
+  document.querySelectorAll(".nav-item[data-dropdown]").forEach((item) => {
+    const btn = item.querySelector(".nav-link");
+    const dropdown = item.querySelector(".dropdown");
+    let timer;
+
+    const open = () => {
+      clearTimeout(timer);
+      item.classList.add("open");
+      btn?.setAttribute("aria-expanded", "true");
+    };
+    const close = () => {
+      timer = setTimeout(() => {
+        item.classList.remove("open");
+        btn?.setAttribute("aria-expanded", "false");
+      }, 120);
+    };
+
+    item.addEventListener("mouseenter", open);
+    item.addEventListener("mouseleave", close);
+    btn?.addEventListener("click", () =>
+      item.classList.contains("open") ? close() : open(),
+    );
+    dropdown?.addEventListener("mouseenter", () => clearTimeout(timer));
+    dropdown?.addEventListener("mouseleave", close);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".nav-item[data-dropdown]")) {
+      document
+        .querySelectorAll(".nav-item.open")
+        .forEach((i) => i.classList.remove("open"));
+    }
+  });
+
+  // ── Mobile menu ───────────────────────────────────────────────────────────
   const mobileMenuBtn = document.getElementById("mobile-menu-btn");
   const mobileMenu = document.getElementById("mobile-menu");
+
   if (mobileMenuBtn && mobileMenu) {
-    mobileMenuBtn.addEventListener("click", () =>
-      mobileMenu.classList.toggle("hidden"),
-    );
+    const setMenuOpen = (open) => {
+      mobileMenu.classList.toggle("open", open);
+      mobileMenuBtn.classList.toggle("open", open);
+      mobileMenuBtn.setAttribute("aria-expanded", String(open));
+      document.body.style.overflow = open ? "hidden" : "";
+    };
+
+    mobileMenuBtn.addEventListener("click", () => {
+      setMenuOpen(!mobileMenu.classList.contains("open"));
+    });
+
     mobileMenu.addEventListener("click", (e) => {
-      if (e.target.closest("[data-link]")) mobileMenu.classList.add("hidden");
+      if (e.target.closest("[data-link]")) setMenuOpen(false);
     });
   }
+
+  // ── Mobile sub-menu accordion ─────────────────────────────────────────────
+  document.querySelectorAll("[data-mobile-toggle]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const sub = document.getElementById(btn.dataset.mobileToggle);
+      const caret = btn.querySelector(".nav-caret");
+      const isOpen = sub?.classList.contains("open");
+
+      document
+        .querySelectorAll(".mobile-sub")
+        .forEach((s) => s.classList.remove("open"));
+      document
+        .querySelectorAll("[data-mobile-toggle] .nav-caret")
+        .forEach((c) => (c.style.transform = ""));
+
+      if (!isOpen && sub) {
+        sub.classList.add("open");
+        if (caret) caret.style.transform = "rotate(180deg)";
+      }
+    });
+  });
 
   // ─── Per-page component initialisation ───────────────────────────────────
 
@@ -181,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
           pWrap.appendChild(el);
         });
       }
-      
+
       // ── Testimonial Carousel ──────────────────────────────────────────────
       const track = document.getElementById("testimonial-track");
       const prevBtn = document.getElementById("prev-testimonial");
@@ -368,7 +426,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (infoName) infoName.textContent = CARDS[clamped].name;
             if (infoDesc) infoDesc.textContent = CARDS[clamped].desc;
 
-            // Render multiple tags
             if (infoTag) {
               infoTag.innerHTML = CARDS[clamped].tags
                 .map((t) => `<span class="c-tag-pill">${t}</span>`)
@@ -407,7 +464,6 @@ document.addEventListener("DOMContentLoaded", () => {
         targetAngle = progress * maxRotation;
       }
 
-      // Hover spotlight
       cards.forEach((card) => {
         card.addEventListener("mousemove", (e) => {
           const r = card.getBoundingClientRect();
@@ -421,7 +477,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       window.addEventListener("resize", () => render(renderedAngle));
 
-      // Initial state
       onCarouselScroll();
       renderedAngle = targetAngle;
       render(renderedAngle);

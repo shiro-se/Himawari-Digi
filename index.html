@@ -1,109 +1,521 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" class="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HimawariDigi - Empowering Your Digital Future</title>
-    
+
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <!-- Tailwind CSS v4 (Compiled via CLI) -->
-    <link rel="stylesheet" href="./css/output.css">
-    
+    <link rel="stylesheet" href="./css/output.css" />
+
     <!-- Phosphor Icons (for premium lightweight icons) -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-</head>
-<body class="min-h-screen flex flex-col font-sans">
-
+  </head>
+  <body class="min-h-screen flex flex-col font-sans">
     <!-- Navbar -->
-    <header class="fixed top-0 w-full z-50 transition-all duration-300 bg-transparent border-transparent">
-        <div class="container mx-auto px-6 h-20 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="/" data-link class="flex items-center gap-2 group">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-emerald-400 flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform duration-300">
-                    <i class="ph-bold ph-sun text-2xl"></i>
+    <header class="navbar" id="navbar">
+      <div class="nav-inner">
+        <!-- Logo (icon only) -->
+        <a href="/" class="nav-logo" data-link>
+          <div class="logo-mark">
+            <i class="ph-bold ph-sun"></i>
+          </div>
+        </a>
+
+        <!-- Desktop Nav -->
+        <ul class="nav-links" id="navLinks">
+          <li class="nav-item">
+            <a href="/" class="nav-link active" data-link>Home</a>
+          </li>
+
+          <!-- Services Dropdown -->
+          <li class="nav-item" id="navServices" data-dropdown>
+            <button class="nav-link" aria-expanded="false" aria-haspopup="true">
+              Services
+              <span class="nav-caret">
+                <i class="ph ph-caret-down" style="font-size: 12px"></i>
+              </span>
+            </button>
+            <div class="dropdown" role="menu">
+              <a href="/services/outsourcing" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-users-three"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Programmer Outsourcing</div>
+                  <div class="di-desc">
+                    Tim developer berpengalaman untuk proyek Anda
+                  </div>
                 </div>
-                <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">HimawariDigi</span>
-            </a>
-
-            <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center gap-8">
-                <a href="/" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Home</a>
-                <a href="/services" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Services</a>
-                <a href="/portfolio" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Portfolio</a>
-                <a href="/contact" data-link class="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Contact</a>
-            </nav>
-
-            <!-- Actions -->
-            <div class="flex items-center gap-4">
-                <button id="theme-toggle" class="p-2.5 rounded-2xl hover:bg-muted text-foreground transition-colors" aria-label="Toggle Dark Mode">
-                    <i class="ph ph-moon text-xl dark:hidden"></i>
-                    <i class="ph ph-sun text-xl hidden dark:block"></i>
-                </button>
-                <a href="/contact" data-link class="hidden md:flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground font-medium rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300">
-                    Get Started <i class="ph-bold ph-arrow-right"></i>
-                </a>
-                <!-- Mobile Menu Btn -->
-                <button id="mobile-menu-btn" class="md:hidden p-2.5 rounded-md hover:bg-muted text-foreground transition-colors">
-                    <i class="ph ph-list text-2xl"></i>
-                </button>
+              </a>
+              <a href="/services/mobile" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-device-mobile"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Mobile App Development</div>
+                  <div class="di-desc">
+                    iOS & Android yang elegan dan scalable
+                  </div>
+                </div>
+                <span class="dropdown-badge">Hot</span>
+              </a>
+              <a href="/services/vibe" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-magic-wand"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Vibe Coding</div>
+                  <div class="di-desc">
+                    Pengembangan berbantuan AI yang lebih cepat
+                  </div>
+                </div>
+                <span class="dropdown-badge">New</span>
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="/services/devops" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-cloud"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Cloud & DevOps</div>
+                  <div class="di-desc">
+                    Pipeline CI/CD dan infrastruktur cloud
+                  </div>
+                </div>
+              </a>
+              <a href="/services/design" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-palette"></i></div>
+                <div class="di-text">
+                  <div class="di-title">UI/UX Design</div>
+                  <div class="di-desc">Antarmuka yang indah dan intuitif</div>
+                </div>
+              </a>
+              <a href="/services/qa" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-shield-check"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Quality Assurance</div>
+                  <div class="di-desc">Pengujian menyeluruh, bebas bug</div>
+                </div>
+              </a>
             </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden border-t border-border bg-card/95 backdrop-blur-md absolute w-full shadow-lg">
-            <div class="flex flex-col p-4 gap-4">
-                <a href="/" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Home</a>
-                <a href="/services" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Services</a>
-                <a href="/portfolio" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Portfolio</a>
-                <a href="/contact" data-link class="font-medium p-2 hover:bg-muted rounded-md transition-colors">Contact</a>
+          </li>
+
+          <!-- Portfolio Dropdown -->
+          <li class="nav-item" id="navPortfolio" data-dropdown>
+            <button class="nav-link" aria-expanded="false" aria-haspopup="true">
+              Portfolio
+              <span class="nav-caret">
+                <i class="ph ph-caret-down" style="font-size: 12px"></i>
+              </span>
+            </button>
+            <div class="dropdown" role="menu">
+              <a href="/portfolio/web" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-browser"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Web Projects</div>
+                  <div class="di-desc">
+                    Solusi web dari landing page hingga SaaS
+                  </div>
+                </div>
+              </a>
+              <a href="/portfolio/mobile" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-app-window"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Mobile Projects</div>
+                  <div class="di-desc">
+                    Aplikasi mobile yang telah diluncurkan
+                  </div>
+                </div>
+              </a>
+              <a href="/portfolio/case-studies" class="dropdown-item" data-link>
+                <div class="di-icon"><i class="ph ph-chart-line-up"></i></div>
+                <div class="di-text">
+                  <div class="di-title">Case Studies</div>
+                  <div class="di-desc">Studi kasus mendalam proyek pilihan</div>
+                </div>
+              </a>
             </div>
+          </li>
+
+          <li class="nav-item">
+            <a href="/contact" class="nav-link" data-link>Contact</a>
+          </li>
+        </ul>
+
+        <!-- Right Actions -->
+        <div class="nav-right">
+          <!-- Theme Toggle -->
+          <button class="btn-ghost" id="themeToggle" aria-label="Toggle theme">
+            <i class="ph ph-moon" id="moonIcon"></i>
+            <i class="ph ph-sun" id="sunIcon" style="display: none"></i>
+          </button>
+
+          <!-- CTA (hidden on mobile) -->
+          <a href="/contact" class="btn-cta" data-link>
+            Get Started
+            <i class="ph-bold ph-arrow-right cta-arrow"></i>
+          </a>
+
+          <!-- Mobile Toggle -->
+          <button
+            class="mobile-toggle"
+            id="mobile-menu-btn"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+          >
+            <span class="toggle-line"></span>
+            <span class="toggle-line"></span>
+            <span class="toggle-line"></span>
+          </button>
         </div>
+      </div>
     </header>
 
-    <!-- Main Content Container (Dynamic) -->
-    <main id="app-content" class="flex-grow min-h-screen transition-opacity duration-300"></main>
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation">
+      <ul class="mobile-nav-links">
+        <li class="mobile-nav-item">
+          <a href="/" class="mobile-nav-link active" data-link>Home</a>
+        </li>
+        <li class="mobile-nav-item">
+          <button class="mobile-nav-link" data-mobile-toggle="mSub1">
+            Services
+            <i
+              class="ph ph-caret-down"
+              id="mCaret1"
+              style="transition: transform 0.3s; font-size: 14px"
+            ></i>
+          </button>
+          <ul
+            class="mobile-sub"
+            id="mSub1"
+            style="list-style: none; padding-left: 0.5rem"
+          >
+            <li>
+              <a href="/services/outsourcing" class="mobile-sub-link" data-link
+                ><i class="ph ph-users-three"></i> Programmer Outsourcing</a
+              >
+            </li>
+            <li>
+              <a href="/services/mobile" class="mobile-sub-link" data-link
+                ><i class="ph ph-device-mobile"></i> Mobile App Development</a
+              >
+            </li>
+            <li>
+              <a href="/services/vibe" class="mobile-sub-link" data-link
+                ><i class="ph ph-magic-wand"></i> Vibe Coding</a
+              >
+            </li>
+            <li>
+              <a href="/services/devops" class="mobile-sub-link" data-link
+                ><i class="ph ph-cloud"></i> Cloud & DevOps</a
+              >
+            </li>
+            <li>
+              <a href="/services/design" class="mobile-sub-link" data-link
+                ><i class="ph ph-palette"></i> UI/UX Design</a
+              >
+            </li>
+            <li>
+              <a href="/services/qa" class="mobile-sub-link" data-link
+                ><i class="ph ph-shield-check"></i> Quality Assurance</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="mobile-nav-item">
+          <button class="mobile-nav-link" data-mobile-toggle="mSub2">
+            Portfolio
+            <i
+              class="ph ph-caret-down"
+              id="mCaret2"
+              style="transition: transform 0.3s; font-size: 14px"
+            ></i>
+          </button>
+          <ul
+            class="mobile-sub"
+            id="mSub2"
+            style="list-style: none; padding-left: 0.5rem"
+          >
+            <li>
+              <a href="/portfolio/web" class="mobile-sub-link" data-link
+                ><i class="ph ph-browser"></i> Web Projects</a
+              >
+            </li>
+            <li>
+              <a href="/portfolio/mobile" class="mobile-sub-link" data-link
+                ><i class="ph ph-app-window"></i> Mobile Projects</a
+              >
+            </li>
+            <li>
+              <a
+                href="/portfolio/case-studies"
+                class="mobile-sub-link"
+                data-link
+                ><i class="ph ph-chart-line-up"></i> Case Studies</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="mobile-nav-item">
+          <a href="/contact" class="mobile-nav-link" data-link>Contact</a>
+        </li>
+      </ul>
+      <div class="mobile-cta">
+        <a href="/contact" data-link>
+          <i class="ph-bold ph-rocket-launch"></i>
+          Mulai Proyek Bersama Kami
+        </a>
+      </div>
+    </nav>
 
-    <!-- Footer -->
-    <footer class="bg-card border-t border-border mt-auto">
-        <div class="container mx-auto px-6 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-                <div class="col-span-1 md:col-span-2">
-                    <a href="/" data-link class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                            <i class="ph-bold ph-sun text-xl"></i>
-                        </div>
-                        <span class="text-xl font-bold">HimawariDigi</span>
-                    </a>
-                    <p class="text-muted-foreground max-w-md">Your trusted technology partner in building scalable digital solutions. We transform complex problems into elegant software.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Quick Links</h4>
-                    <div class="flex flex-col gap-2">
-                        <a href="/services" data-link class="text-muted-foreground hover:text-primary transition-colors">Our Services</a>
-                        <a href="/portfolio" data-link class="text-muted-foreground hover:text-primary transition-colors">Portfolio</a>
-                        <a href="/contact" data-link class="text-muted-foreground hover:text-primary transition-colors">Contact Us</a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Connect</h4>
-                    <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><i class="ph-fill ph-linkedin-logo text-xl"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><i class="ph-fill ph-twitter-logo text-xl"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"><i class="ph-fill ph-github-logo text-xl"></i></a>
-                    </div>
-                </div>
+    <!-- Main Content Container (Dynamic) -->
+    <main
+      id="app-content"
+      class="flex-grow min-h-screen transition-opacity duration-300"
+    ></main>
+
+    <!-- Footer  -->
+    <footer>
+      <div class="footer-top">
+        <!-- Brand -->
+        <div class="footer-brand">
+          <a href="/" class="footer-logo" data-link>
+            <div class="footer-logo-mark">
+              <i class="ph-bold ph-sun"></i>
             </div>
-            <div class="border-t border-border mt-12 pt-8 text-center text-sm text-muted-foreground">
-                &copy; 2026 HimawariDigi. All rights reserved.
-            </div>
+            <span class="footer-logo-name">HimawariDigi</span>
+          </a>
+          <p class="footer-tagline">
+            Mitra teknologi terpercaya dalam membangun solusi digital yang
+            skalabel. Kami mengubah masalah kompleks menjadi perangkat lunak
+            yang elegan dan berdampak.
+          </p>
+          <div class="footer-socials">
+            <a href="#" class="social-btn" aria-label="LinkedIn">
+              <i class="ph-fill ph-linkedin-logo"></i>
+            </a>
+            <a href="#" class="social-btn" aria-label="Twitter / X">
+              <i class="ph-fill ph-x-logo"></i>
+            </a>
+            <a href="#" class="social-btn" aria-label="GitHub">
+              <i class="ph-fill ph-github-logo"></i>
+            </a>
+            <a href="#" class="social-btn" aria-label="Instagram">
+              <i class="ph-fill ph-instagram-logo"></i>
+            </a>
+            <a href="#" class="social-btn" aria-label="Email">
+              <i class="ph ph-envelope"></i>
+            </a>
+          </div>
         </div>
+
+        <!-- Services Links -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Services</h4>
+          <ul class="footer-links">
+            <li>
+              <a href="/services/outsourcing" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Programmer Outsourcing
+              </a>
+            </li>
+            <li>
+              <a href="/services/mobile" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Mobile App Development
+              </a>
+            </li>
+            <li>
+              <a href="/services/vibe" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Vibe Coding
+              </a>
+            </li>
+            <li>
+              <a href="/services/devops" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Cloud & DevOps
+              </a>
+            </li>
+            <li>
+              <a href="/services/design" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                UI/UX Design
+              </a>
+            </li>
+            <li>
+              <a href="/services/qa" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Quality Assurance
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Company Links -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Company</h4>
+          <ul class="footer-links">
+            <li>
+              <a href="/about" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                About Us
+              </a>
+            </li>
+            <li>
+              <a href="/portfolio" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Portfolio
+              </a>
+            </li>
+            <li>
+              <a href="/blog" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Blog & Insights
+              </a>
+            </li>
+            <li>
+              <a href="/careers" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Careers
+                <span
+                  style="
+                    font-size: 0.65rem;
+                    padding: 2px 8px;
+                    border-radius: 99px;
+                    background: rgba(34, 197, 94, 0.12);
+                    color: var(--primary);
+                    border: 1px solid rgba(34, 197, 94, 0.25);
+                    font-weight: 700;
+                    letter-spacing: 0.04em;
+                    text-transform: uppercase;
+                    margin-left: 4px;
+                  "
+                  >Hiring</span
+                >
+              </a>
+            </li>
+            <li>
+              <a href="/contact" data-link>
+                <i class="ph ph-arrow-right fl-arrow"></i>
+                Contact Us
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="footer-col footer-newsletter">
+          <h4 class="footer-col-title">Newsletter</h4>
+          <p
+            style="
+              font-size: 0.825rem;
+              color: var(--muted-fg);
+              line-height: 1.6;
+              margin-bottom: 0.25rem;
+            "
+          >
+            Dapatkan update terbaru tentang teknologi dan insight dari tim kami,
+            langsung di inbox Anda.
+          </p>
+          <div class="newsletter-form">
+            <div class="newsletter-input-wrap">
+              <input
+                type="email"
+                class="newsletter-input"
+                placeholder="email@kamu.com"
+                aria-label="Email address"
+              />
+              <button class="newsletter-btn" aria-label="Subscribe">
+                <i class="ph-bold ph-paper-plane-tilt"></i>
+              </button>
+            </div>
+            <p class="newsletter-note">
+              <i class="ph ph-lock-simple" style="font-size: 13px"></i>
+              Tidak ada spam. Unsubscribe kapan saja.
+            </p>
+          </div>
+
+          <!-- Location -->
+          <div
+            style="
+              margin-top: 1.5rem;
+              display: flex;
+              align-items: flex-start;
+              gap: 8px;
+            "
+          >
+            <div
+              style="
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                background: var(--muted);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                margin-top: 2px;
+              "
+            >
+              <i
+                class="ph ph-map-pin"
+                style="color: var(--primary); font-size: 16px"
+              ></i>
+            </div>
+            <div>
+              <div
+                style="
+                  font-size: 0.75rem;
+                  font-weight: 600;
+                  color: var(--fg);
+                  letter-spacing: 0.02em;
+                "
+              >
+                Yogyakarta, Indonesia
+              </div>
+              <div
+                style="
+                  font-size: 0.7rem;
+                  color: var(--muted-fg);
+                  margin-top: 1px;
+                "
+              >
+                WIB (UTC+7) · Remote-first
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom">
+        <p class="footer-copy">
+          &copy; 2026 <a href="/">HimawariDigi</a>. All rights reserved. Made
+          with
+          <i
+            class="ph-fill ph-heart"
+            style="color: #ef4444; font-size: 12px; vertical-align: middle"
+          ></i>
+          in Yogyakarta.
+        </p>
+
+        <div class="footer-status">
+          <div class="status-dot"></div>
+          All systems operational
+        </div>
+
+        <div class="footer-legal">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/cookies">Cookies</a>
+        </div>
+      </div>
     </footer>
 
     <!-- Custom App Script -->
     <script src="./js/app.js"></script>
-</body>
+  </body>
 </html>
