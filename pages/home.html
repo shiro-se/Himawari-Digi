@@ -35,46 +35,96 @@
         <div id="hero-particles" class="absolute inset-0 z-0 pointer-events-none overflow-hidden"></div>
 
         <!-- Content -->
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight
-                    text-foreground dark:text-white mb-8 max-w-6xl mx-auto leading-tight
-                    flex flex-col gap-2 md:gap-4">
-            <span class="block overflow-hidden p-2 -m-2">
-                <span class="block hero-text-reveal delay-100">
-                Build <span class="text-transparent bg-clip-text
-                                    bg-linear-to-r from-primary via-emerald-400 to-cyan-400
-                                    dark:from-green-400 dark:via-emerald-300 dark:to-cyan-300">
-                    Digital Experiences
-                </span>
-                </span>
-            </span>
-            <span class="block overflow-hidden p-2 -m-2">
-                <span class="block hero-text-reveal delay-200">That Wow The World.</span>
-            </span>
-            </h1>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-            <div class="overflow-hidden p-2 -m-2 mb-12 max-w-2xl mx-auto">
-            <p class="hero-text-reveal delay-300 text-lg md:text-xl text-muted-foreground">
-                End-to-end software house based in Indonesia. We design, develop, and scale
-                custom web and mobile applications for modern businesses.
-            </p>
-            </div>
+                <div class="flex flex-col items-start text-left">
 
-            <div class="overflow-hidden p-2 -m-2">
-            <div class="hero-text-reveal delay-400 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="/contact" data-link
-                class="w-full sm:w-auto px-8 py-4 bg-primary text-primary-foreground font-semibold
-                        rounded-2xl hover:scale-105 hover:shadow-[0_8px_28px_rgba(34,197,94,0.4)]
-                        transition-all duration-300 shadow-[0_4px_20px_rgba(22,163,74,0.3)]">
-                Start Your Project
-                </a>
-                <a href="/services" data-link
-                class="w-full sm:w-auto px-8 py-4 bg-white/70 dark:bg-white/5 text-foreground
-                        font-semibold rounded-2xl border border-border hover:border-primary/50
-                        hover:bg-muted backdrop-blur-sm transition-all duration-300">
-                Explore Services →
-                </a>
-            </div>
+                    <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight
+                            text-foreground dark:text-white mb-6 leading-[1.1] flex flex-col gap-2">
+
+                        <span class="block overflow-hidden p-1 -m-1">
+                            <span class="block hero-text-reveal delay-100">We Build</span>
+                        </span>
+
+                        <span class="block overflow-hidden p-1 -m-1">
+                            <span class="block hero-text-reveal delay-200">
+                                <span id="hero-typed-wrapper" class="inline-block text-left whitespace-nowrap">
+                                    <span id="hero-typed"
+                                        class="text-transparent bg-clip-text bg-linear-to-r
+                                                from-primary via-emerald-400 to-cyan-400
+                                                dark:from-green-400 dark:via-emerald-300 dark:to-cyan-300"></span><span class="hero-cursor text-primary dark:text-green-400">|</span>
+                                </span>
+                            </span>
+                        </span>
+                    </h1>
+
+                    <div class="mb-10 max-w-lg overflow-hidden p-1 -m-1">
+                        <p class="hero-text-reveal delay-300 text-lg text-muted-foreground leading-relaxed">
+                            End-to-end software house based in Indonesia. We design, develop,
+                            and scale custom web and mobile applications for modern businesses.
+                        </p>
+                    </div>
+
+                    <div class="overflow-hidden p-1 -m-1">
+                        <div class="hero-text-reveal delay-400 flex flex-col sm:flex-row items-start gap-4">
+                            <a href="/contact" data-link
+                            class="px-8 py-4 bg-primary text-primary-foreground font-semibold
+                                    rounded-2xl hover:scale-105 hover:shadow-[0_8px_28px_rgba(34,197,94,0.4)]
+                                    transition-all duration-300 shadow-[0_4px_20px_rgba(22,163,74,0.3)]
+                                    whitespace-nowrap">
+                                Start Your Project
+                            </a>
+                            <a href="/services" data-link
+                            class="px-8 py-4 bg-white/70 dark:bg-white/5 text-foreground font-semibold
+                                    rounded-2xl border border-border hover:border-primary/50
+                                    hover:bg-muted backdrop-blur-sm transition-all duration-300
+                                    whitespace-nowrap">
+                                Explore Services →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden lg:block relative h-[520px]">
+                    <div id="hero-right" class="hidden lg:block relative h-[520px]">
+
+                    <!-- SVG connection lines -->
+                    <svg id="hero-lines" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index:3" overflow="visible"></svg>
+
+                    <!-- Central icon stage -->
+                    <div class="absolute inset-0 flex items-center justify-center" style="z-index:1" id="hero-icon-stage">
+                        <div class="hero-orbit-wrap">
+                            <div class="hero-orbit-ring ring-inner">
+                                <span class="hero-orbit-dot"></span>
+                            </div>
+                            <div class="hero-orbit-ring ring-mid">
+                                <span class="hero-orbit-dot"></span>
+                            </div>
+                            <div class="hero-orbit-ring ring-outer">
+                                <span class="hero-orbit-dot"></span>
+                            </div>
+                            <div class="hero-icon-card" id="hero-icon-card">
+                                <div class="hero-icon-bg-glow"></div>
+                                <div class="hero-icon-scanlines"></div>
+                                <i id="hero-main-icon" class="ph-light ph-package hero-main-icon-el"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="hsc-0" class="hero-stat-card" style="top:15%;right:0%;animation-delay:0.4s">
+                        <div><p class="hsc-val">50+</p><p class="hsc-lbl">Projects Shipped</p></div>
+                    </div>
+                    <div id="hsc-1" class="hero-stat-card" style="top:15%;left:0%;animation-delay:1.2s">
+                        <div><p class="hsc-val">98%</p><p class="hsc-lbl">Happy Clients</p></div>
+                    </div>
+                    <div id="hsc-2" class="hero-stat-card" style="bottom:10%;right:0%;animation-delay:2.0s">
+                        <div><p class="hsc-val">5 ★</p><p class="hsc-lbl">Avg. Rating</p></div>
+                    </div>
+                    <div id="hsc-3" class="hero-stat-card" style="bottom:10%;left:0%;animation-delay:0.8s">
+                        <div><p class="hsc-val">3×</p><p class="hsc-lbl">Faster Delivery</p></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -305,131 +355,233 @@
 
     <!-- Services Preview Section -->
     <section class="py-24 bg-muted/50 rounded-t-[3rem] border-t border-border">
-        <div class="container mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-16 reveal-on-scroll">
+                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3">What we do</p>
                 <h2 class="text-3xl md:text-5xl font-bold mb-6">Empowering Your Business</h2>
-                <p class="text-lg text-muted-foreground">We provide a comprehensive suite of digital services designed to accelerate your growth and streamline your operations.</p>
+                <p class="text-lg text-muted-foreground">A comprehensive suite of digital services designed to accelerate your growth and streamline operations.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="reveal-on-scroll delay-100 group p-8 rounded-3xl bg-card border border-border hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:rotate-12 transition-transform">
-                        <i class="ph-fill ph-device-mobile"></i>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="reveal-on-scroll delay-100 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-emerald-400/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="ph-fill ph-browser"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Web & Mobile Apps</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">High-performance, scalable applications built with React, Next.js, Flutter and modern frameworks.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Web & Mobile Apps</h3>
-                    <p class="text-muted-foreground mb-6">High-performance scalable applications built with modern frameworks tailored to your needs.</p>
-                    <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
-                </div>
-                
-                <div class="reveal-on-scroll delay-200 group p-8 rounded-3xl bg-card border border-border hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4">
-                        <span class="px-3 py-1 bg-gradient-to-r from-primary to-emerald-400 text-primary-foreground text-xs font-bold rounded-2xl uppercase tracking-wider">Popular</span>
-                    </div>
-                    <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:rotate-12 transition-transform">
-                        <i class="ph-fill ph-users"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Tech Outsourcing</h3>
-                    <p class="text-muted-foreground mb-6">Curated tech talents ready to integrate and accelerate your internal team's productivity instantly.</p>
-                    <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
                 </div>
 
-                <div class="reveal-on-scroll delay-300 group p-8 rounded-3xl bg-card border border-border hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-                    <div class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:rotate-12 transition-transform">
-                        <i class="ph-fill ph-magic-wand"></i>
+                <!-- Card 2 — Popular -->
+                <div class="reveal-on-scroll delay-200 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="absolute top-4 right-4 z-20">
+                        <span class="px-3 py-1 bg-linear-to-r from-primary to-emerald-400 text-primary-foreground text-[0.65rem] font-bold rounded-full uppercase tracking-wider">Popular</span>
                     </div>
-                    <h3 class="text-2xl font-bold mb-4">Vibe Coding</h3>
-                    <p class="text-muted-foreground mb-6">Rapid prototyping utilizing cutting-edge AI and LLMs to bring your ideas to life at lightspeed.</p>
-                    <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-emerald-400/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="ph-fill ph-users-three"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Tech Outsourcing</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Curated tech talents ready to integrate and accelerate your internal team's productivity instantly.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="reveal-on-scroll delay-300 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-emerald-400/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="ph-fill ph-magic-wand"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Vibe Coding</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Rapid AI-powered prototyping utilizing cutting-edge LLMs to bring ideas to life at lightspeed.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="reveal-on-scroll delay-100 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-emerald-400/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="ph-fill ph-cloud-arrow-up"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Cloud & DevOps</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">CI/CD pipelines, container orchestration, and reliable cloud infrastructure on AWS & GCP.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="reveal-on-scroll delay-200 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-emerald-400/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="ph-fill ph-pen-nib"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">UI/UX Design</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Beautiful, intuitive interfaces crafted through user research, wireframing, and pixel-perfect design.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="reveal-on-scroll delay-300 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <div class="relative z-10">
+                        <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-emerald-400/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                            <i class="ph-fill ph-shield-check"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Quality Assurance</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Comprehensive automated and manual testing to ensure your product is bug-free and production-ready.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section class="py-24 bg-muted/30 border-y border-border relative overflow-hidden reveal-on-scroll">
-        <div class="container mx-auto px-6">
+    <section id="testimonial-section" class="tmc-section reveal-on-scroll">
+        <!-- Ambient glow -->
+        <div class="tmc-ambient-glow"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-2xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-5xl font-bold mb-6">Client Stories</h2>
+                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3">What clients say</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-4">Client Stories</h2>
                 <p class="text-lg text-muted-foreground">Hear what our partners have to say about our collaborations.</p>
             </div>
 
-            <div class="relative max-w-5xl mx-auto">
-                <div class="relative">
-                    <!-- Carousel Container -->
-                    <div class="overflow-hidden py-12 -my-12 px-4 -mx-4" id="testimonial-carousel">
-                        <div class="flex transition-transform duration-500 ease-out items-stretch" id="testimonial-track">
+            <div class="tmc-carousel" id="testimonial-carousel">
+                <!-- Carousel Viewport -->
+                <div class="tmc-viewport" id="testimonial-viewport">
+                    <div class="tmc-track" id="testimonial-track">
+                        
                         <!-- Slide 1 -->
-                        <div class="w-full flex-shrink-0 px-4 transition-all duration-700 ease-in-out carousel-slide opacity-100 scale-100" data-index="0">
-                            <div class="bg-background/80 backdrop-blur-xl border border-border/50 hover:border-primary/30 rounded-3xl p-8 md:p-12 relative shadow-2xl transition-all duration-300 group h-full flex flex-col">
-                                <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                                <i class="ph-fill ph-quotes text-6xl text-primary/10 absolute top-8 left-8 group-hover:text-primary/20 transition-colors pointer-events-none"></i>
-                                <div class="relative z-10 flex-1 flex items-center mb-8">
-                                    <p class="text-xl md:text-2xl font-medium leading-relaxed">"HimawariDigi completely transformed how we operate. Their attention to detail and proactive approach to problem-solving delivered an app that exceeded all our expectations."</p>
+                        <div class="tmc-slide is-active" data-index="0">
+                            <div class="tmc-card">
+                                <div class="tmc-card-glow"></div>
+                                <i class="ph-fill ph-quotes tmc-quote-icon"></i>
+                                <div class="tmc-card-body">
+                                    <p class="tmc-quote-text">"HimawariDigi completely transformed how we operate. Their attention to detail and proactive approach to problem-solving delivered an app that exceeded all our expectations."</p>
                                 </div>
-                                <div class="relative z-10 mt-auto pt-6 border-t border-border/50 flex items-center gap-4">
-                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary to-emerald-400 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-md group-hover:scale-110 transition-transform">A</div>
-                                    <div>
-                                        <h4 class="font-bold text-lg">Ahmad Ridwan</h4>
-                                        <p class="text-sm text-muted-foreground">CEO, TechNusantara</p>
+                                <div class="tmc-card-footer">
+                                    <div class="tmc-author">
+                                        <div class="tmc-avatar" style="--av-from: #16a34a; --av-to: #34d399;">AR</div>
+                                        <div>
+                                            <h4 class="tmc-author-name">Ahmad Ridwan</h4>
+                                            <p class="tmc-author-role">CEO, TechNusantara</p>
+                                        </div>
+                                    </div>
+                                    <div class="tmc-stars">
+                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Slide 2 -->
-                        <div class="w-full flex-shrink-0 px-4 transition-all duration-700 ease-in-out carousel-slide opacity-50 scale-95" data-index="1">
-                            <div class="bg-background/80 backdrop-blur-xl border border-border/50 hover:border-primary/30 rounded-3xl p-8 md:p-12 relative shadow-2xl transition-all duration-300 group h-full flex flex-col">
-                                <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                                <i class="ph-fill ph-quotes text-6xl text-primary/10 absolute top-8 left-8 group-hover:text-primary/20 transition-colors pointer-events-none"></i>
-                                <div class="relative z-10 flex-1 flex items-center mb-8">
-                                    <p class="text-xl md:text-2xl font-medium leading-relaxed">"The Vibe Coding service is insane. They prototyped our idea in a weekend, and the final production build was flawless. Absolutely top-tier software house."</p>
+                        <div class="tmc-slide" data-index="1">
+                            <div class="tmc-card">
+                                <div class="tmc-card-glow"></div>
+                                <i class="ph-fill ph-quotes tmc-quote-icon"></i>
+                                <div class="tmc-card-body">
+                                    <p class="tmc-quote-text">"The Vibe Coding service is insane. They prototyped our idea in a weekend, and the final production build was flawless. Absolutely top-tier software house."</p>
                                 </div>
-                                <div class="relative z-10 mt-auto pt-6 border-t border-border/50 flex items-center gap-4">
-                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-md group-hover:scale-110 transition-transform">S</div>
-                                    <div>
-                                        <h4 class="font-bold text-lg">Sarah Wijaya</h4>
-                                        <p class="text-sm text-muted-foreground">Founder, EduCepat</p>
+                                <div class="tmc-card-footer">
+                                    <div class="tmc-author">
+                                        <div class="tmc-avatar" style="--av-from: #3b82f6; --av-to: #22d3ee;">SW</div>
+                                        <div>
+                                            <h4 class="tmc-author-name">Sarah Wijaya</h4>
+                                            <p class="tmc-author-role">Founder, EduCepat</p>
+                                        </div>
+                                    </div>
+                                    <div class="tmc-stars">
+                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <!-- Slide 3 -->
-                        <div class="w-full flex-shrink-0 px-4 transition-all duration-700 ease-in-out carousel-slide opacity-50 scale-95" data-index="2">
-                            <div class="bg-background/80 backdrop-blur-xl border border-border/50 hover:border-primary/30 rounded-3xl p-8 md:p-12 relative shadow-2xl transition-all duration-300 group h-full flex flex-col">
-                                <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                                <i class="ph-fill ph-quotes text-6xl text-primary/10 absolute top-8 left-8 group-hover:text-primary/20 transition-colors pointer-events-none"></i>
-                                <div class="relative z-10 flex-1 flex items-center mb-8">
-                                    <p class="text-xl md:text-2xl font-medium leading-relaxed">"We outsourced our QA to HimawariDigi and the result was an immediate drop in production bugs. They integrated seamlessly with our internal team."</p>
+                        <div class="tmc-slide" data-index="2">
+                            <div class="tmc-card">
+                                <div class="tmc-card-glow"></div>
+                                <i class="ph-fill ph-quotes tmc-quote-icon"></i>
+                                <div class="tmc-card-body">
+                                    <p class="tmc-quote-text">"We outsourced our QA to HimawariDigi and the result was an immediate drop in production bugs. They integrated seamlessly with our internal team."</p>
                                 </div>
-                                <div class="relative z-10 mt-auto pt-6 border-t border-border/50 flex items-center gap-4">
-                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-primary-foreground font-bold text-xl shadow-md group-hover:scale-110 transition-transform">B</div>
-                                    <div>
-                                        <h4 class="font-bold text-lg">Budi Santoso</h4>
-                                        <p class="text-sm text-muted-foreground">CTO, Finaku</p>
+                                <div class="tmc-card-footer">
+                                    <div class="tmc-author">
+                                        <div class="tmc-avatar" style="--av-from: #f97316; --av-to: #fbbf24;">BS</div>
+                                        <div>
+                                            <h4 class="tmc-author-name">Budi Santoso</h4>
+                                            <p class="tmc-author-role">CTO, Finaku</p>
+                                        </div>
+                                    </div>
+                                    <div class="tmc-stars">
+                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Slide 4 -->
+                        <div class="tmc-slide" data-index="3">
+                            <div class="tmc-card">
+                                <div class="tmc-card-glow"></div>
+                                <i class="ph-fill ph-quotes tmc-quote-icon"></i>
+                                <div class="tmc-card-body">
+                                    <p class="tmc-quote-text">"From concept to deployment, HimawariDigi's cloud team architected an infrastructure that auto-scales flawlessly. Our uptime went from 97% to 99.99%."</p>
+                                </div>
+                                <div class="tmc-card-footer">
+                                    <div class="tmc-author">
+                                        <div class="tmc-avatar" style="--av-from: #a855f7; --av-to: #ec4899;">DK</div>
+                                        <div>
+                                            <h4 class="tmc-author-name">Dewi Kartika</h4>
+                                            <p class="tmc-author-role">VP Engineering, Sehatmu</p>
+                                        </div>
+                                    </div>
+                                    <div class="tmc-stars">
+                                        <i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- Navigation Buttons -->
-                <button id="prev-testimonial" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-6 w-12 h-12 rounded-2xl bg-background border border-border flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-lg z-10 group">
-                    <i class="ph-bold ph-caret-left text-xl group-hover:-translate-x-1 transition-transform"></i>
-                </button>
-                <button id="next-testimonial" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-6 w-12 h-12 rounded-2xl bg-background border border-border flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-lg z-10 group">
-                    <i class="ph-bold ph-caret-right text-xl group-hover:translate-x-1 transition-transform"></i>
-                </button>
+                <!-- Navigation Controls -->
+                <div class="tmc-controls">
+                    <button id="prev-testimonial" class="tmc-nav-btn" aria-label="Previous testimonial">
+                        <i class="ph-bold ph-caret-left"></i>
+                    </button>
 
-                <!-- Dots -->
-                <div class="flex justify-center gap-2 mt-8" id="testimonial-dots">
-                    <button class="relative overflow-hidden w-16 h-2 rounded-2xl bg-primary/20 transition-all duration-300 dot-btn group" data-index="0" aria-label="Go to slide 1">
-                        <div class="absolute top-0 left-0 h-full bg-primary w-full progress-bar"></div>
-                    </button>
-                    <button class="relative overflow-hidden w-4 h-2 rounded-2xl bg-border hover:bg-primary/50 transition-all duration-300 dot-btn group" data-index="1" aria-label="Go to slide 2">
-                        <div class="absolute top-0 left-0 h-full bg-primary w-0 progress-bar"></div>
-                    </button>
-                    <button class="relative overflow-hidden w-4 h-2 rounded-2xl bg-border hover:bg-primary/50 transition-all duration-300 dot-btn group" data-index="2" aria-label="Go to slide 3">
-                        <div class="absolute top-0 left-0 h-full bg-primary w-0 progress-bar"></div>
+                    <div class="tmc-dots" id="testimonial-dots">
+                        <button class="tmc-dot is-active" data-index="0" aria-label="Go to slide 1">
+                            <span class="tmc-dot-progress"></span>
+                        </button>
+                        <button class="tmc-dot" data-index="1" aria-label="Go to slide 2">
+                            <span class="tmc-dot-progress"></span>
+                        </button>
+                        <button class="tmc-dot" data-index="2" aria-label="Go to slide 3">
+                            <span class="tmc-dot-progress"></span>
+                        </button>
+                        <button class="tmc-dot" data-index="3" aria-label="Go to slide 4">
+                            <span class="tmc-dot-progress"></span>
+                        </button>
+                    </div>
+
+                    <button id="next-testimonial" class="tmc-nav-btn" aria-label="Next testimonial">
+                        <i class="ph-bold ph-caret-right"></i>
                     </button>
                 </div>
             </div>
@@ -438,35 +590,54 @@
 
     <!-- Featured Project -->
     <section class="py-24">
-        <div class="container mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-card rounded-[3rem] border border-border p-8 md:p-16 overflow-hidden relative shadow-2xl reveal-on-scroll">
-                <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-2xl blur-[100px] z-0"></div>
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px] z-0"></div>
+                <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-emerald-400/10 rounded-full blur-[80px] z-0"></div>
                 
                 <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-2xl bg-primary/10 text-primary font-medium text-xs mb-6 uppercase tracking-wider">
-                            Featured Case Study
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-xs mb-6 uppercase tracking-wider">
+                            <i class="ph-fill ph-star text-xs"></i> Featured Case Study
                         </div>
-                        <h2 class="text-4xl md:text-5xl font-bold mb-6">Revolutionizing HR with <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">Pagii</span></h2>
-                        <p class="text-lg text-muted-foreground mb-8">
-                            We helped build a comprehensive digital attendance solution that streamlines HR operations with real-time tracking, facial recognition, and detailed analytics.
+                        <h2 class="text-3xl md:text-5xl font-bold mb-6">Revolutionizing HR with <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-emerald-400">Pagii</span></h2>
+                        <p class="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
+                            We built a comprehensive digital attendance solution that streamlines HR operations with real-time tracking, facial recognition, and detailed analytics.
                         </p>
+
+                        <div class="flex flex-wrap gap-6 mb-10">
+                            <div>
+                                <p class="text-2xl font-bold text-primary">99.9%</p>
+                                <p class="text-xs text-muted-foreground">Uptime</p>
+                            </div>
+                            <div class="w-px bg-border"></div>
+                            <div>
+                                <p class="text-2xl font-bold text-primary">50K+</p>
+                                <p class="text-xs text-muted-foreground">Daily Users</p>
+                            </div>
+                            <div class="w-px bg-border"></div>
+                            <div>
+                                <p class="text-2xl font-bold text-primary">3×</p>
+                                <p class="text-xs text-muted-foreground">Faster Onboarding</p>
+                            </div>
+                        </div>
+
                         <a href="/portfolio" data-link class="px-8 py-4 bg-foreground text-white dark:bg-primary dark:text-primary-foreground font-medium rounded-2xl hover:scale-105 transition-transform duration-300 shadow-lg inline-flex items-center gap-2">
                             View Portfolio <i class="ph-bold ph-arrow-right"></i>
                         </a>
                     </div>
                     
                     <div class="relative group">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent rounded-3xl transform rotate-3 group-hover:rotate-6 transition-transform duration-500"></div>
-                        <div class="bg-muted rounded-3xl border border-border aspect-[4/3] flex items-center justify-center relative overflow-hidden transform -rotate-2 group-hover:rotate-0 transition-transform duration-500 shadow-lg">
+                        <div class="absolute inset-0 bg-linear-to-tr from-primary/30 to-transparent rounded-3xl transform rotate-3 group-hover:rotate-6 transition-transform duration-500"></div>
+                        <div class="bg-muted rounded-3xl border border-border aspect-4/3 flex items-center justify-center relative overflow-hidden transform -rotate-2 group-hover:rotate-0 transition-transform duration-500 shadow-lg">
                             <i class="ph-fill ph-calendar-check text-9xl text-foreground/10 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-background/80 to-transparent flex items-end p-8">
+                            <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-background/80 to-transparent flex items-end p-6 md:p-8">
                                 <div class="w-full bg-card/80 backdrop-blur border border-border rounded-xl p-4 flex items-center justify-between shadow-lg">
                                     <div>
                                         <p class="font-bold">Pagii App</p>
                                         <p class="text-xs text-muted-foreground">Attendance System</p>
                                     </div>
-                                    <div class="w-8 h-8 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center">
+                                    <div class="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
                                         <i class="ph-bold ph-check"></i>
                                     </div>
                                 </div>
@@ -479,15 +650,28 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-24 bg-gradient-to-b from-transparent to-primary/5 border-b border-border">
-        <div class="container mx-auto px-6 text-center reveal-on-scroll">
-            <h2 class="text-4xl md:text-6xl font-bold mb-8">Ready to Transform?</h2>
-            <p class="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+    <section class="py-24 bg-linear-to-b from-transparent to-primary/5 border-b border-border relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 reveal-on-scroll">
+            <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-4">Start today</p>
+            <h2 class="text-4xl md:text-6xl font-bold mb-6">Ready to Transform?</h2>
+            <p class="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
                 Join numerous businesses that have accelerated their digital transformation with our expertise. Let's discuss your next big idea.
             </p>
-            <a href="/contact" data-link class="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-primary-foreground bg-primary rounded-2xl hover:shadow-[0_0_40px_-10px_rgba(34,197,94,0.5)] hover:-translate-y-1 transition-all duration-300 gap-3">
-                Let's Talk <i class="ph-bold ph-chat-circle-dots text-2xl"></i>
-            </a>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+                <a href="/contact" data-link class="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-primary-foreground bg-primary rounded-2xl hover:shadow-[0_0_40px_-10px_rgba(34,197,94,0.5)] hover:-translate-y-1 transition-all duration-300 gap-3">
+                    Let's Talk <i class="ph-bold ph-chat-circle-dots text-2xl"></i>
+                </a>
+                <a href="/services" data-link class="inline-flex items-center justify-center px-10 py-5 text-lg font-semibold text-foreground bg-card border border-border rounded-2xl hover:border-primary/50 hover:-translate-y-1 transition-all duration-300 gap-3">
+                    View Services <i class="ph-bold ph-arrow-right text-xl"></i>
+                </a>
+            </div>
+            <div class="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+                <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-primary"></i> Free Consultation</span>
+                <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-primary"></i> No Commitment</span>
+                <span class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-primary"></i> NDA Available</span>
+            </div>
         </div>
     </section>
+
 </div>

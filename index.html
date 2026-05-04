@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap"
       rel="stylesheet"
     />
 
@@ -23,82 +23,19 @@
     <!-- Navbar -->
     <header class="navbar" id="navbar">
       <div class="nav-inner">
-        <!-- Logo (icon only) -->
-        <a href="/" class="nav-logo" data-link>
-          <div class="logo-mark">
-            <i class="ph-bold ph-sun"></i>
-          </div>
+        <!-- Logo -->
+        <a href="/" class="nav-logo flex items-baseline gap-1.5 transition-opacity duration-300 hover:opacity-75" data-link>
+          <span class="text-xl md:text-2xl font-black tracking-tighter" style="font-family: 'Outfit', sans-serif;">
+            <span class="text-foreground dark:text-white">HIMAWARI</span><span class="text-primary">DIGI</span>
+          </span>
+          <span class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase" style="font-family: 'Outfit', sans-serif;">CREATIVE</span>
         </a>
 
         <!-- Desktop Nav -->
         <ul class="nav-links" id="navLinks">
+          <!-- Services (plain link, no dropdown) -->
           <li class="nav-item">
-            <a href="/" class="nav-link active" data-link>Home</a>
-          </li>
-
-          <!-- Services Dropdown -->
-          <li class="nav-item" id="navServices" data-dropdown>
-            <button class="nav-link" aria-expanded="false" aria-haspopup="true">
-              Services
-              <span class="nav-caret">
-                <i class="ph ph-caret-down" style="font-size: 12px"></i>
-              </span>
-            </button>
-            <div class="dropdown" role="menu">
-              <a href="/services/outsourcing" class="dropdown-item" data-link>
-                <div class="di-icon"><i class="ph ph-users-three"></i></div>
-                <div class="di-text">
-                  <div class="di-title">Programmer Outsourcing</div>
-                  <div class="di-desc">
-                    Tim developer berpengalaman untuk proyek Anda
-                  </div>
-                </div>
-              </a>
-              <a href="/services/mobile" class="dropdown-item" data-link>
-                <div class="di-icon"><i class="ph ph-device-mobile"></i></div>
-                <div class="di-text">
-                  <div class="di-title">Mobile App Development</div>
-                  <div class="di-desc">
-                    iOS & Android yang elegan dan scalable
-                  </div>
-                </div>
-                <span class="dropdown-badge">Hot</span>
-              </a>
-              <a href="/services/vibe" class="dropdown-item" data-link>
-                <div class="di-icon"><i class="ph ph-magic-wand"></i></div>
-                <div class="di-text">
-                  <div class="di-title">Vibe Coding</div>
-                  <div class="di-desc">
-                    Pengembangan berbantuan AI yang lebih cepat
-                  </div>
-                </div>
-                <span class="dropdown-badge">New</span>
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="/services/devops" class="dropdown-item" data-link>
-                <div class="di-icon"><i class="ph ph-cloud"></i></div>
-                <div class="di-text">
-                  <div class="di-title">Cloud & DevOps</div>
-                  <div class="di-desc">
-                    Pipeline CI/CD dan infrastruktur cloud
-                  </div>
-                </div>
-              </a>
-              <a href="/services/design" class="dropdown-item" data-link>
-                <div class="di-icon"><i class="ph ph-palette"></i></div>
-                <div class="di-text">
-                  <div class="di-title">UI/UX Design</div>
-                  <div class="di-desc">Antarmuka yang indah dan intuitif</div>
-                </div>
-              </a>
-              <a href="/services/qa" class="dropdown-item" data-link>
-                <div class="di-icon"><i class="ph ph-shield-check"></i></div>
-                <div class="di-text">
-                  <div class="di-title">Quality Assurance</div>
-                  <div class="di-desc">Pengujian menyeluruh, bebas bug</div>
-                </div>
-              </a>
-            </div>
+            <a href="/services" class="nav-link" data-link>Services</a>
           </li>
 
           <!-- Portfolio Dropdown -->
@@ -139,6 +76,14 @@
           </li>
 
           <li class="nav-item">
+            <a href="/about" class="nav-link" data-link>About Us</a>
+          </li>
+
+          <li class="nav-item">
+            <a href="/blog" class="nav-link" data-link>Blog</a>
+          </li>
+
+          <li class="nav-item">
             <a href="/contact" class="nav-link" data-link>Contact</a>
           </li>
         </ul>
@@ -157,123 +102,53 @@
             <i class="ph-bold ph-arrow-right cta-arrow"></i>
           </a>
 
-          <!-- Mobile Toggle -->
-          <button
-            class="mobile-toggle"
-            id="mobile-menu-btn"
-            aria-label="Toggle menu"
-            aria-expanded="false"
-          >
-            <span class="toggle-line"></span>
-            <span class="toggle-line"></span>
-            <span class="toggle-line"></span>
-          </button>
+          <!-- Theme Toggle kept, no hamburger on mobile -->
         </div>
       </div>
     </header>
 
-    <!-- Mobile Menu -->
-    <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation">
-      <ul class="mobile-nav-links">
-        <li class="mobile-nav-item">
-          <a href="/" class="mobile-nav-link active" data-link>Home</a>
-        </li>
-        <li class="mobile-nav-item">
-          <button class="mobile-nav-link" data-mobile-toggle="mSub1">
-            Services
-            <i
-              class="ph ph-caret-down"
-              id="mCaret1"
-              style="transition: transform 0.3s; font-size: 14px"
-            ></i>
-          </button>
-          <ul
-            class="mobile-sub"
-            id="mSub1"
-            style="list-style: none; padding-left: 0.5rem"
-          >
-            <li>
-              <a href="/services/outsourcing" class="mobile-sub-link" data-link
-                ><i class="ph ph-users-three"></i> Programmer Outsourcing</a
-              >
-            </li>
-            <li>
-              <a href="/services/mobile" class="mobile-sub-link" data-link
-                ><i class="ph ph-device-mobile"></i> Mobile App Development</a
-              >
-            </li>
-            <li>
-              <a href="/services/vibe" class="mobile-sub-link" data-link
-                ><i class="ph ph-magic-wand"></i> Vibe Coding</a
-              >
-            </li>
-            <li>
-              <a href="/services/devops" class="mobile-sub-link" data-link
-                ><i class="ph ph-cloud"></i> Cloud & DevOps</a
-              >
-            </li>
-            <li>
-              <a href="/services/design" class="mobile-sub-link" data-link
-                ><i class="ph ph-palette"></i> UI/UX Design</a
-              >
-            </li>
-            <li>
-              <a href="/services/qa" class="mobile-sub-link" data-link
-                ><i class="ph ph-shield-check"></i> Quality Assurance</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li class="mobile-nav-item">
-          <button class="mobile-nav-link" data-mobile-toggle="mSub2">
-            Portfolio
-            <i
-              class="ph ph-caret-down"
-              id="mCaret2"
-              style="transition: transform 0.3s; font-size: 14px"
-            ></i>
-          </button>
-          <ul
-            class="mobile-sub"
-            id="mSub2"
-            style="list-style: none; padding-left: 0.5rem"
-          >
-            <li>
-              <a href="/portfolio/web" class="mobile-sub-link" data-link
-                ><i class="ph ph-browser"></i> Web Projects</a
-              >
-            </li>
-            <li>
-              <a href="/portfolio/mobile" class="mobile-sub-link" data-link
-                ><i class="ph ph-app-window"></i> Mobile Projects</a
-              >
-            </li>
-            <li>
-              <a
-                href="/portfolio/case-studies"
-                class="mobile-sub-link"
-                data-link
-                ><i class="ph ph-chart-line-up"></i> Case Studies</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li class="mobile-nav-item">
-          <a href="/contact" class="mobile-nav-link" data-link>Contact</a>
-        </li>
-      </ul>
-      <div class="mobile-cta">
-        <a href="/contact" data-link>
-          <i class="ph-bold ph-rocket-launch"></i>
-          Mulai Proyek Bersama Kami
-        </a>
-      </div>
+    <!-- Mobile Bottom Dock -->
+    <nav class="mobile-dock" id="mobile-dock" aria-label="Mobile navigation dock">
+      <a href="/" class="dock-item" data-link id="dock-home">
+        <div class="dock-icon-wrap">
+          <i class="ph-bold ph-house"></i>
+        </div>
+        <span class="dock-label">Home</span>
+      </a>
+
+      <a href="/services" class="dock-item" data-link id="dock-services">
+        <div class="dock-icon-wrap">
+          <i class="ph-bold ph-stack-plus"></i>
+        </div>
+        <span class="dock-label">Services</span>
+      </a>
+
+      <a href="/portfolio" class="dock-item" data-link id="dock-portfolio">
+        <div class="dock-icon-wrap">
+          <i class="ph-bold ph-briefcase"></i>
+        </div>
+        <span class="dock-label">Portfolio</span>
+      </a>
+
+      <a href="/about" class="dock-item" data-link id="dock-about">
+        <div class="dock-icon-wrap">
+          <i class="ph-bold ph-users"></i>
+        </div>
+        <span class="dock-label">About</span>
+      </a>
+
+      <a href="/contact" class="dock-item" data-link id="dock-contact">
+        <div class="dock-icon-wrap">
+          <i class="ph-bold ph-phone"></i>
+        </div>
+        <span class="dock-label">Contact</span>
+      </a>
     </nav>
 
     <!-- Main Content Container (Dynamic) -->
     <main
       id="app-content"
-      class="flex-grow min-h-screen transition-opacity duration-300"
+      class="grow min-h-screen transition-opacity duration-300"
     ></main>
 
     <!-- Footer  -->
@@ -281,11 +156,11 @@
       <div class="footer-top">
         <!-- Brand -->
         <div class="footer-brand">
-          <a href="/" class="footer-logo" data-link>
-            <div class="footer-logo-mark">
-              <i class="ph-bold ph-sun"></i>
-            </div>
-            <span class="footer-logo-name">HimawariDigi</span>
+          <a href="/" class="footer-logo flex items-baseline gap-1.5 transition-opacity duration-300 hover:opacity-75 mb-6" data-link>
+            <span class="text-2xl font-black tracking-tighter" style="font-family: 'Outfit', sans-serif;">
+              <span class="text-foreground dark:text-white">HIMAWARI</span><span class="text-primary">DIGI</span>
+            </span>
+            <span class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase" style="font-family: 'Outfit', sans-serif;">CREATIVE</span>
           </a>
           <p class="footer-tagline">
             Mitra teknologi terpercaya dalam membangun solusi digital yang

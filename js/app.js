@@ -34,11 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
       appContent.classList.remove("fade-in");
       appContent.style.opacity = "0";
 
+      // Scroll to top with smooth animation before rendering new page
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
       setTimeout(() => {
         appContent.innerHTML = htmlContent;
         appContent.style.opacity = "1";
         appContent.classList.add("fade-in");
-        updateNav(route);
+        updateNav(pathname);
         initPageComponents(route);
       }, 200);
     } catch (error) {
@@ -50,19 +53,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  const updateNav = (route) => {
-    document.querySelectorAll("[data-link]").forEach((link) => {
+  const updateNav = (pathname) => {
+    // ── Desktop nav-links ──────────────────────────────────────────────────
+    document.querySelectorAll(".nav-link[data-link], .mobile-nav-link[data-link]").forEach((link) => {
       const href = link.getAttribute("href");
       if (!href) return;
-      const linkRoute = href === "/" ? "home" : href.replace("/", "");
+      const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
+      link.classList.toggle("active", isActive);
+    });
 
-      if (linkRoute === route) {
-        link.classList.add("text-primary", "font-semibold");
-        link.classList.remove("text-foreground/80");
-      } else {
-        link.classList.remove("text-primary", "font-semibold");
-        link.classList.add("text-foreground/80");
-      }
+    // ── Portfolio dropdown button: active when any /portfolio/* is open ────
+    const portfolioBtn = document.querySelector("#navPortfolio > .nav-link");
+    if (portfolioBtn) {
+      portfolioBtn.classList.toggle("active", pathname.startsWith("/portfolio"));
+    }
+
+    // ── Bottom Dock active state ───────────────────────────────────────────
+    document.querySelectorAll(".dock-item[data-link]").forEach((item) => {
+      const href = item.getAttribute("href");
+      if (!href) return;
+      const isActive =
+        pathname === href ||
+        (href === "/" && pathname === "/") ||
+        (href !== "/" && pathname.startsWith(href));
+      item.classList.toggle("active", isActive);
     });
   };
 
@@ -151,28 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ── Mobile menu ───────────────────────────────────────────────────────────
-  const mobileMenuBtn = document.getElementById("mobile-menu-btn");
-  const mobileMenu = document.getElementById("mobile-menu");
-
-  if (mobileMenuBtn && mobileMenu) {
-    const setMenuOpen = (open) => {
-      mobileMenu.classList.toggle("open", open);
-      mobileMenuBtn.classList.toggle("open", open);
-      mobileMenuBtn.setAttribute("aria-expanded", String(open));
-      document.body.style.overflow = open ? "hidden" : "";
-    };
-
-    mobileMenuBtn.addEventListener("click", () => {
-      setMenuOpen(!mobileMenu.classList.contains("open"));
-    });
-
-    mobileMenu.addEventListener("click", (e) => {
-      if (e.target.closest("[data-link]")) setMenuOpen(false);
-    });
-  }
-
-  // ── Mobile sub-menu accordion ─────────────────────────────────────────────
+  // ── Mobile sub-menu accordion (desktop dropdown only) ───────────────────
   document.querySelectorAll("[data-mobile-toggle]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const sub = document.getElementById(btn.dataset.mobileToggle);
@@ -215,6 +208,303 @@ document.addEventListener("DOMContentLoaded", () => {
     // ── Home-only components ──────────────────────────────────────────────
 
     if (route === "home") {
+      // ── Hero Typing Animation ─────────────────────────────────────────────
+      const typedEl = document.getElementById("hero-typed");
+      const typedWrapper = document.getElementById("hero-typed-wrapper");
+
+      const phrases = [
+        "Scalable Apps",
+        "Loved Products",
+        "Smooth UX",
+        "AI Features",
+        "Durable Systems",
+        "Fast UI",
+      ];
+
+      const probe = document.createElement("span");
+      Object.assign(probe.style, {
+        visibility: "hidden",
+        position: "absolute",
+        whiteSpace: "nowrap",
+        font: getComputedStyle(typedEl).font,
+      });
+      document.body.appendChild(probe);
+
+      const maxWidth = Math.max(
+        ...phrases.map((p) => {
+          probe.textContent = p;
+          return probe.offsetWidth;
+        }),
+      );
+      document.body.removeChild(probe);
+
+      typedWrapper.style.minWidth = maxWidth + "px";
+      typedWrapper.style.textAlign = "left";
+
+      let pIdx = 0,
+        cIdx = 0,
+        isDeleting = false;
+
+      const TYPE_SPEED = 50,
+        DELETE_SPEED = 25,
+        PAUSE_END = 1800,
+        PAUSE_START = 350;
+
+      function typeLoop() {
+        if (!typedEl) return;
+        const current = phrases[pIdx];
+        typedEl.textContent = isDeleting
+          ? current.slice(0, --cIdx)
+          : current.slice(0, ++cIdx);
+
+        let delay = isDeleting ? DELETE_SPEED : TYPE_SPEED;
+
+        if (!isDeleting && cIdx === current.length) {
+          delay = PAUSE_END;
+          isDeleting = true;
+        } else if (isDeleting && cIdx === 0) {
+          isDeleting = false;
+          pIdx = (pIdx + 1) % phrases.length;
+          delay = PAUSE_START;
+        }
+        setTimeout(typeLoop, delay);
+      }
+
+      setTimeout(typeLoop, 600);
+
+      const heroRight = document.getElementById("hero-right");
+      if (heroRight) {
+        const SCENES = [
+          { icon: "ph-stack-plus", statId: "hsc-0" },
+          { icon: "ph-users-four", statId: "hsc-1" },
+          { icon: "ph-star", statId: "hsc-2" },
+          { icon: "ph-lightning", statId: "hsc-3" },
+        ];
+
+        let heroIdx = 0;
+        const HOLD = 3200;
+
+        const iconEl = document.getElementById("hero-main-icon");
+        const svgEl = document.getElementById("hero-lines");
+        const iconStage = document.getElementById("hero-icon-stage");
+        const iconCard = document.getElementById("hero-icon-card");
+        const statEls = SCENES.map((s) => document.getElementById(s.statId));
+
+        // Inject dynamic keyframe (drawPath) once
+        const animStyle = document.createElement("style");
+        animStyle.id = "hero-anim-style";
+        document.head.appendChild(animStyle);
+
+        function centerOnNearestEdge(fromRect, toRect, pad = 10) {
+          const fx = fromRect.left + fromRect.width / 2;
+          const fy = fromRect.top + fromRect.height / 2;
+          const cx = toRect.left + toRect.width / 2;
+          const cy = toRect.top + toRect.height / 2;
+          const dx = cx - fx,
+            dy = cy - fy;
+          let x = cx,
+            y = cy,
+            nx = 0,
+            ny = 0;
+          if (Math.abs(dx) >= Math.abs(dy)) {
+            if (dx >= 0) {
+              x = toRect.left;
+              nx = -1;
+            } else {
+              x = toRect.right;
+              nx = 1;
+            }
+            y = cy;
+          } else {
+            if (dy >= 0) {
+              y = toRect.top;
+              ny = -1;
+            } else {
+              y = toRect.bottom;
+              ny = 1;
+            }
+            x = cx;
+          }
+          return { x: x + nx * pad, y: y + ny * pad };
+        }
+
+        function drawLine(idx) {
+          if (!svgEl) return;
+          svgEl.innerHTML = "";
+
+          const statEl = statEls[idx];
+          if (!statEl || !iconStage) return;
+
+          const cRect = heroRight.getBoundingClientRect();
+          const sRect = statEl.getBoundingClientRect();
+          const iconCardEl =
+            iconStage.querySelector(".hero-icon-card") || iconStage;
+          const iRect = iconCardEl.getBoundingClientRect();
+
+          const startAbs = centerOnNearestEdge(sRect, iRect, 4);
+          const endAbs = centerOnNearestEdge(iRect, sRect, 10);
+
+          const x1 = startAbs.x - cRect.left;
+          const y1 = startAbs.y - cRect.top;
+          const x2 = endAbs.x - cRect.left;
+          const y2 = endAbs.y - cRect.top;
+
+          const dk = document.documentElement.classList.contains("dark");
+          const col = dk ? "52,211,153" : "22,163,74";
+
+          // Orthogonal bend path
+          const dx = x2 - x1;
+          const bendPad = 20,
+            margin = 12;
+          let outX = x1 + Math.sign(dx || 1) * bendPad;
+          if (dx > 0) outX = Math.min(outX, x2 - margin);
+          else outX = Math.max(outX, x2 + margin);
+          if (Math.abs(x2 - x1) < bendPad + margin) outX = x1 + dx * 0.5;
+
+          const d = `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`;
+          const totalLen =
+            Math.abs(outX - x1) + Math.abs(y2 - y1) + Math.abs(x2 - outX);
+
+          const uid = `${idx}-${Date.now()}`;
+
+          // Update dynamic keyframe
+          document.getElementById("hero-anim-style").textContent = `
+      @keyframes drawPath-${uid} {
+        from { stroke-dashoffset: ${totalLen}; }
+        to   { stroke-dashoffset: 0; }
+      }
+    `;
+
+          svgEl.innerHTML = `
+      <defs>
+        <linearGradient id="hlg-${uid}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="rgba(${col},0.90)"/>
+          <stop offset="100%" stop-color="rgba(${col},0.20)"/>
+        </linearGradient>
+        <filter id="glow-${uid}" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Aura glow -->
+      <path d="${d}" fill="none"
+        stroke="rgba(${col},0.10)" stroke-width="8"
+        stroke-linecap="round" stroke-linejoin="round"
+        style="animation: lineAppear 0.5s ease forwards"/>
+
+      <!-- Main line (draw stroke animation) -->
+      <path id="hlp-${uid}" d="${d}" fill="none"
+        stroke="url(#hlg-${uid})" stroke-width="1.5"
+        stroke-linecap="round" stroke-linejoin="round"
+        stroke-dasharray="${totalLen}" stroke-dashoffset="${totalLen}"
+        style="animation: drawPath-${uid} 0.50s cubic-bezier(0.4,0,0.2,1) 0.05s forwards"/>
+
+      <!-- Traveling signal dot -->
+      <circle r="4" fill="rgba(${col},0.95)" filter="url(#glow-${uid})">
+        <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.35s"
+          keySplines=".4 0 .6 1" calcMode="spline">
+          <mpath href="#hlp-${uid}"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="0;1;1;0"  dur="1.4s" repeatCount="indefinite" begin="0.35s"/>
+        <animate attributeName="r"       values="3;5;3"    dur="1.4s" repeatCount="indefinite" begin="0.35s"/>
+      </circle>
+
+      <!-- Double pulse ring at stat card -->
+      <circle cx="${x2}" cy="${y2}" r="7" fill="rgba(${col},0.08)">
+        <animate attributeName="r"       values="7;16;7"      dur="1.9s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.12;0;0.12" dur="1.9s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="${x2}" cy="${y2}" r="11" fill="rgba(${col},0.04)">
+        <animate attributeName="r"       values="11;24;11"    dur="1.9s" repeatCount="indefinite" begin="0.65s"/>
+        <animate attributeName="opacity" values="0.08;0;0.08" dur="1.9s" repeatCount="indefinite" begin="0.65s"/>
+      </circle>
+
+      <!-- Endpoint dot -->
+      <circle cx="${x2}" cy="${y2}" r="4.5"
+        fill="rgba(${col},0.85)"
+        stroke="rgba(255,255,255,0.55)" stroke-width="1.5"
+        filter="url(#glow-${uid})"
+        style="animation: lineAppear 0.3s ease 0.3s both"/>
+
+      <!-- Startpoint dot -->
+      <circle cx="${x1}" cy="${y1}" r="2.5"
+        fill="rgba(${col},0.50)"
+        style="animation: lineAppear 0.3s ease 0.05s both"/>
+    `;
+        }
+
+        function setHeroScene(idx, first = false) {
+          const scene = SCENES[idx];
+
+          // Aktifkan stat card + flash
+          statEls.forEach((el, i) => {
+            if (!el) return;
+            el.classList.toggle("hsc-active", i === idx);
+            if (i === idx) {
+              el.style.animation = "none";
+              void el.offsetWidth; // reflow
+              el.style.animation = "cardFlash 0.7s ease forwards";
+            }
+          });
+
+          // Pulse border icon card
+          if (iconCard) {
+            iconCard.style.animation = "none";
+            void iconCard.offsetWidth;
+            iconCard.style.animation = "iconCardPulse 0.8s ease";
+          }
+
+          if (first) {
+            iconEl.className = `ph-light ${scene.icon} hero-main-icon-el`;
+            setTimeout(() => drawLine(idx), 420);
+            return;
+          }
+
+          // ─── FASE EXIT ──────────────────────────────────────────
+          // 1. Hentikan animation apapun yang sedang berjalan
+          iconEl.style.animation = "none";
+          iconEl.classList.remove("icon-entering"); // pastikan bersih
+          void iconEl.offsetWidth; // commit state "no animation"
+
+          // 2. Trigger exit via transition (bukan animation)
+          iconEl.classList.add("icon-exiting");
+          svgEl.innerHTML = "";
+
+          // ─── FASE ENTER ─────────────────────────────────────────
+          setTimeout(() => {
+            // 3. Ganti icon, lepas semua class state
+            iconEl.style.animation = "none";
+            iconEl.classList.remove("icon-exiting", "icon-entering");
+            iconEl.className = `ph-light ${scene.icon} hero-main-icon-el`;
+
+            // 4. KRITIS: reflow untuk reset engine animasi browser
+            void iconEl.offsetWidth;
+
+            // 5. Lepas override inline, baru tambah class entering
+            iconEl.style.animation = "";
+            iconEl.classList.add("icon-entering");
+
+            // 6. Hapus class entering setelah selesai agar cycle berikutnya bisa restart
+            setTimeout(() => {
+              iconEl.classList.remove("icon-entering");
+            }, 580); // sedikit lebih lama dari durasi animasi (550ms)
+
+            setTimeout(() => drawLine(idx), 300);
+          }, 350);
+        }
+
+        setHeroScene(0, true);
+
+        const heroTimer = setInterval(() => {
+          heroIdx = (heroIdx + 1) % SCENES.length;
+          setHeroScene(heroIdx);
+        }, HOLD);
+        activeIntervals.push(heroTimer);
+
+        window.addEventListener("resize", () => drawLine(heroIdx));
+      }
+
       // ── Hero floating particles ──────────────────
       const pWrap = document.getElementById("hero-particles");
       if (pWrap) {
@@ -241,73 +531,198 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // ── Testimonial Carousel ──────────────────────────────────────────────
-      const track = document.getElementById("testimonial-track");
-      const prevBtn = document.getElementById("prev-testimonial");
-      const nextBtn = document.getElementById("next-testimonial");
-      const tdots = document.querySelectorAll(".dot-btn");
+      const tmcViewport = document.getElementById('testimonial-viewport');
+      const tmcTrack = document.getElementById('testimonial-track');
+      const tmcPrev = document.getElementById('prev-testimonial');
+      const tmcNext = document.getElementById('next-testimonial');
+      const tmcDots = document.querySelectorAll('#testimonial-dots .tmc-dot');
+      const tmcSlides = tmcTrack ? tmcTrack.querySelectorAll('.tmc-slide') : [];
 
-      if (track && prevBtn && nextBtn && tdots.length > 0) {
-        let currentIndex = 0;
-        const slideCount = tdots.length;
-        let autoPlayInterval;
+      if (tmcTrack && tmcViewport && tmcSlides.length > 0) {
+        const SLIDE_COUNT = tmcSlides.length;
+        const AUTO_DELAY = 6000;
+        const SWIPE_THRESHOLD = 40;     // min px to count as intentional swipe
+        const VELOCITY_THRESHOLD = 0.3; // px/ms for momentum-based navigation
 
-        const startAutoPlay = () => {
-          clearInterval(autoPlayInterval);
-          autoPlayInterval = setInterval(() => {
-            goToSlide(currentIndex < slideCount - 1 ? currentIndex + 1 : 0);
-          }, 5000);
-          activeIntervals.push(autoPlayInterval);
-        };
+        let cur = 0;
+        let autoTimer = null;
+        let dragging = false;
+        let dragStartX = 0;
+        let dragStartTime = 0;
+        let dragCurrentX = 0;
+        let dragPrevTranslate = 0;
 
-        const goToSlide = (index) => {
-          currentIndex = index;
-          track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        // ─── Core render ─────────────────────────────────────────────
+        function tmcGo(index, animate = true) {
+          cur = ((index % SLIDE_COUNT) + SLIDE_COUNT) % SLIDE_COUNT;
 
-          tdots.forEach((dot, idx) => {
-            const progressBar = dot.querySelector(".progress-bar");
-            if (progressBar) {
-              progressBar.style.transition = "none";
-              progressBar.style.width = "0%";
-            }
-            if (idx === currentIndex) {
-              dot.classList.replace("w-4", "w-16");
-              dot.classList.replace("bg-border", "bg-primary/20");
-              dot.classList.remove("hover:bg-primary/50");
-              if (progressBar) {
-                void progressBar.offsetWidth;
-                progressBar.style.transition = "width 5000ms linear";
-                progressBar.style.width = "100%";
-              }
-            } else {
-              dot.classList.replace("w-16", "w-4");
-              dot.classList.replace("bg-primary/20", "bg-border");
-              dot.classList.add("hover:bg-primary/50");
-            }
+          // Track position
+          tmcTrack.style.transition = animate
+            ? 'transform 0.7s cubic-bezier(0.25, 1, 0.5, 1)'
+            : 'none';
+          tmcTrack.style.transform = `translateX(${cur * -100}%)`;
+          dragPrevTranslate = cur * -100;
+
+          // Slide states
+          tmcSlides.forEach((s, i) => {
+            s.classList.toggle('is-active', i === cur);
           });
 
-          track.querySelectorAll(".carousel-slide").forEach((slide, idx) => {
-            if (idx === currentIndex) {
-              slide.classList.remove("opacity-50", "scale-95");
-              slide.classList.add("opacity-100", "scale-100");
-            } else {
-              slide.classList.remove("opacity-100", "scale-100");
-              slide.classList.add("opacity-50", "scale-95");
+          // Dot states + progress
+          tmcDots.forEach((dot, i) => {
+            const bar = dot.querySelector('.tmc-dot-progress');
+            if (bar) {
+              bar.style.transition = 'none';
+              bar.style.transform = 'scaleX(0)';
+            }
+            dot.classList.toggle('is-active', i === cur);
+
+            if (i === cur && bar) {
+              // Force reflow then animate
+              void bar.offsetWidth;
+              bar.style.transition = `transform ${AUTO_DELAY}ms linear`;
+              bar.style.transform = 'scaleX(1)';
             }
           });
+        }
 
-          startAutoPlay();
+        // ─── Autoplay ────────────────────────────────────────────────
+        function startAuto() {
+          stopAuto();
+          autoTimer = setInterval(() => tmcGo(cur + 1), AUTO_DELAY);
+          activeIntervals.push(autoTimer);
+        }
+
+        function stopAuto() {
+          if (autoTimer !== null) {
+            clearInterval(autoTimer);
+            // Remove from activeIntervals to prevent pile-up
+            const idx = activeIntervals.indexOf(autoTimer);
+            if (idx !== -1) activeIntervals.splice(idx, 1);
+            autoTimer = null;
+          }
+        }
+
+        function resetAuto() {
+          stopAuto();
+          startAuto();
+        }
+
+        // ─── Pointer helpers ─────────────────────────────────────────
+        function getX(e) {
+          return e.touches ? e.touches[0].clientX : e.clientX;
+        }
+
+        function onDragStart(e) {
+          dragging = true;
+          dragStartX = getX(e);
+          dragStartTime = Date.now();
+          dragCurrentX = dragStartX;
+
+          tmcTrack.style.transition = 'none';
+          tmcViewport.classList.add('is-dragging');
+          stopAuto();
+        }
+
+        function onDragMove(e) {
+          if (!dragging) return;
+          dragCurrentX = getX(e);
+          const dx = dragCurrentX - dragStartX;
+          const pxToPercent = (dx / tmcViewport.offsetWidth) * 100;
+          tmcTrack.style.transform = `translateX(${dragPrevTranslate + pxToPercent}%)`;
+        }
+
+        function onDragEnd() {
+          if (!dragging) return;
+          dragging = false;
+          tmcViewport.classList.remove('is-dragging');
+
+          const dx = dragCurrentX - dragStartX;
+          const dt = Date.now() - dragStartTime;
+          const velocity = Math.abs(dx) / (dt || 1);
+
+          // Determine direction via velocity OR distance threshold
+          if (velocity > VELOCITY_THRESHOLD || Math.abs(dx) > SWIPE_THRESHOLD) {
+            if (dx < 0 && cur < SLIDE_COUNT - 1) {
+              tmcGo(cur + 1);
+            } else if (dx > 0 && cur > 0) {
+              tmcGo(cur - 1);
+            } else {
+              tmcGo(cur); // snap back
+            }
+          } else {
+            tmcGo(cur); // snap back
+          }
+
+          resetAuto();
+        }
+
+        // ─── Bind events ─────────────────────────────────────────────
+        // Touch
+        tmcViewport.addEventListener('touchstart', onDragStart, { passive: true });
+        tmcViewport.addEventListener('touchmove', onDragMove, { passive: true });
+        tmcViewport.addEventListener('touchend', onDragEnd);
+        tmcViewport.addEventListener('touchcancel', onDragEnd);
+
+        // Mouse
+        tmcViewport.addEventListener('mousedown', (e) => {
+          e.preventDefault(); // prevent text selection
+          onDragStart(e);
+        });
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+
+        // Pause autoplay on hover (desktop)
+        tmcViewport.addEventListener('mouseenter', () => {
+          if (!dragging) stopAuto();
+        });
+        tmcViewport.addEventListener('mouseleave', () => {
+          if (!dragging) resetAuto();
+        });
+
+        // Prev / Next buttons
+        if (tmcPrev) {
+          tmcPrev.addEventListener('click', () => {
+            tmcGo(cur > 0 ? cur - 1 : SLIDE_COUNT - 1);
+            resetAuto();
+          });
+        }
+        if (tmcNext) {
+          tmcNext.addEventListener('click', () => {
+            tmcGo(cur < SLIDE_COUNT - 1 ? cur + 1 : 0);
+            resetAuto();
+          });
+        }
+
+        // Dots
+        tmcDots.forEach((dot, i) => {
+          dot.addEventListener('click', () => {
+            tmcGo(i);
+            resetAuto();
+          });
+        });
+
+        // Keyboard navigation (when carousel is in view)
+        const tmcSection = document.getElementById('testimonial-section');
+        const keyHandler = (e) => {
+          if (!tmcSection) return;
+          const rect = tmcSection.getBoundingClientRect();
+          const inView = rect.top < window.innerHeight && rect.bottom > 0;
+          if (!inView) return;
+
+          if (e.key === 'ArrowLeft') {
+            tmcGo(cur > 0 ? cur - 1 : SLIDE_COUNT - 1);
+            resetAuto();
+          } else if (e.key === 'ArrowRight') {
+            tmcGo(cur < SLIDE_COUNT - 1 ? cur + 1 : 0);
+            resetAuto();
+          }
         };
+        document.addEventListener('keydown', keyHandler);
 
-        prevBtn.addEventListener("click", () =>
-          goToSlide(currentIndex > 0 ? currentIndex - 1 : slideCount - 1),
-        );
-        nextBtn.addEventListener("click", () =>
-          goToSlide(currentIndex < slideCount - 1 ? currentIndex + 1 : 0),
-        );
-        tdots.forEach((dot, idx) =>
-          dot.addEventListener("click", () => goToSlide(idx)),
-        );
-        goToSlide(0);
+        // ─── Init ────────────────────────────────────────────────────
+        tmcGo(0, false);
+        startAuto();
       }
 
       // ── 3D Cylinder Carousel (scroll-driven, lerp-smoothed) ──────────────
