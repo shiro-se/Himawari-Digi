@@ -349,9 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
           const x2 = endAbs.x - cRect.left;
           const y2 = endAbs.y - cRect.top;
 
-          const dk = document.documentElement.classList.contains("dark");
-          const col = dk ? "52,211,153" : "22,163,74";
-
           // Orthogonal bend path
           const dx = x2 - x1;
           const bendPad = 20,
@@ -378,8 +375,8 @@ document.addEventListener("DOMContentLoaded", () => {
           svgEl.innerHTML = `
       <defs>
         <linearGradient id="hlg-${uid}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" gradientUnits="userSpaceOnUse">
-          <stop offset="0%"   stop-color="rgba(${col},0.90)"/>
-          <stop offset="100%" stop-color="rgba(${col},0.20)"/>
+          <stop offset="0%"   stop-color="var(--primary)" stop-opacity="0.90"/>
+          <stop offset="100%" stop-color="var(--primary)" stop-opacity="0.20"/>
         </linearGradient>
         <filter id="glow-${uid}" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.5" result="blur"/>
@@ -389,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <!-- Aura glow -->
       <path d="${d}" fill="none"
-        stroke="rgba(${col},0.10)" stroke-width="8"
+        stroke="var(--primary)" stroke-opacity="0.10" stroke-width="8"
         stroke-linecap="round" stroke-linejoin="round"
         style="animation: lineAppear 0.5s ease forwards"/>
 
@@ -401,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
         style="animation: drawPath-${uid} 0.50s cubic-bezier(0.4,0,0.2,1) 0.05s forwards"/>
 
       <!-- Traveling signal dot -->
-      <circle r="4" fill="rgba(${col},0.95)" filter="url(#glow-${uid})">
+      <circle r="4" fill="var(--primary)" fill-opacity="0.95" filter="url(#glow-${uid})">
         <animateMotion dur="1.4s" repeatCount="indefinite" begin="0.35s"
           keySplines=".4 0 .6 1" calcMode="spline">
           <mpath href="#hlp-${uid}"/>
@@ -411,25 +408,25 @@ document.addEventListener("DOMContentLoaded", () => {
       </circle>
 
       <!-- Double pulse ring at stat card -->
-      <circle cx="${x2}" cy="${y2}" r="7" fill="rgba(${col},0.08)">
+      <circle cx="${x2}" cy="${y2}" r="7" fill="var(--primary)" fill-opacity="0.08">
         <animate attributeName="r"       values="7;16;7"      dur="1.9s" repeatCount="indefinite"/>
         <animate attributeName="opacity" values="0.12;0;0.12" dur="1.9s" repeatCount="indefinite"/>
       </circle>
-      <circle cx="${x2}" cy="${y2}" r="11" fill="rgba(${col},0.04)">
+      <circle cx="${x2}" cy="${y2}" r="11" fill="var(--primary)" fill-opacity="0.04">
         <animate attributeName="r"       values="11;24;11"    dur="1.9s" repeatCount="indefinite" begin="0.65s"/>
         <animate attributeName="opacity" values="0.08;0;0.08" dur="1.9s" repeatCount="indefinite" begin="0.65s"/>
       </circle>
 
       <!-- Endpoint dot -->
       <circle cx="${x2}" cy="${y2}" r="4.5"
-        fill="rgba(${col},0.85)"
+        fill="var(--primary)" fill-opacity="0.85"
         stroke="rgba(255,255,255,0.55)" stroke-width="1.5"
         filter="url(#glow-${uid})"
         style="animation: lineAppear 0.3s ease 0.3s both"/>
 
       <!-- Startpoint dot -->
       <circle cx="${x1}" cy="${y1}" r="2.5"
-        fill="rgba(${col},0.50)"
+        fill="var(--primary)" fill-opacity="0.50"
         style="animation: lineAppear 0.3s ease 0.05s both"/>
     `;
         }
