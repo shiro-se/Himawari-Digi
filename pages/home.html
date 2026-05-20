@@ -44,7 +44,7 @@
                             text-foreground dark:text-white mb-6 leading-[1.1] flex flex-col gap-2">
 
                         <span class="block overflow-hidden p-1 -m-1">
-                            <span class="block hero-text-reveal delay-100">We Build</span>
+                            <span class="block hero-text-reveal delay-100" data-i18n="home_hero_build">We Build</span>
                         </span>
 
                         <span class="block overflow-hidden p-1 -m-1">
@@ -61,8 +61,8 @@
 
                     <div class="mb-10 max-w-lg overflow-hidden p-1 -m-1">
                         <p class="hero-text-reveal delay-300 text-lg text-muted-foreground leading-relaxed">
-                            End-to-end software house based in Indonesia. We design, develop,
-                            and scale custom web and mobile applications for modern businesses.
+                            <span data-i18n="home_hero_desc">End-to-end software house based in Indonesia. We design, develop,
+                            and scale custom web and mobile applications for modern businesses.</span>
                         </p>
                     </div>
 
@@ -73,14 +73,14 @@
                                     rounded-2xl hover:scale-105 hover:shadow-[0_8px_28px_rgba(34,197,94,0.4)]
                                     transition-all duration-300 shadow-[0_4px_20px_rgba(22,163,74,0.3)]
                                     whitespace-nowrap">
-                                Start Your Project
+                                <span data-i18n="home_hero_btn_1">Start Your Project</span>
                             </a>
                             <a href="/services" data-link
                             class="px-8 py-4 bg-white/70 dark:bg-white/5 text-foreground font-semibold
                                     rounded-2xl border border-border hover:border-primary/50
                                     hover:bg-muted backdrop-blur-sm transition-all duration-300
                                     whitespace-nowrap">
-                                Explore Services →
+                                <span data-i18n="home_hero_btn_2">Explore Services →</span>
                             </a>
                         </div>
                     </div>
@@ -113,16 +113,16 @@
                     </div>
 
                     <div id="hsc-0" class="hero-stat-card" style="top:15%;right:0%;animation-delay:0.4s">
-                        <div><p class="hsc-val">50+</p><p class="hsc-lbl">Projects Shipped</p></div>
+                        <div><p class="hsc-val">50+</p><p class="hsc-lbl"><span data-i18n="home_stat_1">Projects Shipped</span></p></div>
                     </div>
                     <div id="hsc-1" class="hero-stat-card" style="top:15%;left:0%;animation-delay:1.2s">
-                        <div><p class="hsc-val">98%</p><p class="hsc-lbl">Happy Clients</p></div>
+                        <div><p class="hsc-val">98%</p><p class="hsc-lbl"><span data-i18n="home_stat_2">Happy Clients</span></p></div>
                     </div>
                     <div id="hsc-2" class="hero-stat-card" style="bottom:10%;right:0%;animation-delay:2.0s">
-                        <div><p class="hsc-val">5 ★</p><p class="hsc-lbl">Avg. Rating</p></div>
+                        <div><p class="hsc-val">5 ★</p><p class="hsc-lbl"><span data-i18n="home_stat_3">Avg. Rating</span></p></div>
                     </div>
                     <div id="hsc-3" class="hero-stat-card" style="bottom:10%;left:0%;animation-delay:0.8s">
-                        <div><p class="hsc-val">3×</p><p class="hsc-lbl">Faster Delivery</p></div>
+                        <div><p class="hsc-val">3×</p><p class="hsc-lbl"><span data-i18n="home_stat_4">Faster Delivery</span></p></div>
                     </div>
                 </div>
             </div>
@@ -136,8 +136,8 @@
 
             <!-- Heading -->
             <div class="section-eyebrow">
-                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-2">What we offer</p>
-                <h2 class="text-2xl sm:text-3xl font-bold" style="font-family:var(--font-sans)">Our Services</h2>
+                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-2" data-i18n="home_services_eyebrow">What we offer</p>
+                <h2 class="text-2xl sm:text-3xl font-bold" style="font-family:var(--font-sans)" data-i18n="home_services_title_2">Our Services</h2>
             </div>
 
             <!-- 3D Stage -->
@@ -155,7 +155,7 @@
                             <div class="c-icon-box">
                                 <i class="ph ph-terminal-window" style="font-size:2.4rem;color:var(--primary,#22c55e)"></i>
                             </div>
-                            <h3 class="c-card-title text-lg font-bold text-white">Programmer Outsourcing</h3>
+                            <h3 class="c-card-title text-lg font-bold text-white" data-i18n="home_services_card_0">Programmer Outsourcing</h3>
                         </div>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
                             <div class="c-icon-box">
                                 <i class="ph ph-device-mobile" style="font-size:2.4rem;color:var(--primary,#22c55e)"></i>
                             </div>
-                            <h3 class="c-card-title text-lg font-bold text-white">Mobile App Development</h3>
+                            <h3 class="c-card-title text-lg font-bold text-white" data-i18n="home_services_card_1">Mobile App Development</h3>
                         </div>
                     </div>
                 </div>
@@ -187,7 +187,7 @@
                             <div class="c-icon-box">
                                 <i class="ph ph-magic-wand" style="font-size:2.4rem;color:var(--primary,#22c55e)"></i>
                             </div>
-                            <h3 class="c-card-title text-lg font-bold text-white">Vibe Coding</h3>
+                            <h3 class="c-card-title text-lg font-bold text-white" data-i18n="home_services_card_2">Vibe Coding</h3>
                         </div>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                             <div class="c-icon-box">
                                 <i class="ph ph-cloud-arrow-up" style="font-size:2.4rem;color:var(--primary,#22c55e)"></i>
                             </div>
-                            <h3 class="c-card-title text-lg font-bold text-white">Cloud &amp; DevOps Solutions</h3>
+                            <h3 class="c-card-title text-lg font-bold text-white" data-i18n="home_services_card_3">Cloud &amp; DevOps Solutions</h3>
                         </div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@
                             <div class="c-icon-box">
                                 <i class="ph ph-pen-nib" style="font-size:2.4rem;color:var(--primary,#22c55e)"></i>
                             </div>
-                            <h3 class="c-card-title text-lg font-bold text-white">UI/UX Design</h3>
+                            <h3 class="c-card-title text-lg font-bold text-white" data-i18n="home_services_card_4">UI/UX Design</h3>
                         </div>
                     </div>
                 </div>
@@ -235,7 +235,7 @@
                             <div class="c-icon-box">
                                 <i class="ph ph-shield-check" style="font-size:2.4rem;color:var(--primary,#22c55e)"></i>
                             </div>
-                            <h3 class="c-card-title text-lg font-bold text-white">Quality Assurance</h3>
+                            <h3 class="c-card-title text-lg font-bold text-white" data-i18n="home_services_card_5">Quality Assurance</h3>
                         </div>
                     </div>
                 </div>
@@ -245,8 +245,8 @@
 
             <!-- Rich info label — always visible, mobile & desktop -->
             <div class="carousel-info" id="cInfo">
-                <h3 class="c-info-name" id="cInfoName">Programmer Outsourcing</h3>
-                <p class="c-info-desc" id="cInfoDesc">Tim developer berpengalaman siap bergabung dengan proyek Anda secara fleksibel.</p>
+                <h3 class="c-info-name" id="cInfoName" data-i18n="home_services_card_0">Programmer Outsourcing</h3>
+                <p class="c-info-desc" id="cInfoDesc" data-i18n="home_services_info_0">Tim developer berpengalaman siap bergabung dengan proyek Anda secara fleksibel.</p>
                 <div class="c-info-tags" id="cInfoTag">
                     <span class="c-tag-pill">Outsourcing</span>
                     <span class="c-tag-pill">Development</span>
@@ -269,7 +269,7 @@
     <!-- Infinite Slides Section -->
     <section class="py-16 overflow-hidden reveal-on-scroll">
         <div class="mb-10 text-center">
-            <p class="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Our Expertise & Stack</p>
+            <p class="text-sm font-semibold text-muted-foreground uppercase tracking-widest" data-i18n="home_expertise_eyebrow">Our Expertise & Stack</p>
         </div>
 
         <!-- Slide 1: Left (Tech Stack) -->
@@ -318,37 +318,37 @@
         <div class="flex animate-scroll-right w-max ml-[-20%]">
             <!-- Half 1 -->
             <div class="flex gap-8 pr-8">
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> UI/UX Design</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> Web Development</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> Mobile Apps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> QA & Testing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> Cloud DevOps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> IT Outsourcing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> Vibe Coding</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> UI/UX Design</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> Web Development</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> Mobile Apps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> QA & Testing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> Cloud DevOps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> IT Outsourcing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> Vibe Coding</div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> <span data-i18n="home_expertise_uiux">UI/UX Design</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> <span data-i18n="home_expertise_web">Web Development</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> <span data-i18n="home_expertise_mobile">Mobile Apps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> <span data-i18n="home_expertise_qa">QA & Testing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> <span data-i18n="home_expertise_cloud">Cloud DevOps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> <span data-i18n="home_expertise_it">IT Outsourcing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> <span data-i18n="home_expertise_vibe">Vibe Coding</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> <span data-i18n="home_expertise_uiux">UI/UX Design</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> <span data-i18n="home_expertise_web">Web Development</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> <span data-i18n="home_expertise_mobile">Mobile Apps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> <span data-i18n="home_expertise_qa">QA & Testing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> <span data-i18n="home_expertise_cloud">Cloud DevOps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> <span data-i18n="home_expertise_it">IT Outsourcing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> <span data-i18n="home_expertise_vibe">Vibe Coding</span></div>
             </div>
             <!-- Half 2 -->
             <div class="flex gap-8 pr-8" aria-hidden="true">
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> UI/UX Design</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> Web Development</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> Mobile Apps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> QA & Testing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> Cloud DevOps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> IT Outsourcing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> Vibe Coding</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> UI/UX Design</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> Web Development</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> Mobile Apps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> QA & Testing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> Cloud DevOps</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> IT Outsourcing</div>
-                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> Vibe Coding</div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> <span data-i18n="home_expertise_uiux">UI/UX Design</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> <span data-i18n="home_expertise_web">Web Development</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> <span data-i18n="home_expertise_mobile">Mobile Apps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> <span data-i18n="home_expertise_qa">QA & Testing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> <span data-i18n="home_expertise_cloud">Cloud DevOps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> <span data-i18n="home_expertise_it">IT Outsourcing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> <span data-i18n="home_expertise_vibe">Vibe Coding</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-pen-nib text-xl"></i> <span data-i18n="home_expertise_uiux">UI/UX Design</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-browser text-xl"></i> <span data-i18n="home_expertise_web">Web Development</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-device-mobile text-xl"></i> <span data-i18n="home_expertise_mobile">Mobile Apps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-bug text-xl"></i> <span data-i18n="home_expertise_qa">QA & Testing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-hard-drives text-xl"></i> <span data-i18n="home_expertise_cloud">Cloud DevOps</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-users-three text-xl"></i> <span data-i18n="home_expertise_it">IT Outsourcing</span></div>
+                <div class="px-8 py-4 bg-transparent border border-border/40 rounded-2xl hover:bg-card flex items-center gap-3 text-lg font-medium hover:border-primary/50 hover:text-primary transition-all hover:scale-105 duration-300 shadow-sm"><i class="ph-bold ph-robot text-xl"></i> <span data-i18n="home_expertise_vibe">Vibe Coding</span></div>
             </div>
         </div>
     </section>
@@ -357,9 +357,9 @@
     <section class="py-24 bg-muted/50 rounded-t-[3rem] border-t border-border">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-16 reveal-on-scroll">
-                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3">What we do</p>
-                <h2 class="text-3xl md:text-5xl font-bold mb-6">Empowering Your Business</h2>
-                <p class="text-lg text-muted-foreground">A comprehensive suite of digital services designed to accelerate your growth and streamline operations.</p>
+                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3" data-i18n="home_preview_eyebrow">What we do</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6" data-i18n="home_preview_title">Empowering Your Business</h2>
+                <p class="text-lg text-muted-foreground" data-i18n="home_preview_desc">A comprehensive suite of digital services designed to accelerate your growth and streamline operations.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -370,9 +370,9 @@
                         <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                             <i class="ph-fill ph-browser"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Web & Mobile Apps</h3>
-                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">High-performance, scalable applications built with React, Next.js, Flutter and modern frameworks.</p>
-                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                        <h3 class="text-xl font-bold mb-3" data-i18n="home_services_web">Web & Mobile Apps</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed" data-i18n="home_preview_web_desc">High-performance, scalable applications built with React, Next.js, Flutter and modern frameworks.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"><span data-i18n="home_preview_learn">Learn more</span> <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
                 </div>
 
@@ -380,15 +380,15 @@
                 <div class="reveal-on-scroll delay-200 group p-8 rounded-3xl bg-card border border-border hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
                     <div class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                     <div class="absolute top-4 right-4 z-20">
-                        <span class="px-3 py-1 bg-linear-to-r from-primary to-chart-2 text-primary-foreground text-[0.65rem] font-bold rounded-full uppercase tracking-wider">Popular</span>
+                        <span class="px-3 py-1 bg-linear-to-r from-primary to-chart-2 text-primary-foreground text-[0.65rem] font-bold rounded-full uppercase tracking-wider" data-i18n="home_preview_popular">Popular</span>
                     </div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                             <i class="ph-fill ph-users-three"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Tech Outsourcing</h3>
-                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Curated tech talents ready to integrate and accelerate your internal team's productivity instantly.</p>
-                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                        <h3 class="text-xl font-bold mb-3" data-i18n="home_services_outsource">Tech Outsourcing</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed" data-i18n="home_preview_outsource_desc">Curated tech talents ready to integrate and accelerate your internal team's productivity instantly.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"><span data-i18n="home_preview_learn">Learn more</span> <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
                 </div>
 
@@ -399,9 +399,9 @@
                         <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                             <i class="ph-fill ph-magic-wand"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Vibe Coding</h3>
-                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Rapid AI-powered prototyping utilizing cutting-edge LLMs to bring ideas to life at lightspeed.</p>
-                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                        <h3 class="text-xl font-bold mb-3" data-i18n="home_services_vibe">Vibe Coding</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed" data-i18n="home_preview_vibe_desc">Rapid AI-powered prototyping utilizing cutting-edge LLMs to bring ideas to life at lightspeed.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"><span data-i18n="home_preview_learn">Learn more</span> <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
                 </div>
 
@@ -412,9 +412,9 @@
                         <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                             <i class="ph-fill ph-cloud-arrow-up"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Cloud & DevOps</h3>
-                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">CI/CD pipelines, container orchestration, and reliable cloud infrastructure on AWS & GCP.</p>
-                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                        <h3 class="text-xl font-bold mb-3" data-i18n="home_services_cloud">Cloud & DevOps</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed" data-i18n="home_preview_cloud_desc">CI/CD pipelines, container orchestration, and reliable cloud infrastructure on AWS & GCP.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"><span data-i18n="home_preview_learn">Learn more</span> <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
                 </div>
 
@@ -425,9 +425,9 @@
                         <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                             <i class="ph-fill ph-pen-nib"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">UI/UX Design</h3>
-                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Beautiful, intuitive interfaces crafted through user research, wireframing, and pixel-perfect design.</p>
-                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                        <h3 class="text-xl font-bold mb-3" data-i18n="home_services_uiux">UI/UX Design</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed" data-i18n="home_preview_uiux_desc">Beautiful, intuitive interfaces crafted through user research, wireframing, and pixel-perfect design.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"><span data-i18n="home_preview_learn">Learn more</span> <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
                 </div>
 
@@ -438,9 +438,9 @@
                         <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
                             <i class="ph-fill ph-shield-check"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Quality Assurance</h3>
-                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed">Comprehensive automated and manual testing to ensure your product is bug-free and production-ready.</p>
-                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all">Learn more <i class="ph-bold ph-arrow-right"></i></a>
+                        <h3 class="text-xl font-bold mb-3" data-i18n="home_services_qa">Quality Assurance</h3>
+                        <p class="text-muted-foreground text-sm mb-6 leading-relaxed" data-i18n="home_preview_qa_desc">Comprehensive automated and manual testing to ensure your product is bug-free and production-ready.</p>
+                        <a href="/services" data-link class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"><span data-i18n="home_preview_learn">Learn more</span> <i class="ph-bold ph-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -454,9 +454,9 @@
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-2xl mx-auto mb-16">
-                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3">What clients say</p>
-                <h2 class="text-3xl md:text-5xl font-bold mb-4">Client Stories</h2>
-                <p class="text-lg text-muted-foreground">Hear what our partners have to say about our collaborations.</p>
+                <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3" data-i18n="home_testimonials_eyebrow">What clients say</p>
+                <h2 class="text-3xl md:text-5xl font-bold mb-4" data-i18n="home_testimonials_title">Client Stories</h2>
+                <p class="text-lg text-muted-foreground" data-i18n="home_testimonials_desc">Hear what our partners have to say about our collaborations.</p>
             </div>
 
             <div class="tmc-carousel" id="testimonial-carousel">
@@ -470,14 +470,14 @@
                                 <div class="tmc-card-glow"></div>
                                 <i class="ph-fill ph-quotes tmc-quote-icon"></i>
                                 <div class="tmc-card-body">
-                                    <p class="tmc-quote-text">"HimawariDigi completely transformed how we operate. Their attention to detail and proactive approach to problem-solving delivered an app that exceeded all our expectations."</p>
+                                    <p class="tmc-quote-text"><span data-i18n="home_testimonials_quote_1">"HimawariDigi completely transformed how we operate. Their attention to detail and proactive approach to problem-solving delivered an app that exceeded all our expectations."</span></p>
                                 </div>
                                 <div class="tmc-card-footer">
                                     <div class="tmc-author">
                                         <div class="tmc-avatar" style="--av-from: #16a34a; --av-to: #34d399;">AR</div>
                                         <div>
-                                            <h4 class="tmc-author-name">Ahmad Ridwan</h4>
-                                            <p class="tmc-author-role">CEO, TechNusantara</p>
+                                            <h4 class="tmc-author-name" data-i18n="home_testimonials_name_1">Ahmad Ridwan</h4>
+                                            <p class="tmc-author-role" data-i18n="home_testimonials_role_1">CEO, TechNusantara</p>
                                         </div>
                                     </div>
                                     <div class="tmc-stars">
@@ -493,14 +493,14 @@
                                 <div class="tmc-card-glow"></div>
                                 <i class="ph-fill ph-quotes tmc-quote-icon"></i>
                                 <div class="tmc-card-body">
-                                    <p class="tmc-quote-text">"The Vibe Coding service is insane. They prototyped our idea in a weekend, and the final production build was flawless. Absolutely top-tier software house."</p>
+                                    <p class="tmc-quote-text"><span data-i18n="home_testimonials_quote_2">"The Vibe Coding service is insane. They prototyped our idea in a weekend, and the final production build was flawless. Absolutely top-tier software house."</span></p>
                                 </div>
                                 <div class="tmc-card-footer">
                                     <div class="tmc-author">
                                         <div class="tmc-avatar" style="--av-from: #3b82f6; --av-to: #22d3ee;">SW</div>
                                         <div>
-                                            <h4 class="tmc-author-name">Sarah Wijaya</h4>
-                                            <p class="tmc-author-role">Founder, EduCepat</p>
+                                            <h4 class="tmc-author-name" data-i18n="home_testimonials_name_2">Sarah Wijaya</h4>
+                                            <p class="tmc-author-role" data-i18n="home_testimonials_role_2">Founder, EduCepat</p>
                                         </div>
                                     </div>
                                     <div class="tmc-stars">
@@ -516,14 +516,14 @@
                                 <div class="tmc-card-glow"></div>
                                 <i class="ph-fill ph-quotes tmc-quote-icon"></i>
                                 <div class="tmc-card-body">
-                                    <p class="tmc-quote-text">"We outsourced our QA to HimawariDigi and the result was an immediate drop in production bugs. They integrated seamlessly with our internal team."</p>
+                                    <p class="tmc-quote-text"><span data-i18n="home_testimonials_quote_3">"We outsourced our QA to HimawariDigi and the result was an immediate drop in production bugs. They integrated seamlessly with our internal team."</span></p>
                                 </div>
                                 <div class="tmc-card-footer">
                                     <div class="tmc-author">
                                         <div class="tmc-avatar" style="--av-from: #f97316; --av-to: #fbbf24;">BS</div>
                                         <div>
-                                            <h4 class="tmc-author-name">Budi Santoso</h4>
-                                            <p class="tmc-author-role">CTO, Finaku</p>
+                                            <h4 class="tmc-author-name" data-i18n="home_testimonials_name_3">Budi Santoso</h4>
+                                            <p class="tmc-author-role" data-i18n="home_testimonials_role_3">CTO, Finaku</p>
                                         </div>
                                     </div>
                                     <div class="tmc-stars">
@@ -598,17 +598,17 @@
                 <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-xs mb-6 uppercase tracking-wider">
-                            <i class="ph-fill ph-star text-xs"></i> Featured Case Study
+                            <i class="ph-fill ph-star text-xs"></i> <span data-i18n="home_case_study">Featured Case Study</span>
                         </div>
-                        <h2 class="text-3xl md:text-5xl font-bold mb-6">Revolutionizing HR with <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2">Pagii</span></h2>
+                        <h2 class="text-3xl md:text-5xl font-bold mb-6" data-i18n="home_case_title">Revolutionizing HR with <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2">Pagii</span></h2>
                         <p class="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
-                            We built a comprehensive digital attendance solution that streamlines HR operations with real-time tracking, facial recognition, and detailed analytics.
+                            <span data-i18n="home_case_desc">We built a comprehensive digital attendance solution that streamlines HR operations with real-time tracking, facial recognition, and detailed analytics.</span>
                         </p>
 
                         <div class="flex flex-wrap gap-6 mb-10">
                             <div>
                                 <p class="text-2xl font-bold text-primary">99.9%</p>
-                                <p class="text-xs text-muted-foreground">Uptime</p>
+                                <p class="text-xs text-muted-foreground"><span data-i18n="home_stat_uptime">Uptime</span></p>
                             </div>
                             <div class="w-px bg-border"></div>
                             <div>

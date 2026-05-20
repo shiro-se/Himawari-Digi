@@ -24,24 +24,36 @@
     <header class="navbar" id="navbar">
       <div class="nav-inner">
         <!-- Logo -->
-        <a href="/" class="nav-logo flex items-baseline gap-1.5 transition-opacity duration-300 hover:opacity-75" data-link>
-          <span class="text-xl md:text-2xl font-black tracking-tighter" style="font-family: 'Outfit', sans-serif;">
-            <span class="text-foreground dark:text-white">HIMAWARI</span><span class="text-primary">DIGI</span>
+        <a
+          href="/"
+          class="nav-logo flex items-baseline gap-1.5 transition-opacity duration-300 hover:opacity-75"
+          data-link
+        >
+          <span
+            class="text-xl md:text-2xl font-black tracking-tighter"
+            style="font-family: 'Outfit', sans-serif"
+          >
+            <span class="text-foreground dark:text-white">HIMAWARI</span
+            ><span class="text-primary">DIGI</span>
           </span>
-          <span class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase" style="font-family: 'Outfit', sans-serif;">CREATIVE</span>
+          <span
+            class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase"
+            style="font-family: 'Outfit', sans-serif"
+            >CREATIVE</span
+          >
         </a>
 
         <!-- Desktop Nav -->
         <ul class="nav-links" id="navLinks">
           <!-- Services (plain link, no dropdown) -->
           <li class="nav-item">
-            <a href="/services" class="nav-link" data-link>Services</a>
+            <a href="/services" class="nav-link" data-link data-i18n="nav_services">Services</a>
           </li>
 
           <!-- Portfolio Dropdown -->
           <li class="nav-item" id="navPortfolio" data-dropdown>
             <button class="nav-link" aria-expanded="false" aria-haspopup="true">
-              Portfolio
+              <span data-i18n="nav_portfolio">Portfolio</span>
               <span class="nav-caret">
                 <i class="ph ph-caret-down" style="font-size: 12px"></i>
               </span>
@@ -50,8 +62,8 @@
               <a href="/portfolio/web" class="dropdown-item" data-link>
                 <div class="di-icon"><i class="ph ph-browser"></i></div>
                 <div class="di-text">
-                  <div class="di-title">Web Projects</div>
-                  <div class="di-desc">
+                  <div class="di-title" data-i18n="nav_portfolio_web">Web Projects</div>
+                  <div class="di-desc" data-i18n="nav_portfolio_web_desc">
                     Solusi web dari landing page hingga SaaS
                   </div>
                 </div>
@@ -59,8 +71,8 @@
               <a href="/portfolio/mobile" class="dropdown-item" data-link>
                 <div class="di-icon"><i class="ph ph-app-window"></i></div>
                 <div class="di-text">
-                  <div class="di-title">Mobile Projects</div>
-                  <div class="di-desc">
+                  <div class="di-title" data-i18n="nav_portfolio_mobile">Mobile Projects</div>
+                  <div class="di-desc" data-i18n="nav_portfolio_mobile_desc">
                     Aplikasi mobile yang telah diluncurkan
                   </div>
                 </div>
@@ -68,28 +80,35 @@
               <a href="/portfolio/case-studies" class="dropdown-item" data-link>
                 <div class="di-icon"><i class="ph ph-chart-line-up"></i></div>
                 <div class="di-text">
-                  <div class="di-title">Case Studies</div>
-                  <div class="di-desc">Studi kasus mendalam proyek pilihan</div>
+                  <div class="di-title" data-i18n="nav_portfolio_cases">Case Studies</div>
+                  <div class="di-desc" data-i18n="nav_portfolio_cases_desc">
+                    Studi kasus mendalam proyek pilihan
+                  </div>
                 </div>
               </a>
             </div>
           </li>
 
           <li class="nav-item">
-            <a href="/about" class="nav-link" data-link>About Us</a>
+            <a href="/about" class="nav-link" data-link data-i18n="nav_about">About Us</a>
           </li>
 
           <li class="nav-item">
-            <a href="/blog" class="nav-link" data-link>Blog</a>
+            <a href="/blog" class="nav-link" data-link data-i18n="nav_blog">Blog</a>
           </li>
 
           <li class="nav-item">
-            <a href="/contact" class="nav-link" data-link>Contact</a>
+            <a href="/contact" class="nav-link" data-link data-i18n="nav_contact">Contact</a>
           </li>
         </ul>
 
         <!-- Right Actions -->
         <div class="nav-right">
+          <!-- Language Toggle -->
+          <button class="btn-ghost" id="langToggle" aria-label="Toggle language">
+            <span class="text-sm font-bold tracking-[0.15em]" id="langText">ID/EN</span>
+          </button>
+
           <!-- Theme Toggle -->
           <button class="btn-ghost" id="themeToggle" aria-label="Toggle theme">
             <i class="ph ph-moon" id="moonIcon"></i>
@@ -98,7 +117,7 @@
 
           <!-- CTA (hidden on mobile) -->
           <a href="/contact" class="btn-cta" data-link>
-            Get Started
+            <span data-i18n="nav_cta">Get Started</span>
             <i class="ph-bold ph-arrow-right cta-arrow"></i>
           </a>
 
@@ -113,59 +132,67 @@
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-house"></i>
         </div>
-        <span class="dock-label">Home</span>
+        <span class="dock-label" data-i18n="nav_home">Home</span>
       </a>
 
       <a href="/services" class="dock-item" data-link id="dock-services">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-stack-plus"></i>
         </div>
-        <span class="dock-label">Services</span>
+        <span class="dock-label" data-i18n="nav_services">Services</span>
       </a>
 
       <a href="/portfolio" class="dock-item" data-link id="dock-portfolio">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-briefcase"></i>
         </div>
-        <span class="dock-label">Portfolio</span>
+        <span class="dock-label" data-i18n="nav_portfolio">Portfolio</span>
       </a>
 
       <a href="/about" class="dock-item" data-link id="dock-about">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-users"></i>
         </div>
-        <span class="dock-label">About</span>
+        <span class="dock-label" data-i18n="nav_about">About</span>
       </a>
 
       <a href="/contact" class="dock-item" data-link id="dock-contact">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-phone"></i>
         </div>
-        <span class="dock-label">Contact</span>
+        <span class="dock-label" data-i18n="nav_contact">Contact</span>
       </a>
     </nav>
 
     <!-- Main Content Container (Dynamic) -->
-    <main
-      id="app-content"
-      class="grow min-h-screen transition-opacity duration-300"
-    ></main>
+    <main id="app-content" class="grow min-h-screen transition-opacity duration-300"></main>
 
     <!-- Footer  -->
     <footer>
       <div class="footer-top">
         <!-- Brand -->
         <div class="footer-brand">
-          <a href="/" class="footer-logo flex items-baseline gap-1.5 transition-opacity duration-300 hover:opacity-75 mb-6" data-link>
-            <span class="text-2xl font-black tracking-tighter" style="font-family: 'Outfit', sans-serif;">
-              <span class="text-foreground dark:text-white">HIMAWARI</span><span class="text-primary">DIGI</span>
+          <a
+            href="/"
+            class="footer-logo flex items-baseline gap-1.5 transition-opacity duration-300 hover:opacity-75 mb-6"
+            data-link
+          >
+            <span
+              class="text-2xl font-black tracking-tighter"
+              style="font-family: 'Outfit', sans-serif"
+            >
+              <span class="text-foreground dark:text-white">HIMAWARI</span
+              ><span class="text-primary">DIGI</span>
             </span>
-            <span class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase" style="font-family: 'Outfit', sans-serif;">CREATIVE</span>
+            <span
+              class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase"
+              style="font-family: 'Outfit', sans-serif"
+              >CREATIVE</span
+            >
           </a>
-          <p class="footer-tagline">
-            Mitra teknologi terpercaya dalam membangun solusi digital yang
-            skalabel. Kami mengubah masalah kompleks menjadi perangkat lunak
-            yang elegan dan berdampak.
+          <p class="footer-tagline" data-i18n="footer_desc">
+            Mitra teknologi terpercaya dalam membangun solusi digital yang skalabel. Kami mengubah
+            masalah kompleks menjadi perangkat lunak yang elegan dan berdampak.
           </p>
           <div class="footer-socials">
             <a href="#" class="social-btn" aria-label="LinkedIn">
@@ -188,7 +215,7 @@
 
         <!-- Services Links -->
         <div class="footer-col">
-          <h4 class="footer-col-title">Services</h4>
+          <h4 class="footer-col-title" data-i18n="footer_services">Services</h4>
           <ul class="footer-links">
             <li>
               <a href="/services/outsourcing" data-link>
@@ -231,22 +258,22 @@
 
         <!-- Company Links -->
         <div class="footer-col">
-          <h4 class="footer-col-title">Company</h4>
+          <h4 class="footer-col-title" data-i18n="footer_company">Company</h4>
           <ul class="footer-links">
             <li>
-              <a href="/about" data-link>
+              <a href="/about" data-link data-i18n="nav_about">
                 <i class="ph ph-arrow-right fl-arrow"></i>
                 About Us
               </a>
             </li>
             <li>
-              <a href="/portfolio" data-link>
+              <a href="/portfolio" data-link data-i18n="nav_portfolio">
                 <i class="ph ph-arrow-right fl-arrow"></i>
                 Portfolio
               </a>
             </li>
             <li>
-              <a href="/blog" data-link>
+              <a href="/blog" data-link data-i18n="nav_blog">
                 <i class="ph ph-arrow-right fl-arrow"></i>
                 Blog & Insights
               </a>
@@ -254,7 +281,7 @@
             <li>
               <a href="/careers" data-link>
                 <i class="ph ph-arrow-right fl-arrow"></i>
-                Careers
+                <span data-i18n="footer_careers">Careers</span>
                 <span
                   style="
                     font-size: 0.65rem;
@@ -268,12 +295,13 @@
                     text-transform: uppercase;
                     margin-left: 4px;
                   "
+                  data-i18n="footer_hiring"
                   >Hiring</span
                 >
               </a>
             </li>
             <li>
-              <a href="/contact" data-link>
+              <a href="/contact" data-link data-i18n="nav_contact">
                 <i class="ph ph-arrow-right fl-arrow"></i>
                 Contact Us
               </a>
@@ -283,7 +311,7 @@
 
         <!-- Newsletter -->
         <div class="footer-col footer-newsletter">
-          <h4 class="footer-col-title">Newsletter</h4>
+          <h4 class="footer-col-title" data-i18n="footer_newsletter">Newsletter</h4>
           <p
             style="
               font-size: 0.825rem;
@@ -291,9 +319,10 @@
               line-height: 1.6;
               margin-bottom: 0.25rem;
             "
+            data-i18n="footer_newsletter_desc"
           >
-            Dapatkan update terbaru tentang teknologi dan insight dari tim kami,
-            langsung di inbox Anda.
+            Dapatkan update terbaru tentang teknologi dan insight dari tim kami, langsung di inbox
+            Anda.
           </p>
           <div class="newsletter-form">
             <div class="newsletter-input-wrap">
@@ -309,19 +338,12 @@
             </div>
             <p class="newsletter-note">
               <i class="ph ph-lock-simple" style="font-size: 13px"></i>
-              Tidak ada spam. Unsubscribe kapan saja.
+              <span data-i18n="footer_subscribe_note">Tidak ada spam. Unsubscribe kapan saja.</span>
             </p>
           </div>
 
           <!-- Location -->
-          <div
-            style="
-              margin-top: 1.5rem;
-              display: flex;
-              align-items: flex-start;
-              gap: 8px;
-            "
-          >
+          <div style="margin-top: 1.5rem; display: flex; align-items: flex-start; gap: 8px">
             <div
               style="
                 width: 32px;
@@ -335,10 +357,7 @@
                 margin-top: 2px;
               "
             >
-              <i
-                class="ph ph-map-pin"
-                style="color: var(--primary); font-size: 16px"
-              ></i>
+              <i class="ph ph-map-pin" style="color: var(--primary); font-size: 16px"></i>
             </div>
             <div>
               <div
@@ -351,13 +370,7 @@
               >
                 Yogyakarta, Indonesia
               </div>
-              <div
-                style="
-                  font-size: 0.7rem;
-                  color: var(--muted-fg);
-                  margin-top: 1px;
-                "
-              >
+              <div style="font-size: 0.7rem; color: var(--muted-fg); margin-top: 1px">
                 WIB (UTC+7) · Remote-first
               </div>
             </div>
@@ -368,8 +381,8 @@
       <!-- Bottom Bar -->
       <div class="footer-bottom">
         <p class="footer-copy">
-          &copy; 2026 <a href="/">HimawariDigi</a>. All rights reserved. Made
-          with
+          &copy; 2026 <a href="/">HimawariDigi</a>.
+          <span data-i18n="footer_rights">All rights reserved.</span> Made with
           <i
             class="ph-fill ph-heart"
             style="color: #ef4444; font-size: 12px; vertical-align: middle"
@@ -383,16 +396,20 @@
         </div>
 
         <div class="footer-legal">
-          <a href="/privacy">Privacy Policy</a>
-          <a href="/terms">Terms of Service</a>
-          <a href="/cookies">Cookies</a>
+          <a href="/privacy" data-i18n="footer_privacy">Privacy Policy</a>
+          <a href="/terms" data-i18n="footer_terms">Terms of Service</a>
+          <a href="/cookies" data-i18n="footer_cookies">Cookies</a>
         </div>
       </div>
     </footer>
 
+    <!-- Floating Chat Button -->
+    <a href="/contact" data-link class="floating-chat-btn">
+      <i class="ph-fill ph-chat-circle-dots text-3xl"></i>
+    </a>
+
     <!-- Vercel Speed Insights -->
     <script type="module" src="./js/speed-insights.js"></script>
-
     <!-- Custom App Script -->
     <script src="./js/app.js"></script>
   </body>

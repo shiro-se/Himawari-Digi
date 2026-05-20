@@ -1,0 +1,18 @@
+{
+  "en": {
+    "portfolio_title": "Our <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">Work</span>",
+    "portfolio_subtitle": "Explore our selected projects showcasing our expertise in web, mobile, and enterprise solutions.",
+    "portfolio_hero_desc": "Discover how we help businesses transform their operations through custom digital solutions.",
+    "portfolio_item1_desc": "A comprehensive digital attendance solution streamlining HR operations with real-time tracking and analytics.",
+    "portfolio_item2_desc": "Telemedicine platform connecting patients with specialized doctors via secure video consultations.",
+    "portfolio_view_btn": "View Case Study"
+  },
+  "id": {
+    "portfolio_title": "Hasil <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">Karya Kami</span>",
+    "portfolio_subtitle": "Intip deretan proyek seru yang udah kami kerjain, mulai dari web, mobile, sampai solusi enterprise.",
+    "portfolio_hero_desc": "Cari tahu gimana cara kami bantu berbagai bisnis buat transformasi pakai solusi digital buatan kami.",
+    "portfolio_item1_desc": "Sistem absensi digital komplit yang bikin kerjaan HR jadi jauh lebih gampang berkat pantauan real-time dan analitik mendetail.",
+    "portfolio_item2_desc": "Platform telemedicine yang ngehubungin pasien sama dokter spesialis lewat konsultasi video yang aman.",
+    "portfolio_view_btn": "Lihat Selengkapnya"
+  }
+}

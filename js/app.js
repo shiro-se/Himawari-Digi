@@ -1,13 +1,78 @@
 document.addEventListener("DOMContentLoaded", () => {
   const appContent = document.getElementById("app-content");
 
+  // --- i18n State & Functions ---
+  window.translations = { en: {}, id: {} };
+  const loadedTranslationFiles = new Set();
+  
+  let currentLang = localStorage.getItem("lang") || "id";
+  const langText = document.getElementById("langText");
+  const langToggleBtn = document.getElementById("langToggle");
+
+  const translateDOM = () => {
+    if (!window.translations) return;
+    const dict = window.translations[currentLang];
+    if (!dict) return;
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[key]) {
+        el.innerHTML = dict[key];
+      }
+    });
+
+    // Translate Placeholders (e.g. for input fields)
+    document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-ph");
+      if (dict[key]) {
+        el.placeholder = dict[key];
+      }
+    });
+  };
+
+  const setLanguage = (lang) => {
+    currentLang = lang;
+    localStorage.setItem("lang", lang);
+    if (langText) langText.textContent = lang.toUpperCase();
+    translateDOM();
+    // Re-render page to re-initialize JS components (like typing animation) with new language
+    if (typeof renderPage === "function") {
+        renderPage(window.location.pathname, true);
+    }
+  };
+
+  if (langToggleBtn) {
+    // Initial UI state
+    if (langText) langText.textContent = currentLang.toUpperCase();
+    
+    langToggleBtn.addEventListener("click", () => {
+      const newLang = currentLang === "id" ? "en" : "id";
+      setLanguage(newLang);
+    });
+  }
+
   let activeIntervals = [];
   let activeScrollListeners = [];
   let activeRafs = [];
 
   const pageCache = {};
 
-  const renderPage = async (pathname) => {
+  const loadTranslationFile = async (name) => {
+    if (loadedTranslationFiles.has(name)) return;
+    try {
+      const res = await fetch(`./js/locales/${name}.json`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.en) Object.assign(window.translations.en, data.en);
+        if (data.id) Object.assign(window.translations.id, data.id);
+        loadedTranslationFiles.add(name);
+      }
+    } catch (e) {
+      console.error(`Failed to load translation: ${name}`, e);
+    }
+  };
+
+  const renderPage = async (pathname, preserveScroll = false) => {
     const route = pathname === "/" ? "home" : pathname.replace("/", "");
     try {
       let htmlContent = "";
@@ -34,13 +99,19 @@ document.addEventListener("DOMContentLoaded", () => {
       appContent.classList.remove("fade-in");
       appContent.style.opacity = "0";
 
-      // Scroll to top with smooth animation before rendering new page
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Scroll to top with smooth animation before rendering new page (only if not language toggle)
+      if (!preserveScroll) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      await loadTranslationFile("common");
+      await loadTranslationFile(route);
 
       setTimeout(() => {
         appContent.innerHTML = htmlContent;
         appContent.style.opacity = "1";
         appContent.classList.add("fade-in");
+        translateDOM(); // Translate newly injected page content
         updateNav(pathname);
         initPageComponents(route);
       }, 200);
@@ -98,6 +169,8 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPage(window.location.pathname);
   });
 
+  // Initial render
+  translateDOM();
   renderPage(window.location.pathname);
 
   // ─── Global UI Components ─────────────────────────────────────────────────
@@ -212,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const typedEl = document.getElementById("hero-typed");
       const typedWrapper = document.getElementById("hero-typed-wrapper");
 
-      const phrases = [
+      let phrases = [
         "Scalable Apps",
         "Loved Products",
         "Smooth UX",
@@ -220,6 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "Durable Systems",
         "Fast UI",
       ];
+      if (window.translations && window.translations[currentLang] && window.translations[currentLang].home_hero_phrases) {
+        phrases = window.translations[currentLang].home_hero_phrases;
+      }
 
       const probe = document.createElement("span");
       Object.assign(probe.style, {
