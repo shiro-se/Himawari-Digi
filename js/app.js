@@ -1,29 +1,29 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const appContent = document.getElementById("app-content");
+document.addEventListener('DOMContentLoaded', () => {
+  const appContent = document.getElementById('app-content');
 
   // --- i18n State & Functions ---
   window.translations = { en: {}, id: {} };
   const loadedTranslationFiles = new Set();
-  
-  let currentLang = localStorage.getItem("lang") || "id";
-  const langText = document.getElementById("langText");
-  const langToggleBtn = document.getElementById("langToggle");
+
+  let currentLang = localStorage.getItem('lang') || 'id';
+  const langText = document.getElementById('langText');
+  const langToggleBtn = document.getElementById('langToggle');
 
   const translateDOM = () => {
     if (!window.translations) return;
     const dict = window.translations[currentLang];
     if (!dict) return;
 
-    document.querySelectorAll("[data-i18n]").forEach((el) => {
-      const key = el.getAttribute("data-i18n");
+    document.querySelectorAll('[data-i18n]').forEach((el) => {
+      const key = el.getAttribute('data-i18n');
       if (dict[key]) {
         el.innerHTML = dict[key];
       }
     });
 
     // Translate Placeholders (e.g. for input fields)
-    document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
-      const key = el.getAttribute("data-i18n-ph");
+    document.querySelectorAll('[data-i18n-ph]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-ph');
       if (dict[key]) {
         el.placeholder = dict[key];
       }
@@ -32,21 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setLanguage = (lang) => {
     currentLang = lang;
-    localStorage.setItem("lang", lang);
+    localStorage.setItem('lang', lang);
     if (langText) langText.textContent = lang.toUpperCase();
     translateDOM();
     // Re-render page to re-initialize JS components (like typing animation) with new language
-    if (typeof renderPage === "function") {
-        renderPage(window.location.pathname, true);
+    if (typeof renderPage === 'function') {
+      renderPage(window.location.pathname, true);
     }
   };
 
   if (langToggleBtn) {
     // Initial UI state
     if (langText) langText.textContent = currentLang.toUpperCase();
-    
-    langToggleBtn.addEventListener("click", () => {
-      const newLang = currentLang === "id" ? "en" : "id";
+
+    langToggleBtn.addEventListener('click', () => {
+      const newLang = currentLang === 'id' ? 'en' : 'id';
       setLanguage(newLang);
     });
   }
@@ -73,14 +73,14 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const renderPage = async (pathname, preserveScroll = false) => {
-    const route = pathname === "/" ? "home" : pathname.replace("/", "");
+    const route = pathname === '/' ? 'home' : pathname.replace('/', '');
     try {
-      let htmlContent = "";
+      let htmlContent = '';
       if (pageCache[route]) {
         htmlContent = pageCache[route];
       } else {
         const response = await fetch(`./pages/${route}.html`);
-        if (!response.ok) throw new Error("Page not found");
+        if (!response.ok) throw new Error('Page not found');
         htmlContent = await response.text();
         pageCache[route] = htmlContent;
       }
@@ -88,74 +88,74 @@ document.addEventListener("DOMContentLoaded", () => {
       activeIntervals.forEach(clearInterval);
       activeIntervals = [];
 
-      activeScrollListeners.forEach(({ fn }) =>
-        window.removeEventListener("scroll", fn),
-      );
+      activeScrollListeners.forEach(({ fn }) => window.removeEventListener('scroll', fn));
       activeScrollListeners = [];
 
       activeRafs.forEach((id) => cancelAnimationFrame(id));
       activeRafs = [];
 
-      appContent.classList.remove("fade-in");
-      appContent.style.opacity = "0";
+      appContent.classList.remove('fade-in');
+      appContent.style.opacity = '0';
 
       // Scroll to top with smooth animation before rendering new page (only if not language toggle)
       if (!preserveScroll) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      await loadTranslationFile("common");
+      await loadTranslationFile('common');
       await loadTranslationFile(route);
 
       setTimeout(() => {
         appContent.innerHTML = htmlContent;
-        appContent.style.opacity = "1";
-        appContent.classList.add("fade-in");
+        appContent.style.opacity = '1';
+        appContent.classList.add('fade-in');
         translateDOM(); // Translate newly injected page content
         updateNav(pathname);
         initPageComponents(route);
       }, 200);
     } catch (error) {
-      console.error("Error loading page:", error);
-      if (route !== "home") {
-        renderPage("/");
-        history.replaceState(null, null, "/");
+      console.error('Error loading page:', error);
+      if (route !== 'home') {
+        renderPage('/');
+        history.replaceState(null, null, '/');
       }
     }
   };
 
   const updateNav = (pathname) => {
     // ── Desktop nav-links ──────────────────────────────────────────────────
-    document.querySelectorAll(".nav-link[data-link], .mobile-nav-link[data-link]").forEach((link) => {
-      const href = link.getAttribute("href");
-      if (!href) return;
-      const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
-      link.classList.toggle("active", isActive);
-    });
+    document
+      .querySelectorAll('.nav-link[data-link], .mobile-nav-link[data-link]')
+      .forEach((link) => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+        const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
+        link.classList.toggle('active', isActive);
+      });
 
     // ── Portfolio dropdown button: active when any /portfolio/* is open ────
-    const portfolioBtn = document.querySelector("#navPortfolio > .nav-link");
+    const portfolioBtn = document.querySelector('#navPortfolio > .nav-link');
     if (portfolioBtn) {
-      portfolioBtn.classList.toggle("active", pathname.startsWith("/portfolio"));
+      portfolioBtn.classList.toggle('active', pathname.startsWith('/portfolio'));
     }
 
     // ── Bottom Dock active state ───────────────────────────────────────────
-    document.querySelectorAll(".dock-item[data-link]").forEach((item) => {
-      const href = item.getAttribute("href");
+    document.querySelectorAll('.dock-item[data-link]').forEach((item) => {
+      const href = item.getAttribute('href');
       if (!href) return;
       const isActive =
         pathname === href ||
-        (href === "/" && pathname === "/") ||
-        (href !== "/" && pathname.startsWith(href));
-      item.classList.toggle("active", isActive);
+        (href === '/' && pathname === '/') ||
+        (href !== '/' && pathname.startsWith(href));
+      item.classList.toggle('active', isActive);
     });
   };
 
-  document.body.addEventListener("click", (e) => {
-    const link = e.target.closest("[data-link]");
+  document.body.addEventListener('click', (e) => {
+    const link = e.target.closest('[data-link]');
     if (link) {
-      const href = link.getAttribute("href");
-      if (href && href.startsWith("/")) {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('/')) {
         e.preventDefault();
         if (window.location.pathname !== href) {
           history.pushState(null, null, href);
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  window.addEventListener("popstate", () => {
+  window.addEventListener('popstate', () => {
     renderPage(window.location.pathname);
   });
 
@@ -175,86 +175,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ─── Global UI Components ─────────────────────────────────────────────────
 
-  const header = document.querySelector("header");
+  const header = document.querySelector('header');
 
   // ── Scroll: navbar glass effect ───────────────────────────────────────────
   const handleScroll = () => {
-    header.classList.toggle("scrolled", window.scrollY > 20);
+    header.classList.toggle('scrolled', window.scrollY > 20);
   };
-  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
 
   // ── Theme toggle ──────────────────────────────────────────────────────────
-  const themeToggleBtn = document.getElementById("themeToggle");
+  const themeToggleBtn = document.getElementById('themeToggle');
   if (themeToggleBtn) {
     const applyTheme = (dark) => {
-      document.documentElement.classList.toggle("dark", dark);
-      localStorage.theme = dark ? "dark" : "light";
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.theme = dark ? 'dark' : 'light';
     };
 
     const prefersDark =
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
+      localStorage.theme === 'dark' ||
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
     applyTheme(prefersDark);
 
-    themeToggleBtn.addEventListener("click", () => {
-      applyTheme(!document.documentElement.classList.contains("dark"));
+    themeToggleBtn.addEventListener('click', () => {
+      applyTheme(!document.documentElement.classList.contains('dark'));
     });
   }
 
   // ── Desktop dropdown menus ────────────────────────────────────────────────
-  document.querySelectorAll(".nav-item[data-dropdown]").forEach((item) => {
-    const btn = item.querySelector(".nav-link");
-    const dropdown = item.querySelector(".dropdown");
+  document.querySelectorAll('.nav-item[data-dropdown]').forEach((item) => {
+    const btn = item.querySelector('.nav-link');
+    const dropdown = item.querySelector('.dropdown');
     let timer;
 
     const open = () => {
       clearTimeout(timer);
-      item.classList.add("open");
-      btn?.setAttribute("aria-expanded", "true");
+      item.classList.add('open');
+      btn?.setAttribute('aria-expanded', 'true');
     };
     const close = () => {
       timer = setTimeout(() => {
-        item.classList.remove("open");
-        btn?.setAttribute("aria-expanded", "false");
+        item.classList.remove('open');
+        btn?.setAttribute('aria-expanded', 'false');
       }, 120);
     };
 
-    item.addEventListener("mouseenter", open);
-    item.addEventListener("mouseleave", close);
-    btn?.addEventListener("click", () =>
-      item.classList.contains("open") ? close() : open(),
-    );
-    dropdown?.addEventListener("mouseenter", () => clearTimeout(timer));
-    dropdown?.addEventListener("mouseleave", close);
+    item.addEventListener('mouseenter', open);
+    item.addEventListener('mouseleave', close);
+    btn?.addEventListener('click', () => (item.classList.contains('open') ? close() : open()));
+    dropdown?.addEventListener('mouseenter', () => clearTimeout(timer));
+    dropdown?.addEventListener('mouseleave', close);
   });
 
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".nav-item[data-dropdown]")) {
-      document
-        .querySelectorAll(".nav-item.open")
-        .forEach((i) => i.classList.remove("open"));
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.nav-item[data-dropdown]')) {
+      document.querySelectorAll('.nav-item.open').forEach((i) => i.classList.remove('open'));
     }
   });
 
   // ── Mobile sub-menu accordion (desktop dropdown only) ───────────────────
-  document.querySelectorAll("[data-mobile-toggle]").forEach((btn) => {
-    btn.addEventListener("click", () => {
+  document.querySelectorAll('[data-mobile-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
       const sub = document.getElementById(btn.dataset.mobileToggle);
-      const caret = btn.querySelector(".nav-caret");
-      const isOpen = sub?.classList.contains("open");
+      const caret = btn.querySelector('.nav-caret');
+      const isOpen = sub?.classList.contains('open');
 
+      document.querySelectorAll('.mobile-sub').forEach((s) => s.classList.remove('open'));
       document
-        .querySelectorAll(".mobile-sub")
-        .forEach((s) => s.classList.remove("open"));
-      document
-        .querySelectorAll("[data-mobile-toggle] .nav-caret")
-        .forEach((c) => (c.style.transform = ""));
+        .querySelectorAll('[data-mobile-toggle] .nav-caret')
+        .forEach((c) => (c.style.transform = ''));
 
       if (!isOpen && sub) {
-        sub.classList.add("open");
-        if (caret) caret.style.transform = "rotate(180deg)";
+        sub.classList.add('open');
+        if (caret) caret.style.transform = 'rotate(180deg)';
       }
     });
   });
@@ -267,41 +260,47 @@ document.addEventListener("DOMContentLoaded", () => {
       (entries, obs) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("is-revealed");
+            entry.target.classList.add('is-revealed');
             obs.unobserve(entry.target);
           }
         });
       },
-      { root: null, rootMargin: "0px", threshold: 0.15 },
+      { root: null, rootMargin: '0px', threshold: 0.15 }
     );
-    document
-      .querySelectorAll(".reveal-on-scroll")
-      .forEach((el) => observer.observe(el));
+    document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
 
     // ── Home-only components ──────────────────────────────────────────────
 
-    if (route === "home") {
+    if (route === 'home') {
+      if (typeof window.initCardSwap === 'function') {
+        window.initCardSwap();
+      }
+
       // ── Hero Typing Animation ─────────────────────────────────────────────
-      const typedEl = document.getElementById("hero-typed");
-      const typedWrapper = document.getElementById("hero-typed-wrapper");
+      const typedEl = document.getElementById('hero-typed');
+      const typedWrapper = document.getElementById('hero-typed-wrapper');
 
       let phrases = [
-        "Scalable Apps",
-        "Loved Products",
-        "Smooth UX",
-        "AI Features",
-        "Durable Systems",
-        "Fast UI",
+        'Scalable Apps',
+        'Loved Products',
+        'Smooth UX',
+        'AI Features',
+        'Durable Systems',
+        'Fast UI',
       ];
-      if (window.translations && window.translations[currentLang] && window.translations[currentLang].home_hero_phrases) {
+      if (
+        window.translations &&
+        window.translations[currentLang] &&
+        window.translations[currentLang].home_hero_phrases
+      ) {
         phrases = window.translations[currentLang].home_hero_phrases;
       }
 
-      const probe = document.createElement("span");
+      const probe = document.createElement('span');
       Object.assign(probe.style, {
-        visibility: "hidden",
-        position: "absolute",
-        whiteSpace: "nowrap",
+        visibility: 'hidden',
+        position: 'absolute',
+        whiteSpace: 'nowrap',
         font: getComputedStyle(typedEl).font,
       });
       document.body.appendChild(probe);
@@ -310,12 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
         ...phrases.map((p) => {
           probe.textContent = p;
           return probe.offsetWidth;
-        }),
+        })
       );
       document.body.removeChild(probe);
 
-      typedWrapper.style.minWidth = maxWidth + "px";
-      typedWrapper.style.textAlign = "left";
+      typedWrapper.style.minWidth = maxWidth + 'px';
+      typedWrapper.style.textAlign = 'left';
 
       let pIdx = 0,
         cIdx = 0,
@@ -329,9 +328,7 @@ document.addEventListener("DOMContentLoaded", () => {
       function typeLoop() {
         if (!typedEl) return;
         const current = phrases[pIdx];
-        typedEl.textContent = isDeleting
-          ? current.slice(0, --cIdx)
-          : current.slice(0, ++cIdx);
+        typedEl.textContent = isDeleting ? current.slice(0, --cIdx) : current.slice(0, ++cIdx);
 
         let delay = isDeleting ? DELETE_SPEED : TYPE_SPEED;
 
@@ -348,27 +345,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(typeLoop, 600);
 
-      const heroRight = document.getElementById("hero-right");
+      const heroRight = document.getElementById('hero-right');
       if (heroRight) {
         const SCENES = [
-          { icon: "ph-stack-plus", statId: "hsc-0" },
-          { icon: "ph-users-four", statId: "hsc-1" },
-          { icon: "ph-star", statId: "hsc-2" },
-          { icon: "ph-lightning", statId: "hsc-3" },
+          { icon: 'ph-stack-plus', statId: 'hsc-0' },
+          { icon: 'ph-users-four', statId: 'hsc-1' },
+          { icon: 'ph-star', statId: 'hsc-2' },
+          { icon: 'ph-lightning', statId: 'hsc-3' },
         ];
 
         let heroIdx = 0;
         const HOLD = 3200;
 
-        const iconEl = document.getElementById("hero-main-icon");
-        const svgEl = document.getElementById("hero-lines");
-        const iconStage = document.getElementById("hero-icon-stage");
-        const iconCard = document.getElementById("hero-icon-card");
+        const iconEl = document.getElementById('hero-main-icon');
+        const svgEl = document.getElementById('hero-lines');
+        const iconStage = document.getElementById('hero-icon-stage');
+        const iconCard = document.getElementById('hero-icon-card');
         const statEls = SCENES.map((s) => document.getElementById(s.statId));
 
         // Inject dynamic keyframe (drawPath) once
-        const animStyle = document.createElement("style");
-        animStyle.id = "hero-anim-style";
+        const animStyle = document.createElement('style');
+        animStyle.id = 'hero-anim-style';
         document.head.appendChild(animStyle);
 
         function centerOnNearestEdge(fromRect, toRect, pad = 10) {
@@ -406,15 +403,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function drawLine(idx) {
           if (!svgEl) return;
-          svgEl.innerHTML = "";
+          svgEl.innerHTML = '';
 
           const statEl = statEls[idx];
           if (!statEl || !iconStage) return;
 
           const cRect = heroRight.getBoundingClientRect();
           const sRect = statEl.getBoundingClientRect();
-          const iconCardEl =
-            iconStage.querySelector(".hero-icon-card") || iconStage;
+          const iconCardEl = iconStage.querySelector('.hero-icon-card') || iconStage;
           const iRect = iconCardEl.getBoundingClientRect();
 
           const startAbs = centerOnNearestEdge(sRect, iRect, 4);
@@ -435,13 +431,12 @@ document.addEventListener("DOMContentLoaded", () => {
           if (Math.abs(x2 - x1) < bendPad + margin) outX = x1 + dx * 0.5;
 
           const d = `M ${x1} ${y1} L ${outX} ${y1} L ${outX} ${y2} L ${x2} ${y2}`;
-          const totalLen =
-            Math.abs(outX - x1) + Math.abs(y2 - y1) + Math.abs(x2 - outX);
+          const totalLen = Math.abs(outX - x1) + Math.abs(y2 - y1) + Math.abs(x2 - outX);
 
           const uid = `${idx}-${Date.now()}`;
 
           // Update dynamic keyframe
-          document.getElementById("hero-anim-style").textContent = `
+          document.getElementById('hero-anim-style').textContent = `
       @keyframes drawPath-${uid} {
         from { stroke-dashoffset: ${totalLen}; }
         to   { stroke-dashoffset: 0; }
@@ -513,19 +508,19 @@ document.addEventListener("DOMContentLoaded", () => {
           // Aktifkan stat card + flash
           statEls.forEach((el, i) => {
             if (!el) return;
-            el.classList.toggle("hsc-active", i === idx);
+            el.classList.toggle('hsc-active', i === idx);
             if (i === idx) {
-              el.style.animation = "none";
+              el.style.animation = 'none';
               void el.offsetWidth; // reflow
-              el.style.animation = "cardFlash 0.7s ease forwards";
+              el.style.animation = 'cardFlash 0.7s ease forwards';
             }
           });
 
           // Pulse border icon card
           if (iconCard) {
-            iconCard.style.animation = "none";
+            iconCard.style.animation = 'none';
             void iconCard.offsetWidth;
-            iconCard.style.animation = "iconCardPulse 0.8s ease";
+            iconCard.style.animation = 'iconCardPulse 0.8s ease';
           }
 
           if (first) {
@@ -536,31 +531,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // ─── FASE EXIT ──────────────────────────────────────────
           // 1. Hentikan animation apapun yang sedang berjalan
-          iconEl.style.animation = "none";
-          iconEl.classList.remove("icon-entering"); // pastikan bersih
+          iconEl.style.animation = 'none';
+          iconEl.classList.remove('icon-entering'); // pastikan bersih
           void iconEl.offsetWidth; // commit state "no animation"
 
           // 2. Trigger exit via transition (bukan animation)
-          iconEl.classList.add("icon-exiting");
-          svgEl.innerHTML = "";
+          iconEl.classList.add('icon-exiting');
+          svgEl.innerHTML = '';
 
           // ─── FASE ENTER ─────────────────────────────────────────
           setTimeout(() => {
             // 3. Ganti icon, lepas semua class state
-            iconEl.style.animation = "none";
-            iconEl.classList.remove("icon-exiting", "icon-entering");
+            iconEl.style.animation = 'none';
+            iconEl.classList.remove('icon-exiting', 'icon-entering');
             iconEl.className = `ph-light ${scene.icon} hero-main-icon-el`;
 
             // 4. KRITIS: reflow untuk reset engine animasi browser
             void iconEl.offsetWidth;
 
             // 5. Lepas override inline, baru tambah class entering
-            iconEl.style.animation = "";
-            iconEl.classList.add("icon-entering");
+            iconEl.style.animation = '';
+            iconEl.classList.add('icon-entering');
 
             // 6. Hapus class entering setelah selesai agar cycle berikutnya bisa restart
             setTimeout(() => {
-              iconEl.classList.remove("icon-entering");
+              iconEl.classList.remove('icon-entering');
             }, 580); // sedikit lebih lama dari durasi animasi (550ms)
 
             setTimeout(() => drawLine(idx), 300);
@@ -575,27 +570,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }, HOLD);
         activeIntervals.push(heroTimer);
 
-        window.addEventListener("resize", () => drawLine(heroIdx));
+        window.addEventListener('resize', () => drawLine(heroIdx));
       }
 
       // ── Hero floating particles ──────────────────
-      const pWrap = document.getElementById("hero-particles");
+      const pWrap = document.getElementById('hero-particles');
       if (pWrap) {
         const pConfig = [
-          { left: "12%", delay: "0s", dur: "9s" },
-          { left: "25%", delay: "2s", dur: "11s" },
-          { left: "38%", delay: "0.5s", dur: "8s" },
-          { left: "50%", delay: "3.5s", dur: "10s" },
-          { left: "63%", delay: "1.2s", dur: "9s" },
-          { left: "74%", delay: "4s", dur: "12s" },
-          { left: "85%", delay: "1.8s", dur: "8.5s" },
-          { left: "20%", delay: "5s", dur: "10s" },
-          { left: "57%", delay: "6s", dur: "7.5s" },
-          { left: "90%", delay: "2.8s", dur: "11s" },
+          { left: '12%', delay: '0s', dur: '9s' },
+          { left: '25%', delay: '2s', dur: '11s' },
+          { left: '38%', delay: '0.5s', dur: '8s' },
+          { left: '50%', delay: '3.5s', dur: '10s' },
+          { left: '63%', delay: '1.2s', dur: '9s' },
+          { left: '74%', delay: '4s', dur: '12s' },
+          { left: '85%', delay: '1.8s', dur: '8.5s' },
+          { left: '20%', delay: '5s', dur: '10s' },
+          { left: '57%', delay: '6s', dur: '7.5s' },
+          { left: '90%', delay: '2.8s', dur: '11s' },
         ];
         pConfig.forEach((p) => {
-          const el = document.createElement("div");
-          el.className = "hero-particle";
+          const el = document.createElement('div');
+          el.className = 'hero-particle';
           el.style.left = p.left;
           el.style.animationDelay = p.delay;
           el.style.animationDuration = p.dur;
@@ -614,7 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tmcTrack && tmcViewport && tmcSlides.length > 0) {
         const SLIDE_COUNT = tmcSlides.length;
         const AUTO_DELAY = 6000;
-        const SWIPE_THRESHOLD = 40;     // min px to count as intentional swipe
+        const SWIPE_THRESHOLD = 40; // min px to count as intentional swipe
         const VELOCITY_THRESHOLD = 0.3; // px/ms for momentum-based navigation
 
         let cur = 0;
@@ -802,48 +797,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const CARDS = [
         {
-          tags: ["Outsourcing", "Development", "Team"],
-          name: "Programmer Outsourcing",
-          desc: "Tim developer berpengalaman siap bergabung dengan proyek Anda secara fleksibel.",
+          tags: ['Outsourcing', 'Development', 'Team'],
+          name: 'Programmer Outsourcing',
+          desc: 'Tim developer berpengalaman siap bergabung dengan proyek Anda secara fleksibel.',
         },
         {
-          tags: ["iOS", "Android", "Mobile"],
-          name: "Mobile App Development",
-          desc: "Aplikasi iOS & Android yang cepat, elegan, dan siap untuk skala besar.",
+          tags: ['iOS', 'Android', 'Mobile'],
+          name: 'Mobile App Development',
+          desc: 'Aplikasi iOS & Android yang cepat, elegan, dan siap untuk skala besar.',
         },
         {
-          tags: ["AI-Assisted", "Automation"],
-          name: "Vibe Coding",
-          desc: "Pengembangan berbantuan AI untuk hasil yang lebih cepat dan kreatif.",
+          tags: ['AI-Assisted', 'Automation'],
+          name: 'Vibe Coding',
+          desc: 'Pengembangan berbantuan AI untuk hasil yang lebih cepat dan kreatif.',
         },
         {
-          tags: ["Cloud", "CI/CD", "DevOps"],
-          name: "Cloud & DevOps Solutions",
-          desc: "Pipeline CI/CD, orkestrasi container, dan infrastruktur cloud yang andal.",
+          tags: ['Cloud', 'CI/CD', 'DevOps'],
+          name: 'Cloud & DevOps Solutions',
+          desc: 'Pipeline CI/CD, orkestrasi container, dan infrastruktur cloud yang andal.',
         },
         {
-          tags: ["UI Design", "UX Research"],
-          name: "UI/UX Design",
-          desc: "Antarmuka yang indah dan intuitif yang membuat pengguna betah berlama-lama.",
+          tags: ['UI Design', 'UX Research'],
+          name: 'UI/UX Design',
+          desc: 'Antarmuka yang indah dan intuitif yang membuat pengguna betah berlama-lama.',
         },
         {
-          tags: ["Testing", "QA", "Bug-Free"],
-          name: "Quality Assurance",
-          desc: "Pengujian menyeluruh untuk memastikan produk Anda bebas bug dan siap rilis.",
+          tags: ['Testing', 'QA', 'Bug-Free'],
+          name: 'Quality Assurance',
+          desc: 'Pengujian menyeluruh untuk memastikan produk Anda bebas bug dan siap rilis.',
         },
       ];
 
-      const section = document.getElementById("carousel-section");
-      const drum = document.getElementById("cDrum");
-      const infoEl = document.getElementById("cInfo");
-      const infoTag = document.getElementById("cInfoTag");
-      const infoName = document.getElementById("cInfoName");
-      const infoDesc = document.getElementById("cInfoDesc");
-      const hint = document.getElementById("cScrollHint");
+      const section = document.getElementById('carousel-section');
+      const drum = document.getElementById('cDrum');
+      const infoEl = document.getElementById('cInfo');
+      const infoTag = document.getElementById('cInfoTag');
+      const infoName = document.getElementById('cInfoName');
+      const infoDesc = document.getElementById('cInfoDesc');
+      const hint = document.getElementById('cScrollHint');
 
       if (!section || !drum) return;
 
-      const cards = Array.from(drum.querySelectorAll(".c-card"));
+      const cards = Array.from(drum.querySelectorAll('.c-card'));
       const N = cards.length;
 
       const GAP_MULTIPLIER = 1.4;
@@ -890,12 +885,11 @@ document.addEventListener("DOMContentLoaded", () => {
           card.style.transform = `rotateY(${cardAngle}deg) translateZ(${radius}px) scale(${st.scale.toFixed(4)})`;
           card.style.opacity = st.opacity.toFixed(4);
           card.style.zIndex = zIdx;
-          card.style.pointerEvents = isBehind ? "none" : "auto";
-          card.classList.toggle("is-active", isActive);
+          card.style.pointerEvents = isBehind ? 'none' : 'auto';
+          card.classList.toggle('is-active', isActive);
         });
 
-        const activeIdx =
-          Math.round((((angle % 360) + 360) % 360) / stepAngle) % N;
+        const activeIdx = Math.round((((angle % 360) + 360) % 360) / stepAngle) % N;
         updateLabel(activeIdx);
       }
 
@@ -906,8 +900,8 @@ document.addEventListener("DOMContentLoaded", () => {
           lastActiveIdx = clamped;
 
           if (infoEl) {
-            infoEl.style.opacity = "0";
-            infoEl.style.transform = "translateY(6px)";
+            infoEl.style.opacity = '0';
+            infoEl.style.transform = 'translateY(6px)';
           }
 
           setTimeout(() => {
@@ -917,17 +911,17 @@ document.addEventListener("DOMContentLoaded", () => {
             if (infoTag) {
               infoTag.innerHTML = CARDS[clamped].tags
                 .map((t) => `<span class="c-tag-pill">${t}</span>`)
-                .join("");
+                .join('');
             }
 
             if (infoEl) {
-              infoEl.style.opacity = "1";
-              infoEl.style.transform = "translateY(0)";
+              infoEl.style.opacity = '1';
+              infoEl.style.transform = 'translateY(0)';
             }
           }, 180);
         }
 
-        if (hint) hint.style.opacity = clamped === 0 ? "0.45" : "0";
+        if (hint) hint.style.opacity = clamped === 0 ? '0.45' : '0';
       }
 
       function tick() {
@@ -953,17 +947,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       cards.forEach((card) => {
-        card.addEventListener("mousemove", (e) => {
+        card.addEventListener('mousemove', (e) => {
           const r = card.getBoundingClientRect();
-          card.style.setProperty("--mx", `${e.clientX - r.left}px`);
-          card.style.setProperty("--my", `${e.clientY - r.top}px`);
+          card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+          card.style.setProperty('--my', `${e.clientY - r.top}px`);
         });
       });
 
-      window.addEventListener("scroll", onCarouselScroll, { passive: true });
+      window.addEventListener('scroll', onCarouselScroll, { passive: true });
       activeScrollListeners.push({ fn: onCarouselScroll });
 
-      window.addEventListener("resize", () => render(renderedAngle));
+      window.addEventListener('resize', () => render(renderedAngle));
 
       onCarouselScroll();
       renderedAngle = targetAngle;

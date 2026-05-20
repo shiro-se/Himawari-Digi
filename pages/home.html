@@ -463,7 +463,7 @@
                 <!-- Carousel Viewport -->
                 <div class="tmc-viewport" id="testimonial-viewport">
                     <div class="tmc-track" id="testimonial-track">
-                        
+
                         <!-- Slide 1 -->
                         <div class="tmc-slide is-active" data-index="0">
                             <div class="tmc-card">
@@ -591,16 +591,21 @@
     <!-- Featured Project -->
     <section class="py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-card rounded-[3rem] border border-border p-8 md:p-16 overflow-hidden relative shadow-2xl reveal-on-scroll">
-                <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px] z-0"></div>
-                <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-primary/10 rounded-full blur-[80px] z-0"></div>
-                
+            <div class="bg-card rounded-[3rem] border border-border p-8 md:p-16 relative shadow-2xl reveal-on-scroll overflow-hidden">
+                <div class="absolute inset-0 overflow-hidden rounded-[3rem] pointer-events-none z-0">
+                    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
+                    <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-primary/10 rounded-full blur-[80px]"></div>
+                </div>
                 <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium text-xs mb-6 uppercase tracking-wider">
-                            <i class="ph-fill ph-star text-xs"></i> <span data-i18n="home_case_study">Featured Case Study</span>
+                            <i class="ph-fill ph-star text-xs"></i>
+                            <span data-i18n="home_case_study">Featured Case Study</span>
                         </div>
-                        <h2 class="text-3xl md:text-5xl font-bold mb-6" data-i18n="home_case_title">Revolutionizing HR with <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2">Pagii</span></h2>
+                        <h2 class="text-3xl md:text-5xl font-bold mb-6" data-i18n="home_case_title">
+                            Revolutionizing HR with
+                            <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2">Pagii</span>
+                        </h2>
                         <p class="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
                             <span data-i18n="home_case_desc">We built a comprehensive digital attendance solution that streamlines HR operations with real-time tracking, facial recognition, and detailed analytics.</span>
                         </p>
@@ -622,24 +627,97 @@
                             </div>
                         </div>
 
-                        <a href="/portfolio" data-link class="px-8 py-4 bg-foreground text-white dark:bg-primary dark:text-primary-foreground font-medium rounded-2xl hover:scale-105 transition-transform duration-300 shadow-lg inline-flex items-center gap-2">
+                        <a href="/portfolio" data-link
+                            class="px-8 py-4 bg-foreground text-white dark:bg-primary dark:text-primary-foreground font-medium rounded-2xl hover:scale-105 transition-transform duration-300 shadow-lg inline-flex items-center gap-2">
                             View Portfolio <i class="ph-bold ph-arrow-right"></i>
                         </a>
                     </div>
-                    
-                    <div class="relative group">
-                        <div class="absolute inset-0 bg-linear-to-tr from-primary/30 to-transparent rounded-3xl transform rotate-3 group-hover:rotate-6 transition-transform duration-500"></div>
-                        <div class="bg-muted rounded-3xl border border-border aspect-4/3 flex items-center justify-center relative overflow-hidden transform -rotate-2 group-hover:rotate-0 transition-transform duration-500 shadow-lg">
-                            <i class="ph-fill ph-calendar-check text-9xl text-foreground/10 group-hover:scale-110 transition-transform duration-500"></i>
-                            <div class="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-background/80 to-transparent flex items-end p-6 md:p-8">
-                                <div class="w-full bg-card/80 backdrop-blur border border-border rounded-xl p-4 flex items-center justify-between shadow-lg">
-                                    <div>
-                                        <p class="font-bold">Pagii App</p>
-                                        <p class="text-xs text-muted-foreground">Attendance System</p>
-                                    </div>
-                                    <div class="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
-                                        <i class="ph-bold ph-check"></i>
-                                    </div>
+
+                    <div
+                        class="hidden card-swap-container lg:block relative w-full h-[350px] md:h-[450px] mt-8 lg:mt-0 max-w-[400px] lg:max-w-none mx-auto"
+                        style="perspective: 900px; transform-style: preserve-3d;"
+                    >
+                        <!-- Card 1: Pagii -->
+                        <div class="swap-card absolute top-1/2 left-1/2 w-[90%] max-w-[380px] aspect-4/3 rounded-3xl border border-border overflow-hidden shadow-2xl [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden]"
+                            style="background: linear-gradient(145deg, color-mix(in srgb, var(--primary) 8%, var(--card)), var(--card));">
+                            <!-- Stat top-left -->
+                            <div class="absolute top-3 left-4 z-10 flex flex-col gap-0.5">
+                                <span class="text-lg font-black leading-none" style="color: var(--foreground);">99.9%</span>
+                                <span class="text-[0.6rem] font-medium tracking-wide uppercase" style="color: var(--muted-foreground);">Uptime</span>
+                            </div>
+                            <!-- Tag top-right -->
+                            <span class="absolute top-3 right-3 z-10 text-[0.6rem] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full border"
+                                style="color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, transparent); border-color: color-mix(in srgb, var(--primary) 25%, transparent);">
+                                Featured
+                            </span>
+                            <!-- Background icon -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <i class="ph-fill ph-calendar-check text-[5rem]" style="opacity: 0.07; color: var(--foreground);"></i>
+                            </div>
+                            <!-- Footer bar -->
+                            <div class="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between px-4 py-3"
+                                style="background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold leading-tight" style="color: var(--foreground);">Pagii App</span>
+                                    <span class="text-[0.7rem] mt-0.5" style="color: var(--muted-foreground);">Attendance System</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                                    style="background: var(--primary); box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 40%, transparent);">
+                                    <i class="ph-bold ph-check text-sm text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: HealthSync -->
+                        <div class="swap-card absolute top-1/2 left-1/2 w-[90%] max-w-[380px] aspect-4/3 rounded-3xl border border-border overflow-hidden shadow-2xl [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden]"
+                            style="background: linear-gradient(145deg, color-mix(in srgb, var(--secondary) 8%, var(--card)), var(--card));">
+                            <div class="absolute top-3 left-4 z-10 flex flex-col gap-0.5">
+                                <span class="text-lg font-black leading-none" style="color: var(--foreground);">50K+</span>
+                                <span class="text-[0.6rem] font-medium tracking-wide uppercase" style="color: var(--muted-foreground);">Daily Users</span>
+                            </div>
+                            <span class="absolute top-3 right-3 z-10 text-[0.6rem] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full border"
+                                style="color: var(--secondary); background: color-mix(in srgb, var(--secondary) 12%, transparent); border-color: color-mix(in srgb, var(--secondary) 25%, transparent);">
+                                Health
+                            </span>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <i class="ph-fill ph-heartbeat text-[5rem]" style="opacity: 0.07; color: var(--foreground);"></i>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between px-4 py-3"
+                                style="background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold leading-tight" style="color: var(--foreground);">HealthSync</span>
+                                    <span class="text-[0.7rem] mt-0.5" style="color: var(--muted-foreground);">Telemedicine</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                                    style="background: var(--secondary); box-shadow: 0 4px 12px color-mix(in srgb, var(--secondary) 40%, transparent);">
+                                    <i class="ph-bold ph-heart text-sm text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: ShopifyPlus -->
+                        <div class="swap-card absolute top-1/2 left-1/2 w-[90%] max-w-[380px] aspect-4/3 rounded-3xl border border-border overflow-hidden shadow-2xl [transform-style:preserve-3d] [will-change:transform] [backface-visibility:hidden]"
+                            style="background: linear-gradient(145deg, color-mix(in srgb, var(--chart-4) 8%, var(--card)), var(--card));">
+                            <div class="absolute top-3 left-4 z-10 flex flex-col gap-0.5">
+                                <span class="text-lg font-black leading-none" style="color: var(--foreground);">3×</span>
+                                <span class="text-[0.6rem] font-medium tracking-wide uppercase" style="color: var(--muted-foreground);">Faster</span>
+                            </div>
+                            <span class="absolute top-3 right-3 z-10 text-[0.6rem] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full border"
+                                style="color: var(--chart-4); background: color-mix(in srgb, var(--chart-4) 12%, transparent); border-color: color-mix(in srgb, var(--chart-4) 25%, transparent);">
+                                E-Commerce
+                            </span>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <i class="ph-fill ph-shopping-cart text-[5rem]" style="opacity: 0.07; color: var(--foreground);"></i>
+                            </div>
+                            <div class="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between px-4 py-3"
+                                style="background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold leading-tight" style="color: var(--foreground);">ShopifyPlus</span>
+                                    <span class="text-[0.7rem] mt-0.5" style="color: var(--muted-foreground);">E-Commerce</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                                    style="background: var(--chart-4); box-shadow: 0 4px 12px color-mix(in srgb, var(--chart-4) 40%, transparent);">
+                                    <i class="ph-bold ph-storefront text-sm text-white"></i>
                                 </div>
                             </div>
                         </div>
