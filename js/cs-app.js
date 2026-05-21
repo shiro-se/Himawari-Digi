@@ -170,18 +170,30 @@
     const location = await getLocation();
     const now = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
-    // Store OTP in Firebase with 5-minute expiry
-    const otpRef = db.ref('cs-otp').push();
-    currentOtpId = otpRef.key;
-    await otpRef.set({
-      code: otp,
-      csName: name,
-      device: deviceInfo.full,
-      location: location,
-      createdAt: firebase.database.ServerValue.TIMESTAMP,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-      used: false,
-    });
+    try {
+      // Store OTP in Firebase with 5-minute expiry, add 10s timeout
+      const otpRef = db.ref('cs-otp').push();
+      currentOtpId = otpRef.key;
+      
+      const setPromise = otpRef.set({
+        code: otp,
+        csName: name,
+        device: deviceInfo.full,
+        location: location,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        expiresAt: Date.now() + 5 * 60 * 1000,
+        used: false,
+      });
+
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Firebase timeout')), 10000)
+      );
+
+      await Promise.race([setPromise, timeoutPromise]);
+    } catch (e) {
+      console.error('Firebase DB error:', e);
+      return false;
+    }
 
     // Send email via EmailJS
     if (typeof emailjs !== 'undefined' && window.EMAILJS_CONFIG.serviceId !== 'EMAILJS_SERVICE_ID') {
