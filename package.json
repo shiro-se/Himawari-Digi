@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:css",
+    "build": "npm run build:env && npm run build:css",
+    "build:env": "node scripts/build-env.js",
     "build:css": "tailwindcss -i ./css/style.css -o ./css/output.css --minify",
     "watch:css": "tailwindcss -i ./css/style.css -o ./css/output.css --watch"
   },
@@ -17,5 +18,8 @@
     "@vercel/speed-insights": "^2.0.0",
     "gsap": "^3.15.0",
     "tailwindcss": "^4.2.4"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2"
   }
 }
