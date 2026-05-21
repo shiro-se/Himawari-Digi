@@ -215,15 +215,12 @@
     recordChatCreation();
 
     const chatRef = db.ref('chats/' + chatId);
-    chatRef.set({
-      info: {
-        clientName: clientName,
-        clientEmail: clientEmail,
-        status: 'active',
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
-        lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
-        deviceId: deviceId,
-      },
+    chatRef.child('info').set({
+      clientName: clientName,
+      status: 'active',
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
+      deviceId: deviceId,
     });
 
     // Add greeting message from system
