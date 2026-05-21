@@ -465,11 +465,11 @@
           <div class="cs-chat-avatar">${window.chatSanitize(initials)}</div>
           <div class="cs-chat-meta">
             <div class="cs-chat-meta-top">
-              <span class="cs-chat-name" style="display: flex; align-items: center; gap: 0.4rem;">
-                ${window.chatSanitize(item.clientName || 'Unknown')}
-                ${item.unread > 0 ? `<div class="cs-chat-unread" style="display: inline-flex; width: auto; padding: 0 0.4rem;">${item.unread}</div>` : ''}
-              </span>
-              <span class="cs-chat-time">${time}</span>
+              <span class="cs-chat-name">${window.chatSanitize(item.clientName || 'Unknown')}</span>
+              ${item.unread > 0 
+                ? `<div class="cs-chat-unread" style="display: inline-flex; width: auto; padding: 0 0.4rem;">${item.unread}</div>` 
+                : `<span class="cs-chat-time">${time}</span>`
+              }
             </div>
             <div class="cs-chat-preview">${preview}</div>
           </div>

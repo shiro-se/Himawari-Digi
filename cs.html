@@ -444,8 +444,8 @@
         color: var(--foreground);
       }
       .cs-msg--cs .cs-msg-bubble {
-        background: var(--primary);
-        color: var(--primary-foreground);
+        background: var(--secondary);
+        color: var(--secondary-foreground);
         border-bottom-right-radius: 4px;
       }
       .cs-msg-time-container {
@@ -462,7 +462,7 @@
         color: var(--muted-foreground);
       }
       .cs-msg--cs .cs-msg-time {
-        color: color-mix(in srgb, var(--primary-foreground) 80%, transparent);
+        color: color-mix(in srgb, var(--secondary-foreground) 80%, transparent);
       }
       .cs-msg-status {
         font-size: 0.8rem;
@@ -473,6 +473,12 @@
       }
       .cs-msg-status.read {
         color: #60a5fa; /* lighter blue for contrast on primary background */
+      }
+      .cs-msg--cs .cs-msg-status.sent {
+        color: color-mix(in srgb, var(--secondary-foreground) 60%, transparent);
+      }
+      .cs-msg--cs .cs-msg-status.read {
+        color: #ffffff; /* solid white */
       }
 
       /* ── Typing indicator ── */
