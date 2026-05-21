@@ -442,6 +442,14 @@
             <form id="chat-prechat-form" autocomplete="off">
               <!-- Honeypot (anti-bot) -->
               <input type="text" name="hp_field" class="chat-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <div class="chat-form-group">
+                <label for="chat-prechat-name" data-i18n="chat_name_label">Nama kamu</label>
+                <input type="text" id="chat-prechat-name" required minlength="2" maxlength="50" placeholder="John Doe" />
+              </div>
+              <div class="chat-form-group">
+                <label for="chat-prechat-email" data-i18n="chat_email_label">Email kamu</label>
+                <input type="email" id="chat-prechat-email" required placeholder="john@example.com" />
+              </div>
               <div class="chat-form-group" id="chat-challenge-group">
                 <label id="chat-challenge-label"></label>
                 <input type="number" id="chat-challenge-input" required placeholder="Jawaban..." />

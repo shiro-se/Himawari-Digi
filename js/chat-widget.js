@@ -17,6 +17,8 @@
 
   const prechat = document.getElementById('chat-prechat');
   const prechatForm = document.getElementById('chat-prechat-form');
+  const nameInput = document.getElementById('chat-prechat-name');
+  const emailInput = document.getElementById('chat-prechat-email');
   const challengeGroup = document.getElementById('chat-challenge-group');
   const challengeLabel = document.getElementById('chat-challenge-label');
   const challengeInput = document.getElementById('chat-challenge-input');
@@ -143,6 +145,10 @@
     typingEl.style.display = 'none';
     inputArea.style.display = 'none';
 
+    // Restore saved client info
+    if (clientName && nameInput) nameInput.value = clientName;
+    if (clientEmail && emailInput) emailInput.value = clientEmail;
+
     // Start from blank answer
     challengeInput.value = '';
 
@@ -199,11 +205,11 @@
       return;
     }
 
-    if (!clientName) {
-      clientName = 'Guest_' + Math.random().toString(36).substring(2, 6).toUpperCase();
-      localStorage.setItem('hd_client_name', clientName);
-    }
-    clientEmail = ''; // Not collected anymore
+    clientName = window.chatSanitize(nameInput.value.trim());
+    clientEmail = window.chatSanitize(emailInput.value.trim());
+
+    localStorage.setItem('hd_client_name', clientName);
+    localStorage.setItem('hd_client_email', clientEmail);
 
     createChat();
   });
@@ -217,6 +223,7 @@
     const chatRef = db.ref('chats/' + chatId);
     chatRef.child('info').set({
       clientName: clientName,
+      clientEmail: clientEmail,
       status: 'active',
       createdAt: firebase.database.ServerValue.TIMESTAMP,
       lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
