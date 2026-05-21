@@ -213,6 +213,23 @@
         background: color-mix(in srgb, var(--primary) 10%, transparent);
         border-left: 3px solid var(--primary);
       }
+      .cs-chat-avatar-wrapper {
+        position: relative;
+        flex-shrink: 0;
+      }
+      .cs-chat-presence-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid var(--background);
+        background: #22c55e;
+      }
+      .cs-chat-presence-dot.inactive {
+        background: var(--muted-foreground);
+      }
       .cs-chat-avatar {
         width: 2.5rem;
         height: 2.5rem;

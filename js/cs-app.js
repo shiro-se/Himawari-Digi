@@ -473,7 +473,10 @@
 
       html += `
         <div class="cs-chat-item ${isActive ? 'active' : ''}" data-chat-id="${item.id}">
-          <div class="cs-chat-avatar">${window.chatSanitize(initials)}</div>
+          <div class="cs-chat-avatar-wrapper">
+            <div class="cs-chat-avatar">${window.chatSanitize(initials)}</div>
+            <div class="cs-chat-presence-dot ${item.isOnline ? '' : 'inactive'}"></div>
+          </div>
           <div class="cs-chat-meta">
             <div class="cs-chat-meta-top">
               <span class="cs-chat-name">${window.chatSanitize(item.clientName || 'Unknown')}</span>
