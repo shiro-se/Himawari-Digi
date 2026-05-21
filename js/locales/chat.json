@@ -1,0 +1,40 @@
+{
+  "en": {
+    "chat_prechat_title": "Start a conversation",
+    "chat_prechat_desc": "Hi! Fill in the details below to start chatting with our team.",
+    "chat_name_label": "Your name",
+    "chat_email_label": "Your email",
+    "chat_start_btn": "Start Chat",
+    "chat_placeholder": "Type a message...",
+    "chat_typing": "CS is typing",
+    "chat_greeting": "Hi! 👋 How can we help you today?",
+    "chat_greeting_name": "Hi {name}! 👋 How can we help you today?",
+    "chat_offline_title": "We're offline",
+    "chat_offline_desc": "Leave a message and we'll reply ASAP.",
+    "chat_header_title": "HimawariDigi Support",
+    "chat_header_subtitle": "Usually replies in a few minutes",
+    "chat_end_title": "Chat ended",
+    "chat_end_desc": "Thank you for contacting us! Feel free to start a new chat anytime.",
+    "chat_challenge_label": "Security check: What is {a} + {b}?",
+    "chat_new_chat": "New Chat"
+  },
+  "id": {
+    "chat_prechat_title": "Mulai percakapan",
+    "chat_prechat_desc": "Halo! Isi data berikut untuk memulai chat dengan tim kami.",
+    "chat_name_label": "Nama kamu",
+    "chat_email_label": "Email kamu",
+    "chat_start_btn": "Mulai Chat",
+    "chat_placeholder": "Ketik pesan...",
+    "chat_typing": "CS sedang mengetik",
+    "chat_greeting": "Halo! 👋 Ada yang bisa kami bantu hari ini?",
+    "chat_greeting_name": "Halo {name}! 👋 Ada yang bisa kami bantu hari ini?",
+    "chat_offline_title": "Kami sedang offline",
+    "chat_offline_desc": "Tinggalkan pesan dan kami akan segera membalas.",
+    "chat_header_title": "HimawariDigi Support",
+    "chat_header_subtitle": "Biasanya membalas dalam beberapa menit",
+    "chat_end_title": "Chat selesai",
+    "chat_end_desc": "Terima kasih sudah menghubungi kami! Silakan mulai chat baru kapan saja.",
+    "chat_challenge_label": "Keamanan: Berapa {a} + {b}?",
+    "chat_new_chat": "Chat Baru"
+  }
+}

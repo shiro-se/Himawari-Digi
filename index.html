@@ -403,17 +403,112 @@
       </div>
     </footer>
 
-    <!-- Floating Chat Button -->
-    <a href="/contact" data-link class="floating-chat-btn">
-      <i class="ph-fill ph-chat-circle-dots text-3xl"></i>
-    </a>
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- FLOATING CHAT WIDGET                          -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div id="chat-widget">
+      <!-- Chat Window -->
+      <div id="chat-window" class="chat-window chat-window--hidden" aria-hidden="true">
+        <!-- Header -->
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <div class="chat-avatar-wrap">
+              <div class="chat-cs-avatar">
+                <i class="ph-fill ph-headset"></i>
+              </div>
+              <span class="chat-status-dot"></span>
+            </div>
+            <div class="chat-header-text">
+              <h4 class="chat-header-title" data-i18n="chat_header_title">HimawariDigi Support</h4>
+              <p class="chat-header-subtitle" id="chat-subtitle" data-i18n="chat_header_subtitle">Biasanya membalas dalam beberapa menit</p>
+            </div>
+          </div>
+          <button id="chat-minimize" class="chat-action-btn" aria-label="Minimize chat">
+            <i class="ph-bold ph-minus"></i>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="chat-body">
+          <!-- Pre-chat Form -->
+          <div id="chat-prechat" class="chat-prechat">
+            <div class="chat-welcome-card">
+              <div class="chat-welcome-icon">
+                <i class="ph-fill ph-hand-waving"></i>
+              </div>
+              <h3 data-i18n="chat_prechat_title">Mulai percakapan</h3>
+              <p data-i18n="chat_prechat_desc">Halo! Isi data berikut untuk memulai chat dengan tim kami.</p>
+            </div>
+            <form id="chat-prechat-form" autocomplete="off">
+              <!-- Honeypot (anti-bot) -->
+              <input type="text" name="hp_field" class="chat-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <div class="chat-form-group" id="chat-challenge-group">
+                <label id="chat-challenge-label"></label>
+                <input type="number" id="chat-challenge-input" required placeholder="Jawaban..." />
+              </div>
+              <button type="submit" id="chat-prechat-submit" class="chat-start-btn">
+                <span data-i18n="chat_start_btn">Mulai Chat</span>
+                <i class="ph-bold ph-paper-plane-tilt"></i>
+              </button>
+            </form>
+          </div>
+
+          <!-- Messages Area -->
+          <div id="chat-messages" class="chat-messages" style="display: none"></div>
+
+          <!-- Typing Indicator -->
+          <div id="chat-typing" class="chat-typing-wrap" style="display: none">
+            <div class="chat-typing-bubble">
+              <span class="chat-typing-dot"></span>
+              <span class="chat-typing-dot"></span>
+              <span class="chat-typing-dot"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div id="chat-input-area" class="chat-input-area" style="display: none">
+          <div class="chat-input-wrap">
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Ketik pesan..."
+              data-i18n-ph="chat_placeholder"
+              maxlength="500"
+              autocomplete="off"
+            />
+            <button id="chat-send-btn" class="chat-send-btn" aria-label="Send message" disabled>
+              <i class="ph-bold ph-paper-plane-tilt"></i>
+            </button>
+          </div>
+          <div class="chat-input-footer">
+            <i class="ph ph-shield-check"></i>
+            <span>Secured by <strong>HimawariDigi</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Toggle Button -->
+      <button id="chat-toggle" class="floating-chat-btn" aria-label="Toggle live chat">
+        <i class="ph-fill ph-chat-circle-dots" id="chat-icon-open"></i>
+        <i class="ph-bold ph-x" id="chat-icon-close" style="display: none"></i>
+        <span id="chat-unread-badge" class="chat-unread-badge" style="display: none">0</span>
+      </button>
+    </div>
 
     <!-- Vercel Speed Insights -->
     <script type="module" src="./js/speed-insights.js"></script>
-    <!-- GSAP for Animations (Local) -->
+    <!-- GSAP for Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <!-- Firebase + EmailJS Config -->
+    <script src="./js/firebase-config.js"></script>
     <!-- Custom Components -->
     <script src="./js/card-swap.js"></script>
+    <!-- Chat Widget -->
+    <script src="./js/chat-widget.js"></script>
     <!-- Custom App Script -->
     <script src="./js/app.js"></script>
   </body>
