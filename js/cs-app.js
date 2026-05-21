@@ -400,6 +400,9 @@
                 if (id !== selectedChatId || document.hidden) {
                   // Not focused or different chat, notify
                   notifyNewMessage('Pesan dari ' + (chat.info?.clientName || 'Client'), lastMsg.text);
+                } else {
+                  // Focused, just play sound
+                  window.playNotifSound();
                 }
               }
             }

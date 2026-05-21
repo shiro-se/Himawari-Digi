@@ -303,11 +303,11 @@
 
       // Handle message reading/notifications
       if (!isFirstLoad && msg.sender === 'cs') {
+        window.playNotifSound();
         if (!isOpen) {
           unreadCount++;
           unreadBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
           unreadBadge.style.display = 'flex';
-          window.playNotifSound();
         } else if (!msg.read) {
           msgRef.child(msgId).update({ read: true });
         }
