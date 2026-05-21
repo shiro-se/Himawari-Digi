@@ -48,9 +48,9 @@
 
   // ── Rate Limiting ─────────────────────────────────────────────
   const RATE_LIMIT = {
-    maxChatsPerHour: 3,
-    maxMessagesPerMinute: 15,
-    minFormDuration: 3000, // 3 seconds minimum to fill form (anti-bot)
+    maxChatsPerHour: 50,
+    maxMessagesPerMinute: 60,
+    minFormDuration: 1000, // 1 second minimum to fill form (anti-bot)
   };
 
   function checkChatRateLimit() {
