@@ -448,13 +448,32 @@
         color: var(--primary-foreground);
         border-bottom-right-radius: 4px;
       }
+      .cs-msg-time-container {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.2rem;
+      }
+      .cs-msg--cs .cs-msg-time-container {
+        justify-content: flex-end;
+      }
       .cs-msg-time {
         font-size: 0.6rem;
         color: var(--muted-foreground);
-        margin-top: 0.2rem;
-        display: block;
       }
-      .cs-msg--cs .cs-msg-time { text-align: right; }
+      .cs-msg--cs .cs-msg-time {
+        color: color-mix(in srgb, var(--primary-foreground) 80%, transparent);
+      }
+      .cs-msg-status {
+        font-size: 0.8rem;
+        line-height: 1;
+      }
+      .cs-msg-status.sent {
+        color: color-mix(in srgb, var(--primary-foreground) 60%, transparent);
+      }
+      .cs-msg-status.read {
+        color: #60a5fa; /* lighter blue for contrast on primary background */
+      }
 
       /* ── Typing indicator ── */
       .cs-typing-indicator {

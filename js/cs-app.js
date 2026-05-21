@@ -378,15 +378,29 @@
       .equalTo('active')
       .on('value', (snap) => {
         const data = snap.val() || {};
-        const prevChatIds = Object.keys(chatsData);
+        const prevData = chatsData || {};
+        const prevChatIds = Object.keys(prevData);
         chatsData = data;
 
-        // Check for new chats (notification)
-        const newChatIds = Object.keys(data).filter((id) => !prevChatIds.includes(id));
-        if (newChatIds.length > 0 && prevChatIds.length > 0) {
-          newChatIds.forEach((id) => {
+        // Check for new chats or new messages (notification)
+        if (prevChatIds.length > 0) {
+          Object.keys(data).forEach((id) => {
             const chat = data[id];
-            notifyNewChat(chat.info?.clientName || 'Client');
+            const prevChat = prevData[id];
+            
+            if (!prevChat) {
+              // New chat
+              notifyNewMessage('Chat baru dari ' + (chat.info?.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.');
+            } else if (chat.info?.lastMessageAt > (prevChat.info?.lastMessageAt || 0)) {
+              // Existing chat, new message
+              const lastMsg = getLastMessage(chat.messages);
+              if (lastMsg && lastMsg.sender === 'client') {
+                if (id !== selectedChatId || document.hidden) {
+                  // Not focused or different chat, notify
+                  notifyNewMessage('Pesan dari ' + (chat.info?.clientName || 'Client'), lastMsg.text);
+                }
+              }
+            }
           });
         }
 
@@ -437,9 +451,13 @@
         .join('')
         .substring(0, 2);
       const isActive = item.id === selectedChatId;
-      const preview = item.lastMsg
-        ? window.chatSanitize(item.lastMsg.text).substring(0, 40)
-        : 'Chat baru...';
+      
+      let preview = 'Chat baru...';
+      if (item.lastMsg) {
+        const prefix = item.lastMsg.sender === 'cs' ? 'You: ' : `${item.clientName}: `;
+        preview = window.chatSanitize(prefix + item.lastMsg.text).substring(0, 45);
+      }
+      
       const time = item.lastMessageAt ? window.chatRelativeTime(item.lastMessageAt) : '';
 
       html += `
@@ -447,12 +465,14 @@
           <div class="cs-chat-avatar">${window.chatSanitize(initials)}</div>
           <div class="cs-chat-meta">
             <div class="cs-chat-meta-top">
-              <span class="cs-chat-name">${window.chatSanitize(item.clientName || 'Unknown')}</span>
+              <span class="cs-chat-name" style="display: flex; align-items: center; gap: 0.4rem;">
+                ${window.chatSanitize(item.clientName || 'Unknown')}
+                ${item.unread > 0 ? `<div class="cs-chat-unread" style="display: inline-flex; width: auto; padding: 0 0.4rem;">${item.unread}</div>` : ''}
+              </span>
               <span class="cs-chat-time">${time}</span>
             </div>
             <div class="cs-chat-preview">${preview}</div>
           </div>
-          ${item.unread > 0 ? `<div class="cs-chat-unread">${item.unread}</div>` : ''}
         </div>
       `;
     });
@@ -521,7 +541,7 @@
         if (renderedIds.has(msgId)) return;
         renderedIds.add(msgId);
 
-        renderCSMessage(msg);
+        renderCSMessage(msg, msgId);
         scrollCSMessages();
 
         // Mark client messages as read
@@ -529,6 +549,19 @@
           db.ref('chats/' + chatId + '/messages/' + msgId).update({ read: true });
         }
       });
+
+    // Listen for read receipts
+    db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
+      const msg = snap.val();
+      const msgId = snap.key;
+      if (msg.sender === 'cs' && msg.read) {
+        const statusEl = document.getElementById('cs-msg-status-' + msgId);
+        if (statusEl) {
+          statusEl.className = 'cs-msg-status read';
+          statusEl.innerHTML = '<i class="ph-fill ph-checks"></i>';
+        }
+      }
+    });
 
     // Listen for client typing
     db.ref('client-typing/' + chatId).on('value', (snap) => {
@@ -549,7 +582,7 @@
     renderChatList();
   }
 
-  function renderCSMessage(msg) {
+  function renderCSMessage(msg, msgId) {
     const div = document.createElement('div');
     const isClient = msg.sender === 'client';
     const isSystem = msg.sender === 'system';
@@ -563,11 +596,21 @@
         ? (msg.senderName || 'U').substring(0, 2).toUpperCase()
         : (csName || 'CS').substring(0, 2).toUpperCase();
 
+      let statusHtml = '';
+      if (!isClient && msgId) {
+        statusHtml = msg.read
+          ? `<span id="cs-msg-status-${msgId}" class="cs-msg-status read"><i class="ph-fill ph-checks"></i></span>`
+          : `<span id="cs-msg-status-${msgId}" class="cs-msg-status sent"><i class="ph ph-check"></i></span>`;
+      }
+
       div.innerHTML = `
         ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
         <div class="cs-msg-bubble">
           <p>${window.chatSanitize(msg.text)}</p>
-          <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+          <div class="cs-msg-time-container">
+            <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+            ${statusHtml}
+          </div>
         </div>
       `;
     }
@@ -657,12 +700,12 @@
   }
 
   // ── Notifications ─────────────────────────────────────────────
-  function notifyNewChat(clientName) {
+  function notifyNewMessage(title, text) {
     window.playNotifSound();
 
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Chat baru dari ' + clientName, {
-        body: 'Ada chat baru yang membutuhkan respons.',
+      new Notification(title, {
+        body: text,
         icon: '/assets/logo/favicon.png',
       });
     }

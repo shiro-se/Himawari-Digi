@@ -2532,11 +2532,31 @@ footer {
   color: var(--foreground);
   border-bottom-left-radius: 4px;
 }
-.chat-msg-time {
-  display: block;
-  font-size: 0.6rem;
+.chat-msg-time-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
   margin-top: 0.2rem;
+}
+
+.chat-msg-time {
+  font-size: 0.6rem;
   opacity: 0.6;
+}
+
+.chat-msg-status {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.chat-msg-status.sent {
+  color: var(--muted-foreground);
+  opacity: 0.6;
+}
+
+.chat-msg-status.read {
+  color: #3b82f6; /* blue-500 */
 }
 
 /* ── New Chat Button ── */

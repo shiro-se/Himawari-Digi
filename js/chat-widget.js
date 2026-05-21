@@ -121,6 +121,18 @@
     if (chatId) {
       showChatView();
       attachListeners();
+      
+      // Mark existing CS messages as read
+      db.ref('chats/' + chatId + '/messages')
+        .orderByChild('sender')
+        .equalTo('cs')
+        .once('value', (snap) => {
+          snap.forEach((child) => {
+            if (!child.val().read) {
+              child.ref.update({ read: true });
+            }
+          });
+        });
     } else {
       showPrechatView();
     }
@@ -261,23 +273,27 @@
     detachListeners();
 
     // Listen for new messages
-    const msgRef = db.ref('chats/' + chatId + '/messages').orderByChild('timestamp');
-    messagesListener = msgRef.on('child_added', (snap) => {
+    const msgRef = db.ref('chats/' + chatId + '/messages');
+    messagesListener = msgRef.orderByChild('timestamp').on('child_added', (snap) => {
       const msg = snap.val();
       const msgId = snap.key;
 
       if (renderedMessageIds.has(msgId)) return;
       renderedMessageIds.add(msgId);
 
-      renderMessage(msg);
+      renderMessage(msg, msgId);
       scrollToBottom();
 
-      // Notification for CS messages when window is closed
-      if (!isFirstLoad && msg.sender === 'cs' && !isOpen) {
-        unreadCount++;
-        unreadBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-        unreadBadge.style.display = 'flex';
-        window.playNotifSound();
+      // Handle message reading/notifications
+      if (!isFirstLoad && msg.sender === 'cs') {
+        if (!isOpen) {
+          unreadCount++;
+          unreadBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+          unreadBadge.style.display = 'flex';
+          window.playNotifSound();
+        } else if (!msg.read) {
+          msgRef.child(msgId).update({ read: true });
+        }
       }
 
       // Mark first load complete after a brief delay
@@ -285,6 +301,19 @@
         setTimeout(() => {
           isFirstLoad = false;
         }, 500);
+      }
+    });
+
+    // Listen for read receipts
+    db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
+      const msg = snap.val();
+      const msgId = snap.key;
+      if (msg.sender === 'client' && msg.read) {
+        const statusEl = document.getElementById('chat-msg-status-' + msgId);
+        if (statusEl) {
+          statusEl.className = 'chat-msg-status read';
+          statusEl.innerHTML = '<i class="ph-fill ph-checks"></i>';
+        }
       }
     });
 
@@ -320,7 +349,7 @@
   }
 
   // ── Render Message Bubble ─────────────────────────────────────
-  function renderMessage(msg) {
+  function renderMessage(msg, msgId) {
     const div = document.createElement('div');
     const isClient = msg.sender === 'client';
     const isSystem = msg.sender === 'system';
@@ -330,11 +359,22 @@
       div.innerHTML = `<p>${window.chatSanitize(msg.text)}</p>`;
     } else {
       div.className = `chat-msg ${isClient ? 'chat-msg--client' : 'chat-msg--cs'}`;
+      
+      let statusHtml = '';
+      if (isClient && msgId) {
+        statusHtml = msg.read
+          ? `<span id="chat-msg-status-${msgId}" class="chat-msg-status read"><i class="ph-fill ph-checks"></i></span>`
+          : `<span id="chat-msg-status-${msgId}" class="chat-msg-status sent"><i class="ph ph-check"></i></span>`;
+      }
+
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
         <div class="chat-msg-bubble">
           <p>${window.chatSanitize(msg.text)}</p>
-          <span class="chat-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+          <div class="chat-msg-time-container">
+            <span class="chat-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+            ${statusHtml}
+          </div>
         </div>
       `;
     }
