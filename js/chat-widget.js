@@ -139,6 +139,7 @@
 
     // Auto-scroll
     scrollToBottom();
+    updatePresence();
   }
 
   function closeChat() {
@@ -149,7 +150,19 @@
     iconOpen.style.display = 'block';
     iconClose.style.display = 'none';
     toggleBtn.classList.remove('is-active');
+    updatePresence();
   }
+
+  // ── Client Presence ───────────────────────────────────────────
+  function updatePresence() {
+    if (!chatId || !db) return;
+    const isOnline = isOpen && !document.hidden;
+    db.ref('chats/' + chatId + '/info').update({
+      isOnline: isOnline
+    }).catch(() => {});
+  }
+
+  document.addEventListener('visibilitychange', updatePresence);
 
   function showPrechatView() {
     prechat.style.display = 'block';
@@ -271,6 +284,10 @@
     if (!chatId || !db) return;
 
     detachListeners();
+
+    // Setup presence disconnect hook
+    db.ref('chats/' + chatId + '/info').onDisconnect().update({ isOnline: false });
+    updatePresence();
 
     // Listen for new messages
     const msgRef = db.ref('chats/' + chatId + '/messages');

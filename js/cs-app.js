@@ -17,7 +17,9 @@
   let csSession = localStorage.getItem('hd_cs_session') || '';
   let selectedChatId = null;
   let chatsData = {};
-  let chatListeners = {};
+  let activeAddedListener = null;
+  let activeChangedListener = null;
+  let activeTypingListener = null;
   let typingTimeout = null;
   let searchQuery = '';
 
@@ -406,10 +408,16 @@
 
         renderChatList();
 
-        // If selected chat was closed, update view
-        if (selectedChatId && !data[selectedChatId]) {
-          detailStatus.textContent = 'Closed';
-          detailStatus.className = 'cs-detail-status closed';
+        // Update selected chat status
+        if (selectedChatId) {
+          if (!data[selectedChatId]) {
+            detailStatus.textContent = 'Closed';
+            detailStatus.className = 'cs-detail-status closed';
+          } else {
+            const isOnline = data[selectedChatId].info?.isOnline;
+            detailStatus.textContent = isOnline ? 'Active' : 'Inactive';
+            detailStatus.className = 'cs-detail-status ' + (isOnline ? 'active' : 'inactive');
+          }
         }
       });
   }
@@ -505,8 +513,20 @@
     return Object.values(messages).filter((m) => m.sender === 'client' && !m.read).length;
   }
 
+  function detachCurrentChatListeners() {
+    if (selectedChatId) {
+      if (activeAddedListener) db.ref('chats/' + selectedChatId + '/messages').off('child_added', activeAddedListener);
+      if (activeChangedListener) db.ref('chats/' + selectedChatId + '/messages').off('child_changed', activeChangedListener);
+      if (activeTypingListener) db.ref('client-typing/' + selectedChatId).off('value', activeTypingListener);
+      activeAddedListener = null;
+      activeChangedListener = null;
+      activeTypingListener = null;
+    }
+  }
+
   // ── Select Chat ───────────────────────────────────────────────
   function selectChat(chatId) {
+    detachCurrentChatListeners();
     selectedChatId = chatId;
     const chat = chatsData[chatId];
     if (!chat) return;
@@ -514,9 +534,9 @@
     // Update header
     detailName.textContent = chat.info?.clientName || 'Unknown';
     detailEmail.textContent = chat.info?.clientEmail || '';
-    detailStatus.textContent = chat.info?.status === 'active' ? 'Active' : 'Closed';
-    detailStatus.className =
-      'cs-detail-status ' + (chat.info?.status === 'active' ? 'active' : 'closed');
+    const isOnline = chat.info?.isOnline;
+    detailStatus.textContent = isOnline ? 'Active' : 'Inactive';
+    detailStatus.className = 'cs-detail-status ' + (isOnline ? 'active' : 'inactive');
 
     // Show chat view
     detailEmpty.style.display = 'none';
@@ -526,13 +546,8 @@
     messagesEl.innerHTML = '';
     const renderedIds = new Set();
 
-    // Detach old listener
-    if (chatListeners[chatId]) {
-      db.ref('chats/' + chatId + '/messages').off('child_added', chatListeners[chatId]);
-    }
-
     // Listen for messages
-    chatListeners[chatId] = db
+    activeAddedListener = db
       .ref('chats/' + chatId + '/messages')
       .orderByChild('timestamp')
       .on('child_added', (snap) => {
@@ -551,7 +566,7 @@
       });
 
     // Listen for read receipts
-    db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
+    activeChangedListener = db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
       const msg = snap.val();
       const msgId = snap.key;
       if (msg.sender === 'cs' && msg.read) {
@@ -564,7 +579,7 @@
     });
 
     // Listen for client typing
-    db.ref('client-typing/' + chatId).on('value', (snap) => {
+    activeTypingListener = db.ref('client-typing/' + chatId).on('value', (snap) => {
       const data = snap.val();
       if (data && data.isTyping && Date.now() - (data.timestamp || 0) < 5000) {
         clientTypingEl.classList.add('show');
@@ -679,15 +694,8 @@
     });
 
     // Detach listener
-    if (chatListeners[selectedChatId]) {
-      db.ref('chats/' + selectedChatId + '/messages').off(
-        'child_added',
-        chatListeners[selectedChatId]
-      );
-      delete chatListeners[selectedChatId];
-    }
+    detachCurrentChatListeners();
 
-    db.ref('client-typing/' + selectedChatId).off();
     db.ref('cs-typing/' + selectedChatId).remove();
 
     selectedChatId = null;
@@ -729,14 +737,11 @@
     if (chatsListener) {
       db.ref('chats').off('value', chatsListener);
     }
-    Object.keys(chatListeners).forEach((id) => {
-      db.ref('chats/' + id + '/messages').off('child_added', chatListeners[id]);
-    });
+    detachCurrentChatListeners();
 
     clearSession();
     selectedChatId = null;
     chatsData = {};
-    chatListeners = {};
 
     showLogin();
 
