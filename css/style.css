@@ -2144,7 +2144,7 @@ footer {
   position: fixed;
   right: 1rem;
   bottom: 7.5rem;
-  z-index: 50;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2217,7 +2217,7 @@ footer {
 /* ── Chat Window ── */
 .chat-window {
   position: fixed;
-  z-index: 49;
+  z-index: 9998;
   border-radius: 1.25rem;
   overflow: hidden;
   display: flex;
