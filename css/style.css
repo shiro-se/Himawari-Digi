@@ -2222,9 +2222,7 @@ footer {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: color-mix(in srgb, var(--card) 92%, transparent);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--card);
   border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.15),
