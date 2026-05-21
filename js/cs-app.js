@@ -558,7 +558,7 @@
         const statusEl = document.getElementById('cs-msg-status-' + msgId);
         if (statusEl) {
           statusEl.className = 'cs-msg-status read';
-          statusEl.innerHTML = '<i class="ph-fill ph-checks"></i>';
+          statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
         }
       }
     });
@@ -599,7 +599,7 @@
       let statusHtml = '';
       if (!isClient && msgId) {
         statusHtml = msg.read
-          ? `<span id="cs-msg-status-${msgId}" class="cs-msg-status read"><i class="ph-fill ph-checks"></i></span>`
+          ? `<span id="cs-msg-status-${msgId}" class="cs-msg-status read"><i class="ph-bold ph-checks"></i></span>`
           : `<span id="cs-msg-status-${msgId}" class="cs-msg-status sent"><i class="ph ph-check"></i></span>`;
       }
 

@@ -312,7 +312,7 @@
         const statusEl = document.getElementById('chat-msg-status-' + msgId);
         if (statusEl) {
           statusEl.className = 'chat-msg-status read';
-          statusEl.innerHTML = '<i class="ph-fill ph-checks"></i>';
+          statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
         }
       }
     });
@@ -363,7 +363,7 @@
       let statusHtml = '';
       if (isClient && msgId) {
         statusHtml = msg.read
-          ? `<span id="chat-msg-status-${msgId}" class="chat-msg-status read"><i class="ph-fill ph-checks"></i></span>`
+          ? `<span id="chat-msg-status-${msgId}" class="chat-msg-status read"><i class="ph-bold ph-checks"></i></span>`
           : `<span id="chat-msg-status-${msgId}" class="chat-msg-status sent"><i class="ph ph-check"></i></span>`;
       }
 
