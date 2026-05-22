@@ -2261,7 +2261,7 @@ footer {
 @media (min-width: 768px) {
   .chat-window {
     right: 2rem;
-    bottom: 5.5rem;
+    bottom: 6.5rem;
     width: 380px;
     height: 540px;
   }

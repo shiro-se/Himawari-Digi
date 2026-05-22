@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('lang', lang);
     if (langText) langText.textContent = lang.toUpperCase();
     translateDOM();
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
     // Re-render page to re-initialize JS components (like typing animation) with new language
     if (typeof renderPage === 'function') {
       renderPage(window.location.pathname, true);
@@ -103,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       await loadTranslationFile('common');
+      await loadTranslationFile('chat');
       await loadTranslationFile(route);
 
       setTimeout(() => {

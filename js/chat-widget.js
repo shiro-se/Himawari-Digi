@@ -193,6 +193,13 @@
     isOpen ? closeChat() : openChat();
   });
 
+  // Handle dynamic language change
+  window.addEventListener('languageChanged', () => {
+    if (prechat && prechat.style.display !== 'none') {
+      generateChallenge();
+    }
+  });
+
   minimizeBtn.addEventListener('click', () => {
     closeChat();
   });
