@@ -246,6 +246,12 @@
 
     // Anti-bot: challenge check
     if (parseInt(challengeInput.value) !== challengeAnswer) {
+      const lang = localStorage.getItem('lang') || 'id';
+      const errorMsg = lang === 'en' 
+        ? 'Incorrect security answer. Please try again.' 
+        : 'Jawaban keamanan salah. Silakan coba lagi.';
+      if (window.showToast) window.showToast(errorMsg, 'error');
+
       challengeInput.classList.add('shake');
       setTimeout(() => challengeInput.classList.remove('shake'), 500);
       challengeInput.value = '';
