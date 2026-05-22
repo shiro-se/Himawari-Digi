@@ -42,6 +42,8 @@
   let messagesListener = null;
   let typingListener = null;
   let typingTimeout = null;
+  let statusListener = null;
+  let messagesChangedListener = null;
   let renderedMessageIds = new Set();
   let isFirstLoad = true;
 
@@ -195,9 +197,30 @@
 
   // Handle dynamic language change
   window.addEventListener('languageChanged', () => {
+    const lang = localStorage.getItem('lang') || 'id';
+
     if (prechat && prechat.style.display !== 'none') {
       generateChallenge();
     }
+
+    // Update greetings
+    const greetings = document.querySelectorAll('[data-greeting="true"]');
+    const name = localStorage.getItem('hd_client_name') || '';
+    const greetingText = lang === 'en' 
+      ? `Hi ${name}! 👋 How can we help you today?` 
+      : `Halo ${name}! 👋 Ada yang bisa kami bantu hari ini?`;
+    greetings.forEach(el => el.textContent = greetingText);
+
+    // Update end chat message
+    const endChats = document.querySelectorAll('[data-endchat="true"]');
+    const endMsg = lang === 'en'
+      ? '— Chat ended. Thank you for contacting us!<br><span style="font-size:0.6rem;opacity:0.7">This chat will be deleted in the designated time.</span> —'
+      : '— Chat selesai. Terima kasih telah menghubungi kami!<br><span style="font-size:0.6rem;opacity:0.7">Chat akan kami hapus dalam waktu yang ditentukan.</span> —';
+    endChats.forEach(el => el.innerHTML = endMsg);
+
+    // Update new chat button text
+    const newChatBtns = document.querySelectorAll('.chat-new-btn span');
+    newChatBtns.forEach(el => el.textContent = lang === 'en' ? 'New Chat' : 'Chat Baru');
   });
 
   minimizeBtn.addEventListener('click', () => {
@@ -217,7 +240,7 @@
 
     // Anti-bot: time check
     if (Date.now() - formOpenedAt < RATE_LIMIT.minFormDuration) {
-      alert('Mohon tunggu sebentar sebelum mengirim.');
+      if (window.showToast) window.showToast('Mohon tunggu sebentar sebelum mengirim.', 'warning');
       return;
     }
 
@@ -233,7 +256,7 @@
 
     // Rate limit check
     if (!checkChatRateLimit()) {
-      alert('Terlalu banyak chat. Silakan coba lagi nanti.');
+      if (window.showToast) window.showToast('Terlalu banyak chat. Silakan coba lagi nanti.', 'error');
       return;
     }
 
@@ -276,6 +299,7 @@
       text: greetingText,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       read: true,
+      isGreeting: true,
     });
 
     renderedMessageIds.clear();
@@ -329,7 +353,7 @@
     });
 
     // Listen for read receipts
-    db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
+    messagesChangedListener = db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
       const msg = snap.val();
       const msgId = snap.key;
       if (msg.sender === 'client' && msg.read) {
@@ -366,9 +390,17 @@
       db.ref('chats/' + chatId + '/messages').off('child_added', messagesListener);
       messagesListener = null;
     }
+    if (messagesChangedListener && chatId) {
+      db.ref('chats/' + chatId + '/messages').off('child_changed', messagesChangedListener);
+      messagesChangedListener = null;
+    }
     if (typingListener && chatId) {
       db.ref('cs-typing/' + chatId).off('value', typingListener);
       typingListener = null;
+    }
+    if (statusListener && chatId) {
+      db.ref('chats/' + chatId + '/info/status').off('value', statusListener);
+      statusListener = null;
     }
   }
 
@@ -380,7 +412,11 @@
 
     if (isSystem) {
       div.className = 'chat-msg chat-msg--system';
-      div.innerHTML = `<p>${window.chatSanitize(msg.text)}</p>`;
+      if (msg.isGreeting) {
+        div.innerHTML = `<p data-greeting="true">${window.chatSanitize(msg.text)}</p>`;
+      } else {
+        div.innerHTML = `<p>${window.chatSanitize(msg.text)}</p>`;
+      }
     } else {
       div.className = `chat-msg ${isClient ? 'chat-msg--client' : 'chat-msg--cs'}`;
       
@@ -413,7 +449,7 @@
     if (!text || !chatId) return;
 
     if (!checkMessageRateLimit()) {
-      alert('Terlalu banyak pesan. Mohon tunggu sebentar.');
+      if (window.showToast) window.showToast('Terlalu banyak pesan. Mohon tunggu sebentar.', 'error');
       return;
     }
 
@@ -468,16 +504,18 @@
   function handleChatClosed() {
     detachListeners();
 
+    if (inputArea) inputArea.style.display = 'none';
+
     const lang = localStorage.getItem('lang') || 'id';
     const endMsg =
       lang === 'en'
-        ? '— Chat ended. Thank you for contacting us! —'
-        : '— Chat selesai. Terima kasih sudah menghubungi kami! —';
+        ? '— Chat ended. Thank you for contacting us!<br><span style="font-size:0.6rem;opacity:0.7">This chat will be deleted in the designated time.</span> —'
+        : '— Chat selesai. Terima kasih telah menghubungi kami!<br><span style="font-size:0.6rem;opacity:0.7">Chat akan kami hapus dalam waktu yang ditentukan.</span> —';
 
     const div = document.createElement('div');
     div.className = 'chat-msg chat-msg--system chat-msg--end';
     div.innerHTML = `
-      <p>${endMsg}</p>
+      <div data-endchat="true">${endMsg}</div>
       <button id="chat-new-btn" class="chat-new-btn">
         <i class="ph-bold ph-plus"></i>
         <span data-i18n="chat_new_chat">${lang === 'en' ? 'New Chat' : 'Chat Baru'}</span>
@@ -498,7 +536,9 @@
       const newBtn = document.getElementById('chat-new-btn');
       if (newBtn) {
         newBtn.addEventListener('click', () => {
-          renderedMessageIds.clear();
+          if (inputArea) inputArea.style.display = 'flex';
+          localStorage.removeItem('hd_chat_id');
+          chatId = null;
           messagesEl.innerHTML = '';
           showPrechatView();
         });

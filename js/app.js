@@ -5,6 +5,36 @@ document.addEventListener('DOMContentLoaded', () => {
   window.translations = { en: {}, id: {} };
   const loadedTranslationFiles = new Set();
 
+  // --- Toast Component ---
+  window.showToast = (message, type = 'info') => {
+    let container = document.querySelector('.hd-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'hd-toast-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = `hd-toast ${type}`;
+    
+    let icon = 'ph-info';
+    if (type === 'error') icon = 'ph-warning-circle';
+    if (type === 'success') icon = 'ph-check-circle';
+    if (type === 'warning') icon = 'ph-warning';
+
+    const text = typeof window.chatSanitize === 'function' ? window.chatSanitize(message) : message;
+    toast.innerHTML = `<i class="ph-fill ${icon}"></i> <span>${text}</span>`;
+    container.appendChild(toast);
+    
+    // Trigger reflow for animation
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  };
+
   let currentLang = localStorage.getItem('lang') || 'id';
   const langText = document.getElementById('langText');
   const langToggleBtn = document.getElementById('langToggle');

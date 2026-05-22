@@ -2740,6 +2740,43 @@ footer {
   animation: chatShake 0.4s ease;
 }
 
+/* ── Global Toast Notification ── */
+.hd-toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.hd-toast {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  pointer-events: auto;
+}
+.hd-toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+.hd-toast.info i { color: #3b82f6; }
+.hd-toast.error i { color: #ef4444; }
+.hd-toast.success i { color: #22c55e; }
+.hd-toast.warning i { color: #f59e0b; }
+
 /* ── Mobile: hide floating button when chat is open ── */
 @media (max-width: 767px) {
   .chat-window--visible ~ .floating-chat-btn {
