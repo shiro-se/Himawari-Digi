@@ -392,14 +392,14 @@
             
             if (!prevChat) {
               // New chat
-              notifyNewMessage('Chat baru dari ' + (chat.info?.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.');
+              notifyNewMessage('Chat baru dari ' + (chat.info?.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', id);
             } else if (chat.info?.lastMessageAt > (prevChat.info?.lastMessageAt || 0)) {
               // Existing chat, new message
               const lastMsg = getLastMessage(chat.messages);
               if (lastMsg && lastMsg.sender === 'client') {
                 if (id !== selectedChatId || document.hidden) {
                   // Not focused or different chat, notify
-                  notifyNewMessage('Pesan dari ' + (chat.info?.clientName || 'Client'), lastMsg.text);
+                  notifyNewMessage('Pesan dari ' + (chat.info?.clientName || 'Client'), lastMsg.text, id);
                 } else {
                   // Focused, just play sound
                   window.playNotifSound();
@@ -714,7 +714,46 @@
   }
 
   // ── Notifications ─────────────────────────────────────────────
-  function notifyNewMessage(title, text) {
+  let notifHistory = [];
+  let unreadNotifCount = 0;
+
+  function updateNotifUI() {
+    const badge = document.getElementById('cs-notif-badge');
+    const list = document.getElementById('cs-notif-list');
+    
+    if (badge) {
+      if (unreadNotifCount > 0) {
+        badge.style.display = 'inline-block';
+        badge.textContent = unreadNotifCount > 9 ? '9+' : unreadNotifCount;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    if (list) {
+      if (notifHistory.length === 0) {
+        list.innerHTML = '<div class="cs-notif-empty">Belum ada notifikasi</div>';
+      } else {
+        list.innerHTML = notifHistory.map(n => `
+          <div class="cs-notif-item" onclick="const el = document.querySelector('[data-chat-id=\\'${n.chatId}\\']'); if(el) el.click();">
+            <div class="cs-notif-item-title">${window.chatSanitize(n.title)}</div>
+            <div class="cs-notif-item-desc">${window.chatSanitize(n.text)}</div>
+            <div class="cs-notif-item-time">${window.chatRelativeTime(n.time)}</div>
+          </div>
+        `).join('');
+      }
+    }
+  }
+
+  function notifyNewMessage(title, text, chatId) {
+    if (window.showToast) window.showToast(title + ': ' + text, 'info');
+
+    notifHistory.unshift({ title, text, chatId, time: Date.now() });
+    if (notifHistory.length > 20) notifHistory.pop(); // Keep max 20
+
+    unreadNotifCount++;
+    updateNotifUI();
+
     window.playNotifSound();
 
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -723,6 +762,25 @@
         icon: '/assets/logo/favicon.png',
       });
     }
+  }
+
+  // Bind notification toggle
+  const notifToggle = document.getElementById('cs-notif-toggle');
+  const notifDropdown = document.getElementById('cs-notif-dropdown');
+  if (notifToggle && notifDropdown) {
+    notifToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      notifDropdown.classList.toggle('show');
+      if (notifDropdown.classList.contains('show')) {
+        unreadNotifCount = 0;
+        updateNotifUI();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!notifToggle.contains(e.target) && !notifDropdown.contains(e.target)) {
+        notifDropdown.classList.remove('show');
+      }
+    });
   }
 
   // ── Logout ────────────────────────────────────────────────────

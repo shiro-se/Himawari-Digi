@@ -109,15 +109,81 @@
         background: var(--muted);
         color: var(--foreground);
       }
-      .cs-notif-dot {
+      .cs-notif-badge {
         position: absolute;
-        top: 4px;
-        right: 4px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
+        top: 2px;
+        right: 2px;
         background: #ef4444;
+        color: #fff;
+        font-size: 0.6rem;
+        font-weight: bold;
+        padding: 0.1rem 0.35rem;
+        border-radius: 10px;
+        border: 2px solid var(--card);
+        pointer-events: none;
+      }
+      .cs-notif-dropdown {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        width: 320px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
         display: none;
+        flex-direction: column;
+        z-index: 100;
+      }
+      .cs-notif-dropdown.show {
+        display: flex;
+        animation: csFadeIn 0.2s ease;
+      }
+      .cs-notif-dropdown-header {
+        padding: 0.75rem 1rem;
+        font-weight: 700;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.9rem;
+      }
+      .cs-notif-dropdown-list {
+        max-height: 320px;
+        overflow-y: auto;
+      }
+      .cs-notif-empty {
+        padding: 1.5rem;
+        text-align: center;
+        color: var(--muted-foreground);
+        font-size: 0.85rem;
+      }
+      .cs-notif-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .cs-notif-item:last-child { border-bottom: none; }
+      .cs-notif-item:hover { background: var(--muted); }
+      .cs-notif-item-title {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--foreground);
+      }
+      .cs-notif-item-desc {
+        font-size: 0.75rem;
+        color: var(--muted-foreground);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .cs-notif-item-time {
+        font-size: 0.65rem;
+        color: var(--primary);
+        align-self: flex-end;
+        margin-top: 0.25rem;
       }
 
       /* ── Main Layout ── */
@@ -817,10 +883,18 @@
             <div class="cs-topbar-user-avatar" id="cs-topbar-avatar">CS</div>
             <span id="cs-topbar-name">CS Agent</span>
           </div>
-          <button class="cs-topbar-btn" id="cs-notif-toggle" title="Notifikasi">
-            <i class="ph-bold ph-bell"></i>
-            <span class="cs-notif-dot" id="cs-notif-dot"></span>
-          </button>
+          <div class="cs-notif-wrapper" style="position: relative;">
+            <button class="cs-topbar-btn" id="cs-notif-toggle" title="Notifikasi">
+              <i class="ph-bold ph-bell"></i>
+              <span class="cs-notif-badge" id="cs-notif-badge" style="display:none">0</span>
+            </button>
+            <div class="cs-notif-dropdown" id="cs-notif-dropdown">
+              <div class="cs-notif-dropdown-header">Notifikasi</div>
+              <div class="cs-notif-dropdown-list" id="cs-notif-list">
+                <div class="cs-notif-empty">Belum ada notifikasi</div>
+              </div>
+            </div>
+          </div>
           <button class="cs-topbar-btn" id="cs-theme-toggle" title="Toggle tema">
             <i class="ph ph-moon" id="cs-theme-moon"></i>
             <i class="ph ph-sun" id="cs-theme-sun" style="display:none"></i>
