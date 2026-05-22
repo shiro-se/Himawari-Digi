@@ -288,17 +288,21 @@
     if (!name) return;
 
     loginSubmit.disabled = true;
-    loginSubmit.innerHTML = '<span class="cs-spinner"></span> Memuat...';
+    loginSubmit.innerHTML = '<span class="cs-spinner"></span> Mengirim kode...';
     showStatus('', '');
 
-    try {
-      // BYPASS OTP FOR TESTING
-      await createSession(name);
-      showDashboard();
-    } catch (err) {
-      showStatus('Gagal login. Coba lagi.', 'error');
+    const sent = await sendOTP(name);
+
+    if (sent) {
+      otpSection.classList.add('show');
+      loginForm.style.display = 'none';
+      otpInput.focus();
+      startResendCooldown();
+      showStatus('Kode dikirim ke tim admin.', 'success');
+    } else {
+      showStatus('Gagal mengirim kode. Coba lagi.', 'error');
       loginSubmit.disabled = false;
-      loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Login as CS';
+      loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
     }
   });
 
