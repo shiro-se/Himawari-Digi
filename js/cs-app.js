@@ -288,21 +288,16 @@
     if (!name) return;
 
     loginSubmit.disabled = true;
-    loginSubmit.innerHTML = '<span class="cs-spinner"></span> Mengirim kode...';
+    loginSubmit.innerHTML = '<span class="cs-spinner"></span> Memuat...';
     showStatus('', '');
 
-    const sent = await sendOTP(name);
-
-    if (sent) {
-      otpSection.classList.add('show');
-      loginForm.style.display = 'none';
-      otpInput.focus();
-      startResendCooldown();
-    } else {
-      showStatus('Gagal mengirim kode. Coba lagi.', 'error');
-      loginSubmit.disabled = false;
-      loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
-    }
+    // BYPASS OTP FOR TESTING
+    await createSession(name);
+    loginView.style.display = 'none';
+    dashboardView.style.display = 'flex';
+    document.getElementById('cs-topbar-name').textContent = csName;
+    document.getElementById('cs-topbar-avatar').textContent = csName.substring(0, 2).toUpperCase();
+    initDashboard();
   });
 
   // OTP input
