@@ -186,7 +186,7 @@
   function showChatView() {
     prechat.style.display = 'none';
     messagesEl.style.display = 'flex';
-    inputArea.style.display = 'flex';
+    inputArea.style.display = 'block';
     chatInput.focus();
   }
 
@@ -548,7 +548,7 @@
           renderedMessageIds.clear();
           isFirstLoad = true;
           unreadCount = 0;
-          if (inputArea) inputArea.style.display = 'flex';
+          if (inputArea) inputArea.style.display = 'block';
           localStorage.removeItem('hd_chat_id');
           chatId = null;
           messagesEl.innerHTML = '';
