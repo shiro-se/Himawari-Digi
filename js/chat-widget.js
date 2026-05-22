@@ -177,7 +177,7 @@
     if (clientEmail && emailInput) emailInput.value = clientEmail;
 
     // Start from blank answer
-    challengeInput.value = '';
+    if (challengeInput) challengeInput.value = '';
 
     generateChallenge();
     formOpenedAt = Date.now();
@@ -186,7 +186,7 @@
   function showChatView() {
     prechat.style.display = 'none';
     messagesEl.style.display = 'flex';
-    inputArea.style.display = 'block';
+    inputArea.style.display = 'flex';
     chatInput.focus();
   }
 
@@ -205,7 +205,7 @@
 
     // Update greetings
     const greetings = document.querySelectorAll('[data-greeting="true"]');
-    const name = localStorage.getItem('hd_client_name') || '';
+    const name = localStorage.getItem('hd_client_name') || 'Guest';
     const greetingText = lang === 'en' 
       ? `Hi ${name}! 👋 How can we help you today?` 
       : `Halo ${name}! 👋 Ada yang bisa kami bantu hari ini?`;
@@ -340,7 +340,7 @@
 
       // Handle message reading/notifications
       if (!isFirstLoad && msg.sender === 'cs') {
-        window.playNotifSound();
+        if (window.playNotifSound) window.playNotifSound();
         if (!isOpen) {
           unreadCount++;
           unreadBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
@@ -384,7 +384,7 @@
     });
 
     // Listen for chat status changes (chat closed by CS)
-    db.ref('chats/' + chatId + '/info/status').on('value', (snap) => {
+    statusListener = db.ref('chats/' + chatId + '/info/status').on('value', (snap) => {
       if (snap.val() === 'closed') {
         handleChatClosed();
       }
@@ -507,7 +507,12 @@
   }
 
   // ── Chat Closed Handler ───────────────────────────────────────
+  let chatClosed = false;
+
   function handleChatClosed() {
+    if (chatClosed) return; // Guard against double invocation
+    chatClosed = true;
+
     detachListeners();
 
     if (inputArea) inputArea.style.display = 'none';
@@ -530,9 +535,6 @@
     messagesEl.appendChild(div);
     scrollToBottom();
 
-    // Hide input area
-    inputArea.style.display = 'none';
-
     // Clear chat ID so next open starts fresh
     localStorage.removeItem('hd_chat_id');
     chatId = null;
@@ -542,6 +544,10 @@
       const newBtn = document.getElementById('chat-new-btn');
       if (newBtn) {
         newBtn.addEventListener('click', () => {
+          chatClosed = false;
+          renderedMessageIds.clear();
+          isFirstLoad = true;
+          unreadCount = 0;
           if (inputArea) inputArea.style.display = 'flex';
           localStorage.removeItem('hd_chat_id');
           chatId = null;

@@ -60,7 +60,7 @@
   const topbarAvatar = document.getElementById('cs-topbar-avatar');
   const logoutBtn = document.getElementById('cs-logout-btn');
   const themeToggle = document.getElementById('cs-theme-toggle');
-  const notifDot = document.getElementById('cs-notif-dot');
+  // notifDot removed - replaced by cs-notif-badge managed by updateNotifUI()
   const clientTypingEl = document.getElementById('cs-client-typing');
 
   // ── Device Info ───────────────────────────────────────────────
@@ -291,13 +291,15 @@
     loginSubmit.innerHTML = '<span class="cs-spinner"></span> Memuat...';
     showStatus('', '');
 
-    // BYPASS OTP FOR TESTING
-    await createSession(name);
-    loginView.style.display = 'none';
-    dashboardView.style.display = 'flex';
-    document.getElementById('cs-topbar-name').textContent = csName;
-    document.getElementById('cs-topbar-avatar').textContent = csName.substring(0, 2).toUpperCase();
-    initDashboard();
+    try {
+      // BYPASS OTP FOR TESTING
+      await createSession(name);
+      showDashboard();
+    } catch (err) {
+      showStatus('Gagal login. Coba lagi.', 'error');
+      loginSubmit.disabled = false;
+      loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Login as CS';
+    }
   });
 
   // OTP input
@@ -397,7 +399,7 @@
                   notifyNewMessage('Pesan dari ' + (chat.info?.clientName || 'Client'), lastMsg.text, id);
                 } else {
                   // Focused, just play sound
-                  window.playNotifSound();
+                  if (window.playNotifSound) window.playNotifSound();
                 }
               }
             }
@@ -495,9 +497,7 @@
     chatList.insertAdjacentHTML('afterbegin', html);
     chatList.scrollTop = scrollTop;
 
-    // Update total unread in topbar
-    const totalUnread = items.reduce((sum, item) => sum + item.unread, 0);
-    notifDot.style.display = totalUnread > 0 ? 'block' : 'none';
+    // Unread badge is now managed by updateNotifUI()
   }
 
   function getLastMessage(messages) {
@@ -749,7 +749,7 @@
     unreadNotifCount++;
     updateNotifUI();
 
-    window.playNotifSound();
+    if (window.playNotifSound) window.playNotifSound();
 
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, {
@@ -814,7 +814,10 @@
   }
 
   // ── Bind Dashboard Events ─────────────────────────────────────
+  let dashboardEventsBound = false;
   function bindDashboardEvents() {
+    if (dashboardEventsBound) return;
+    dashboardEventsBound = true;
     // Chat list item click (event delegation)
     chatList.addEventListener('click', (e) => {
       const item = e.target.closest('.cs-chat-item');
