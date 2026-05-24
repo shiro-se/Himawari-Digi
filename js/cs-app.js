@@ -14,7 +14,6 @@
 
   // ── State ─────────────────────────────────────────────────────
   let csName = localStorage.getItem('hd_cs_name') || '';
-  let csSession = localStorage.getItem('hd_cs_session') || '';
   let selectedChatId = null;
   let chatsData = {};
   let activeMessagesListener = null;
@@ -128,28 +127,28 @@
   // LOGIN FLOW
   // ═══════════════════════════════════════════════════════════════
 
-  let currentOtpId = null;
+  let currentEmail = window.EMAILJS_CONFIG?.recipientEmail || 'himawaridigi@gmail.com';
   let resendCooldown = 0;
   let resendInterval = null;
 
-  function checkExistingSession() {
-    if (csSession && csName) {
-      supabase.from('cs_sessions').select('*').eq('id', csSession).single()
-        .then(({ data, error }) => {
-          if (data && data.active) {
-            showDashboard();
-          } else {
-            clearSession();
-            showLogin();
-          }
-        })
-        .catch(() => {
-          showLogin();
-        });
+  async function checkExistingSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && csName) {
+      showDashboard();
     } else {
+      clearSession();
       showLogin();
     }
   }
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
+      clearSession();
+      showLogin();
+    } else if (event === 'SIGNED_IN' && csName) {
+      showDashboard();
+    }
+  });
 
   function showLogin() {
     loginView.style.display = 'flex';
@@ -166,19 +165,12 @@
 
   function clearSession() {
     localStorage.removeItem('hd_cs_name');
-    localStorage.removeItem('hd_cs_session');
     csName = '';
-    csSession = '';
   }
 
   function showStatus(msg, type) {
     loginStatus.textContent = msg;
     loginStatus.className = 'cs-login-status ' + type;
-  }
-
-  // Generate 6-digit OTP
-  function generateOTP() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   // Get approximate location via free API
@@ -195,90 +187,54 @@
     return 'Tidak dapat mendeteksi lokasi';
   }
 
-  // Send OTP via EmailJS
+  // Send OTP via Supabase Auth
   async function sendOTP(name) {
-    const otp = generateOTP();
     const location = await getLocation();
     const now = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
     try {
-      const { data, error } = await supabase.from('cs_otp').insert({
-        code: otp,
-        generatedAt: new Date().toISOString(),
-        used: false,
-      }).select().single();
-      
+      const { error } = await supabase.auth.signInWithOtp({
+        email: currentEmail,
+      });
       if (error) throw error;
-      currentOtpId = data.id;
-    } catch (e) {
-      console.error('Supabase DB error:', e);
-      return false;
-    }
 
-    // Send email via EmailJS
-    if (typeof emailjs !== 'undefined' && window.EMAILJS_CONFIG.serviceId !== 'EMAILJS_SERVICE_ID') {
-      try {
-        await emailjs.send(window.EMAILJS_CONFIG.serviceId, window.EMAILJS_CONFIG.templateId, {
-          to_email: window.EMAILJS_CONFIG.recipientEmail,
-          otp_code: otp,
-          cs_name: name,
-          device_info: deviceInfo.full,
-          location_info: location,
-          login_time: now,
-          message: `Kode verifikasi CS Login: ${otp}\n\nNama CS: ${name}\nPerangkat: ${deviceInfo.full}\nLokasi: ${location}\nWaktu: ${now}`,
-        });
-        return true;
-      } catch (e) {
-        console.error('EmailJS error:', e);
-        // Fallback: show OTP in console for testing
-        console.warn('⚠️ EmailJS not configured. OTP Code:', otp);
-        showStatus(
-          'EmailJS belum dikonfigurasi. Cek console untuk kode OTP (development mode).',
-          'info'
-        );
-        return true;
+      // Send admin notification via EmailJS
+      if (typeof emailjs !== 'undefined' && window.EMAILJS_CONFIG.serviceId !== 'EMAILJS_SERVICE_ID') {
+        try {
+          await emailjs.send(window.EMAILJS_CONFIG.serviceId, window.EMAILJS_CONFIG.templateId, {
+            to_email: currentEmail,
+            otp_code: 'Dikirim oleh Supabase',
+            cs_name: name,
+            device_info: deviceInfo.full,
+            location_info: location,
+            login_time: now,
+            message: `Permintaan login CS Dashboard.\n\nNama CS: ${name}\nPerangkat: ${deviceInfo.full}\nLokasi: ${location}\nWaktu: ${now}\n\nKode OTP telah dikirimkan secara otomatis oleh Supabase ke email ini.`,
+          });
+        } catch (e) {
+          console.error('EmailJS notif error:', e);
+        }
       }
-    } else {
-      // EmailJS not configured — development mode
-      console.warn('⚠️ Development mode — OTP Code:', otp);
-      showStatus(
-        'EmailJS belum dikonfigurasi. Cek browser console untuk kode OTP (development mode).',
-        'info'
-      );
       return true;
+    } catch (e) {
+      console.error('Supabase Auth error:', e);
+      return false;
     }
   }
 
   // Verify OTP
   async function verifyOTP(inputCode) {
-    if (!currentOtpId) return false;
-
-    const { data } = await supabase.from('cs_otp').select('*').eq('id', currentOtpId).single();
-
-    if (!data) return false;
-    if (data.used) return false;
-    if (Date.now() > new Date(data.generatedAt).getTime() + 5 * 60 * 1000) return false;
-    if (data.code !== inputCode) return false;
-
-    // Mark as used
-    await supabase.from('cs_otp').update({ used: true }).eq('id', currentOtpId);
-    return true;
-  }
-
-  // Create session
-  async function createSession(name) {
-    const sessionId =
-      'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
-    await supabase.from('cs_sessions').insert({
-      id: sessionId,
-      active: true,
-      loginTime: new Date().toISOString(),
-    });
-
-    csName = name;
-    csSession = sessionId;
-    localStorage.setItem('hd_cs_name', name);
-    localStorage.setItem('hd_cs_session', sessionId);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: currentEmail,
+        token: inputCode,
+        type: 'email'
+      });
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.error('Verify error:', e);
+      return false;
+    }
   }
 
   // Start resend cooldown
@@ -316,7 +272,7 @@
       startResendCooldown();
       showStatus('Kode dikirim ke tim admin.', 'success');
     } else {
-      showStatus('Gagal mengirim kode. Coba lagi.', 'error');
+      showStatus('Gagal mengirim kode. Cek kredensial email Supabase Anda.', 'error');
       loginSubmit.disabled = false;
       loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
     }
@@ -346,7 +302,8 @@
 
     if (valid) {
       showStatus('Verifikasi berhasil! Memuat dashboard...', 'success');
-      await createSession(loginNameInput.value.trim());
+      csName = loginNameInput.value.trim();
+      localStorage.setItem('hd_cs_name', csName);
       setTimeout(() => showDashboard(), 500);
     } else {
       showStatus('Kode salah atau sudah kedaluwarsa.', 'error');
@@ -964,13 +921,8 @@
   }
 
   // ── Logout ────────────────────────────────────────────────────
-  function logout() {
+  async function logout() {
     if (!confirm('Logout dari CS Dashboard?')) return;
-
-    // Deactivate session
-    if (csSession) {
-      supabase.from('cs_sessions').update({ active: false }).eq('id', csSession).then();
-    }
 
     // Clear typing
     if (selectedChatId) {
@@ -988,6 +940,7 @@
     }
     detachCurrentChatListeners();
 
+    await supabase.auth.signOut();
     clearSession();
     selectedChatId = null;
     chatsData = {};
