@@ -1079,11 +1079,54 @@
         position: absolute;
         inset: 0;
         background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(4px);
       }
       .cs-lightbox-content {
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .cs-lightbox-content img {
         max-width: 90vw;
         max-height: 90vh;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        cursor: zoom-in;
+      }
+      .cs-lightbox-content img.zoomed {
+        transform: scale(2.5) !important;
+        cursor: zoom-out;
+      }
+      .cs-lightbox-actions {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        display: flex;
+        gap: 12px;
+        z-index: 10005;
+      }
+      .cs-lightbox-actions a,
+      .cs-lightbox-actions button {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.25rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+      .cs-lightbox-actions a:hover,
+      .cs-lightbox-actions button:hover { background: rgba(255,255,255,0.4); }
     </style>
   </head>
   <body class="cs-body">
