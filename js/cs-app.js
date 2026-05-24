@@ -352,7 +352,7 @@
 
   // ── Listen for Active Chats ───────────────────────────────────
   async function listenForChats() {
-    const { data: chats } = await supabase.from('chats').select('*').eq('status', 'open');
+    const { data: chats } = await supabase.from('chats').select('*').eq('status', 'active');
     const newChatsData = {};
     if (chats) {
       chats.forEach(c => {
@@ -393,7 +393,7 @@
     }
 
     chatsListener = supabase.channel('chats-active')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.open' }, async (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.active' }, async (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const c = payload.new;
           const prevChat = chatsData[c.id];
