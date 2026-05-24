@@ -214,18 +214,27 @@
 
   // Verify OTP
   async function verifyOTP(inputCode) {
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email: currentEmail,
-        token: inputCode,
-        type: 'magiclink'
-      });
-      if (error) throw error;
-      return true;
-    } catch (e) {
-      console.error('Verify error:', e);
-      return false;
+    const typesToTry = ['email', 'magiclink', 'signup'];
+    let lastError = null;
+
+    for (const type of typesToTry) {
+      try {
+        const { data, error } = await supabase.auth.verifyOtp({
+          email: currentEmail,
+          token: inputCode,
+          type: type
+        });
+        if (!error && data.session) {
+          return true; // Sukses verifikasi!
+        }
+        if (error) lastError = error;
+      } catch (e) {
+        lastError = e;
+      }
     }
+    
+    console.error('Verify error:', lastError);
+    return false;
   }
 
   // Start resend cooldown
