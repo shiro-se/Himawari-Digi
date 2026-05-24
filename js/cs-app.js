@@ -219,6 +219,7 @@
 
     for (const type of typesToTry) {
       try {
+        console.log(`Mencoba verifikasi OTP dengan tipe: ${type}, kode: ${inputCode}`);
         const { data, error } = await supabase.auth.verifyOtp({
           email: currentEmail,
           token: inputCode,
@@ -292,8 +293,14 @@
 
   // OTP verify
   otpVerifyBtn.addEventListener('click', async () => {
-    const code = otpInput.value.trim();
-    if (code.length < 6 || code.length > 10) return;
+    // Bersihkan kode dari spasi tersembunyi/karakter tak terlihat saat copas
+    const rawCode = otpInput.value;
+    const code = rawCode.replace(/[^0-9]/g, '');
+    
+    if (code.length < 6 || code.length > 10) {
+      if (window.showToast) window.showToast('Panjang kode tidak valid.', 'warning');
+      return;
+    }
 
     otpVerifyBtn.disabled = true;
     otpVerifyBtn.innerHTML = '<span class="cs-spinner"></span>';
