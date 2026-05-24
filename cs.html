@@ -829,6 +829,184 @@
         background: var(--border);
         border-radius: 4px;
       }
+
+      /* ── CS Sender Name ── */
+      .cs-msg-sender-name {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 2px;
+        opacity: 0.85;
+      }
+
+      /* ── Sidebar Tabs ── */
+      .cs-sidebar-tabs {
+        display: flex;
+        gap: 4px;
+        padding: 0 0.75rem;
+        margin-bottom: 0.5rem;
+      }
+      .cs-tab {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+      .cs-tab:hover { background: var(--border); color: var(--foreground); }
+      .cs-tab.active {
+        background: var(--primary);
+        color: white;
+      }
+      .cs-tab .cs-count-badge {
+        font-size: 0.65rem;
+        padding: 1px 6px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.2);
+      }
+      .cs-tab.active .cs-count-badge {
+        background: rgba(255,255,255,0.3);
+      }
+
+      /* ── Export Chat ── */
+      .cs-detail-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .cs-export-btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 0.4rem 0.75rem;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--foreground);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .cs-export-btn:hover { border-color: var(--primary); color: var(--primary); }
+      .cs-export-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 4px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 4px;
+        z-index: 100;
+        min-width: 140px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        animation: csFadeIn 0.2s ease;
+      }
+      .cs-export-dropdown.show { display: block; }
+      .cs-export-dropdown button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: none;
+        background: none;
+        color: var(--foreground);
+        font-size: 0.8rem;
+        cursor: pointer;
+        border-radius: 6px;
+        font-family: inherit;
+        transition: background 0.15s;
+      }
+      .cs-export-dropdown button:hover { background: var(--border); }
+
+      /* ── Attach Button ── */
+      .cs-attach-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .cs-attach-btn:hover { color: var(--primary); background: var(--border); }
+
+      /* ── Image Message ── */
+      .cs-msg-image {
+        max-width: 220px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .cs-msg-image:hover { transform: scale(1.02); }
+
+      /* ── Lightbox ── */
+      .cs-lightbox {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cs-lightbox-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+      }
+      .cs-lightbox-content {
+        position: relative;
+        max-width: 90vw;
+        max-height: 90vh;
+      }
+      .cs-lightbox-content img {
+        max-width: 90vw;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+      .cs-lightbox-actions {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        display: flex;
+        gap: 8px;
+      }
+      .cs-lightbox-actions a,
+      .cs-lightbox-actions button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.15);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: background 0.2s;
+        text-decoration: none;
+      }
+      .cs-lightbox-actions a:hover,
+      .cs-lightbox-actions button:hover { background: rgba(255,255,255,0.3); }
     </style>
   </head>
   <body class="cs-body">
@@ -914,10 +1092,16 @@
         <!-- Sidebar -->
         <div class="cs-sidebar" id="cs-sidebar">
           <div class="cs-sidebar-header">
-            <h2>
-              Active Chats
-              <span class="cs-count-badge" id="cs-chat-count">0</span>
-            </h2>
+            <div class="cs-sidebar-tabs">
+              <button class="cs-tab active" id="cs-tab-active" data-tab="active">
+                <i class="ph ph-chat-circle-dots"></i> Active
+                <span class="cs-count-badge" id="cs-chat-count">0</span>
+              </button>
+              <button class="cs-tab" id="cs-tab-archive" data-tab="archive">
+                <i class="ph ph-archive"></i> Arsip
+                <span class="cs-count-badge" id="cs-archive-count">0</span>
+              </button>
+            </div>
             <div class="cs-search-wrap">
               <i class="ph ph-magnifying-glass"></i>
               <input type="text" class="cs-search" id="cs-search-input" placeholder="Cari nama client..." />
@@ -952,10 +1136,22 @@
                 </div>
                 <span class="cs-detail-status active" id="cs-detail-status">Active</span>
               </div>
-              <button class="cs-close-chat-btn" id="cs-close-chat-btn">
-                <i class="ph-bold ph-x"></i>
-                Tutup Chat
-              </button>
+              <div class="cs-detail-actions">
+                <div class="cs-export-wrapper" style="position:relative">
+                  <button class="cs-export-btn" id="cs-export-btn" title="Export chat">
+                    <i class="ph-bold ph-download-simple"></i> Export
+                  </button>
+                  <div class="cs-export-dropdown" id="cs-export-dropdown">
+                    <button data-format="pdf"><i class="ph ph-file-pdf"></i> PDF</button>
+                    <button data-format="excel"><i class="ph ph-file-xls"></i> Excel</button>
+                    <button data-format="csv"><i class="ph ph-file-csv"></i> CSV</button>
+                  </div>
+                </div>
+                <button class="cs-close-chat-btn" id="cs-close-chat-btn">
+                  <i class="ph-bold ph-x"></i>
+                  Tutup Chat
+                </button>
+              </div>
             </div>
             <div class="cs-messages" id="cs-messages"></div>
             <div class="cs-typing-indicator" id="cs-client-typing">
@@ -965,6 +1161,10 @@
               <span>Client sedang mengetik...</span>
             </div>
             <div class="cs-input-area" id="cs-input-area">
+              <label class="cs-attach-btn" for="cs-image-upload" title="Kirim gambar">
+                <i class="ph ph-image"></i>
+              </label>
+              <input type="file" id="cs-image-upload" accept="image/*" style="display:none" />
               <input type="text" class="cs-input" id="cs-chat-input" placeholder="Ketik pesan..." maxlength="500" autocomplete="off" />
               <button class="cs-send-btn" id="cs-chat-send" disabled>
                 <i class="ph-bold ph-paper-plane-tilt"></i>
@@ -978,8 +1178,25 @@
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="./js/firebase-config.js"></script>
     <script src="./js/cs-app.js"></script>
+
+    <!-- Lightbox -->
+    <div class="cs-lightbox" id="cs-lightbox" style="display:none">
+      <div class="cs-lightbox-overlay"></div>
+      <div class="cs-lightbox-content">
+        <img id="cs-lightbox-img" src="" alt="Preview" />
+        <div class="cs-lightbox-actions">
+          <a id="cs-lightbox-download" href="" download title="Download">
+            <i class="ph-bold ph-download-simple"></i>
+          </a>
+          <button id="cs-lightbox-close" title="Tutup">
+            <i class="ph-bold ph-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

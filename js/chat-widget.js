@@ -433,10 +433,14 @@
           : `<span id="chat-msg-status-${msgId}" class="chat-msg-status sent"><i class="ph ph-check"></i></span>`;
       }
 
+      const contentHtml = msg.imageUrl
+        ? `<img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openChatLightbox('${msg.imageUrl}')" loading="lazy" />`
+        : `<p>${window.chatSanitize(msg.text)}</p>`;
+
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
         <div class="chat-msg-bubble">
-          <p>${window.chatSanitize(msg.text)}</p>
+          ${contentHtml}
           <div class="chat-msg-time-container">
             <span class="chat-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
             ${statusHtml}
@@ -602,10 +606,99 @@
       });
   }
 
+  // ── Image Upload ──────────────────────────────────────────────
+  const imageUploadInput = document.getElementById('chat-image-upload');
+  if (imageUploadInput) {
+    imageUploadInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file || !chatId) return;
+
+      if (file.size > 5 * 1024 * 1024) {
+        if (window.showToast) window.showToast('Ukuran gambar maksimal 5MB', 'error');
+        imageUploadInput.value = '';
+        return;
+      }
+
+      if (!checkMessageRateLimit()) {
+        if (window.showToast) window.showToast('Terlalu banyak pesan. Mohon tunggu sebentar.', 'error');
+        imageUploadInput.value = '';
+        return;
+      }
+
+      const storage = window.firebaseStorage;
+      if (!storage) {
+        if (window.showToast) window.showToast('Storage tidak tersedia', 'error');
+        imageUploadInput.value = '';
+        return;
+      }
+
+      try {
+        // Show uploading state
+        sendBtn.disabled = true;
+
+        const ref = storage.ref('chat-images/' + chatId + '/' + Date.now() + '_' + file.name);
+        const snap = await ref.put(file);
+        const url = await snap.ref.getDownloadURL();
+
+        recordMessage();
+
+        db.ref('chats/' + chatId + '/messages').push({
+          sender: 'client',
+          senderName: clientName,
+          text: '',
+          imageUrl: url,
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          read: false,
+        });
+
+        db.ref('chats/' + chatId + '/info').update({
+          lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
+        });
+
+        sendClientTyping();
+      } catch (err) {
+        if (window.showToast) window.showToast('Gagal upload gambar', 'error');
+      }
+
+      sendBtn.disabled = !chatInput.value.trim();
+      imageUploadInput.value = '';
+    });
+  }
+
+  // ── Lightbox ───────────────────────────────────────────────────
+  window.openChatLightbox = function (url) {
+    const lb = document.getElementById('chat-lightbox');
+    const img = document.getElementById('chat-lightbox-img');
+    const dl = document.getElementById('chat-lightbox-download');
+    if (lb && img) {
+      img.src = url;
+      if (dl) {
+        dl.href = url;
+        dl.download = 'image_' + Date.now() + '.jpg';
+      }
+      lb.style.display = 'flex';
+    }
+  };
+
+  function closeLightbox() {
+    const lb = document.getElementById('chat-lightbox');
+    if (lb) lb.style.display = 'none';
+  }
+
+  const lbClose = document.getElementById('chat-lightbox-close');
+  const lbOverlay = document.querySelector('.chat-lightbox-overlay');
+  if (lbClose) lbClose.addEventListener('click', closeLightbox);
+  if (lbOverlay) lbOverlay.addEventListener('click', closeLightbox);
+
   // ── Close on Escape Key ───────────────────────────────────────
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isOpen) {
-      closeChat();
+    if (e.key === 'Escape') {
+      const lb = document.getElementById('chat-lightbox');
+      if (lb && lb.style.display !== 'none') {
+        closeLightbox();
+      } else if (isOpen) {
+        closeChat();
+      }
     }
   });
 })();

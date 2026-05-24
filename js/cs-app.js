@@ -22,6 +22,9 @@
   let activeTypingListener = null;
   let typingTimeout = null;
   let searchQuery = '';
+  let currentTab = 'active';
+  let archiveData = {};
+  let archiveListener = null;
 
   // ── DOM Refs ──────────────────────────────────────────────────
   const loginView = document.getElementById('cs-login-view');
@@ -366,6 +369,7 @@
     }
 
     listenForChats();
+    listenForArchive();
     bindDashboardEvents();
   }
 
@@ -426,9 +430,28 @@
       });
   }
 
+  // ── Listen for Archived Chats ─────────────────────────────────
+  function listenForArchive() {
+    if (archiveListener) {
+      db.ref('chats').off('value', archiveListener);
+    }
+    archiveListener = db
+      .ref('chats')
+      .orderByChild('info/status')
+      .equalTo('closed')
+      .limitToLast(50)
+      .on('value', (snap) => {
+        archiveData = snap.val() || {};
+        const archiveCount = document.getElementById('cs-archive-count');
+        if (archiveCount) archiveCount.textContent = Object.keys(archiveData).length;
+        if (currentTab === 'archive') renderChatList();
+      });
+  }
+
   // ── Render Chat List ──────────────────────────────────────────
   function renderChatList() {
-    const items = Object.entries(chatsData)
+    const data = currentTab === 'archive' ? archiveData : chatsData;
+    const items = Object.entries(data)
       .map(([id, chat]) => ({
         id,
         ...chat.info,
@@ -533,7 +556,8 @@
   function selectChat(chatId) {
     detachCurrentChatListeners();
     selectedChatId = chatId;
-    const chat = chatsData[chatId];
+    const chatSource = currentTab === 'archive' ? archiveData : chatsData;
+    const chat = chatSource[chatId];
     if (!chat) return;
 
     // Update header
@@ -594,6 +618,16 @@
       }
     });
 
+    // Archive mode: hide input area and close button
+    const csInputArea = document.getElementById('cs-input-area');
+    if (currentTab === 'archive') {
+      if (csInputArea) csInputArea.style.display = 'none';
+      if (closeChatBtn) closeChatBtn.style.display = 'none';
+    } else {
+      if (csInputArea) csInputArea.style.display = 'flex';
+      if (closeChatBtn) closeChatBtn.style.display = 'flex';
+    }
+
     // Mobile: show detail
     detail.classList.add('show-mobile');
     sidebar.classList.add('hidden-mobile');
@@ -623,10 +657,17 @@
           : `<span id="cs-msg-status-${msgId}" class="cs-msg-status sent"><i class="ph ph-check"></i></span>`;
       }
 
+      const senderNameHtml = !isClient ? `<div class="cs-msg-sender-name">${window.chatSanitize(msg.senderName || 'CS')}</div>` : '';
+
+      const imageHtml = msg.imageUrl 
+        ? `<img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openCSLightbox('${msg.imageUrl}')" loading="lazy" />`
+        : `<p>${window.chatSanitize(msg.text)}</p>`;
+
       div.innerHTML = `
         ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
         <div class="cs-msg-bubble">
-          <p>${window.chatSanitize(msg.text)}</p>
+          ${senderNameHtml}
+          ${imageHtml}
           <div class="cs-msg-time-container">
             <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
             ${statusHtml}
@@ -817,6 +858,96 @@
     loginStatus.className = 'cs-login-status';
   }
 
+  // ── Export Chat ────────────────────────────────────────────
+  function loadScript(url) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${url}"]`)) return resolve();
+      const s = document.createElement('script');
+      s.src = url;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  function getChatExportData() {
+    const data = currentTab === 'archive' ? archiveData : chatsData;
+    const chat = data[selectedChatId];
+    if (!chat) return null;
+    const messages = chat.messages ? Object.values(chat.messages).sort((a,b) => (a.timestamp||0) - (b.timestamp||0)) : [];
+    return {
+      clientName: chat.info?.clientName || 'Unknown',
+      clientEmail: chat.info?.clientEmail || '',
+      assignedCS: chat.info?.assignedCS || '',
+      messages: messages.map(m => ({
+        time: m.timestamp ? new Date(m.timestamp).toLocaleString('id-ID') : '',
+        sender: m.sender === 'client' ? (chat.info?.clientName || 'Client') : m.sender === 'system' ? 'System' : (m.senderName || 'CS'),
+        text: m.text || (m.imageUrl ? '[Image]' : ''),
+      }))
+    };
+  }
+
+  async function exportChat(format) {
+    const data = getChatExportData();
+    if (!data) return;
+    const filename = 'chat_' + (data.clientName.replace(/\s+/g, '_')) + '_' + new Date().toISOString().slice(0,10);
+
+    if (format === 'csv') {
+      let csv = 'Waktu,Pengirim,Pesan\n';
+      data.messages.forEach(m => {
+        csv += `"${m.time}","${m.sender}","${m.text.replace(/"/g, '""')}"\n`;
+      });
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      downloadBlob(blob, filename + '.csv');
+    } else if (format === 'excel') {
+      await loadScript('https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js');
+      const ws = XLSX.utils.json_to_sheet(data.messages.map(m => ({ Waktu: m.time, Pengirim: m.sender, Pesan: m.text })));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Chat');
+      XLSX.writeFile(wb, filename + '.xlsx');
+    } else if (format === 'pdf') {
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text('Chat History \u2014 HimawariDigi', 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Client: ${data.clientName} (${data.clientEmail})`, 14, 23);
+      doc.text(`CS: ${data.assignedCS}`, 14, 29);
+      doc.autoTable({
+        startY: 35,
+        head: [['Waktu', 'Pengirim', 'Pesan']],
+        body: data.messages.map(m => [m.time, m.sender, m.text]),
+        styles: { fontSize: 8, cellPadding: 3 },
+        headStyles: { fillColor: [99, 102, 241] },
+        columnStyles: { 2: { cellWidth: 'auto' } },
+      });
+      doc.save(filename + '.pdf');
+    }
+  }
+
+  function downloadBlob(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Lightbox ────────────────────────────────────────────────
+  window.openCSLightbox = function(url) {
+    const lb = document.getElementById('cs-lightbox');
+    const img = document.getElementById('cs-lightbox-img');
+    const dl = document.getElementById('cs-lightbox-download');
+    if (lb && img) {
+      img.src = url;
+      if (dl) { dl.href = url; dl.download = 'image_' + Date.now() + '.jpg'; }
+      lb.style.display = 'flex';
+    }
+  };
+
   // ── Bind Dashboard Events ─────────────────────────────────────
   let dashboardEventsBound = false;
   function bindDashboardEvents() {
@@ -860,6 +991,86 @@
 
     // Logout
     logoutBtn.addEventListener('click', logout);
+
+    // ── Tab Switcher ──
+    const tabActive = document.getElementById('cs-tab-active');
+    const tabArchive = document.getElementById('cs-tab-archive');
+    if (tabActive) tabActive.addEventListener('click', () => {
+      currentTab = 'active';
+      tabActive.classList.add('active');
+      if (tabArchive) tabArchive.classList.remove('active');
+      renderChatList();
+    });
+    if (tabArchive) tabArchive.addEventListener('click', () => {
+      currentTab = 'archive';
+      tabArchive.classList.add('active');
+      if (tabActive) tabActive.classList.remove('active');
+      renderChatList();
+    });
+
+    // ── Export Chat ──
+    const exportBtn = document.getElementById('cs-export-btn');
+    const exportDropdown = document.getElementById('cs-export-dropdown');
+    if (exportBtn && exportDropdown) {
+      exportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        exportDropdown.classList.toggle('show');
+      });
+      exportDropdown.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-format]');
+        if (btn) {
+          exportChat(btn.dataset.format);
+          exportDropdown.classList.remove('show');
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (!exportBtn.contains(e.target) && !exportDropdown.contains(e.target)) {
+          exportDropdown.classList.remove('show');
+        }
+      });
+    }
+
+    // ── Image Upload ──
+    const csImageUpload = document.getElementById('cs-image-upload');
+    if (csImageUpload) {
+      csImageUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file || !selectedChatId) return;
+        if (file.size > 5 * 1024 * 1024) {
+          if (window.showToast) window.showToast('Ukuran gambar maksimal 5MB', 'error');
+          return;
+        }
+        try {
+          const storage = window.firebaseStorage;
+          if (!storage) { if (window.showToast) window.showToast('Storage tidak tersedia', 'error'); return; }
+          const ref = storage.ref('chat-images/' + selectedChatId + '/' + Date.now() + '_' + file.name);
+          const snap = await ref.put(file);
+          const url = await snap.ref.getDownloadURL();
+          db.ref('chats/' + selectedChatId + '/messages').push({
+            sender: 'cs',
+            senderName: csName,
+            text: '',
+            imageUrl: url,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            read: true,
+          });
+          db.ref('chats/' + selectedChatId + '/info').update({
+            lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
+            assignedCS: csName,
+          });
+        } catch (err) {
+          if (window.showToast) window.showToast('Gagal upload gambar', 'error');
+        }
+        csImageUpload.value = '';
+      });
+    }
+
+    // ── Lightbox Close ──
+    const lightbox = document.getElementById('cs-lightbox');
+    const lightboxClose = document.getElementById('cs-lightbox-close');
+    const lightboxOverlay = document.querySelector('.cs-lightbox-overlay');
+    if (lightboxClose) lightboxClose.addEventListener('click', () => { lightbox.style.display = 'none'; });
+    if (lightboxOverlay) lightboxOverlay.addEventListener('click', () => { lightbox.style.display = 'none'; });
   }
 
   // ── Init ──────────────────────────────────────────────────────
