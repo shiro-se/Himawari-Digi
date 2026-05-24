@@ -195,25 +195,16 @@
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: currentEmail,
+        options: {
+          data: {
+            cs_name: name,
+            device: deviceInfo.full,
+            location: location,
+            time: now
+          }
+        }
       });
       if (error) throw error;
-
-      // Send admin notification via EmailJS
-      if (typeof emailjs !== 'undefined' && window.EMAILJS_CONFIG.serviceId !== 'EMAILJS_SERVICE_ID') {
-        try {
-          await emailjs.send(window.EMAILJS_CONFIG.serviceId, window.EMAILJS_CONFIG.templateId, {
-            to_email: currentEmail,
-            otp_code: 'Dikirim oleh Supabase',
-            cs_name: name,
-            device_info: deviceInfo.full,
-            location_info: location,
-            login_time: now,
-            message: `Permintaan login CS Dashboard.\n\nNama CS: ${name}\nPerangkat: ${deviceInfo.full}\nLokasi: ${location}\nWaktu: ${now}\n\nKode OTP telah dikirimkan secara otomatis oleh Supabase ke email ini.`,
-          });
-        } catch (e) {
-          console.error('EmailJS notif error:', e);
-        }
-      }
       return true;
     } catch (e) {
       console.error('Supabase Auth error:', e);
@@ -293,7 +284,7 @@
   // OTP verify
   otpVerifyBtn.addEventListener('click', async () => {
     const code = otpInput.value.trim();
-    if (code.length !== 6) return;
+    if (code.length < 6 || code.length > 10) return;
 
     otpVerifyBtn.disabled = true;
     otpVerifyBtn.innerHTML = '<span class="cs-spinner"></span>';
