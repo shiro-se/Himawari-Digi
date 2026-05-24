@@ -218,7 +218,7 @@
       const { data, error } = await supabase.auth.verifyOtp({
         email: currentEmail,
         token: inputCode,
-        type: 'email'
+        type: 'magiclink'
       });
       if (error) throw error;
       return true;
