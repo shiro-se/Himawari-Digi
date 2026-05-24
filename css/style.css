@@ -2837,21 +2837,31 @@ footer {
 
 /* ── Chat Message Extras (Reactions & Reply) ── */
 .chat-msg-reply {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--muted-foreground);
   background: rgba(0,0,0,0.05);
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 6px;
-  border-left: 2px solid var(--primary);
+  border-left: 3px solid var(--primary);
   margin-bottom: 6px;
-  opacity: 0.9;
+  opacity: 0.95;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .dark .chat-msg-reply {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.08);
+}
+.chat-msg--client .chat-msg-reply {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.2);
+  border-left-color: rgba(255, 255, 255, 0.6);
+}
+.dark .chat-msg--client .chat-msg-reply {
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+  border-left-color: rgba(255, 255, 255, 0.4);
 }
 .chat-msg-reactions {
   display: flex;
