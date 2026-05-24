@@ -53,10 +53,24 @@
 
   // ── Authentication ──────────────────────────────────────────────
   async function ensureAuth() {
-    if (!supabaseClient) return;
-    const { data } = await supabaseClient.auth.getSession();
-    if (!data.session) {
-      await supabaseClient.auth.signInAnonymously();
+    if (!supabaseClient) return false;
+    try {
+      const { data } = await supabaseClient.auth.getSession();
+      if (!data.session) {
+        const { error } = await supabaseClient.auth.signInAnonymously();
+        if (error) throw error;
+      }
+      return true;
+    } catch (err) {
+      console.error('Auth error:', err);
+      if (window.showToast) {
+        if (err.status === 422 || (err.message && err.message.toLowerCase().includes('anonymous provider is disabled'))) {
+          window.showToast('Gagal terhubung: Fitur Anonymous Auth belum diaktifkan di Supabase Dashboard.', 'error');
+        } else {
+          window.showToast('Gagal terhubung ke layanan autentikasi.', 'error');
+        }
+      }
+      return false;
     }
   }
 
@@ -132,7 +146,8 @@
     // If we have an active chat, resume it
     if (chatId) {
       showChatView();
-      ensureAuth().then(() => {
+      ensureAuth().then((authSuccess) => {
+        if (!authSuccess) return;
         attachListeners();
         
         // Mark existing CS messages as read
@@ -287,14 +302,19 @@
 
   // ── Create New Chat in Supabase ───────────────────────────────
   async function createChat() {
-    await ensureAuth();
+    const authSuccess = await ensureAuth();
+    if (!authSuccess) return;
+
+    const { data: authData } = await supabaseClient.auth.getSession();
+    const userId = authData?.session?.user?.id;
 
     chatId = 'chat_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
     localStorage.setItem('hd_chat_id', chatId);
     recordChatCreation();
 
-    await supabaseClient.from('chats').insert({
+    const { error: chatError } = await supabaseClient.from('chats').insert({
       id: chatId,
+      user_id: userId,
       clientName: clientName,
       clientEmail: clientEmail,
       status: 'active',
@@ -302,10 +322,15 @@
       lastMessageAt: new Date().toISOString()
     });
 
+    if (chatError) {
+      console.error('Chat error:', chatError);
+      if (window.showToast) window.showToast('Gagal memulai obrolan (Akses Ditolak)', 'error');
+      return;
+    }
+
     await supabaseClient.from('typing_status').insert({
       chat_id: chatId,
-      client_is_typing: false,
-      cs_is_typing: false
+      client_is_typing: false
     });
 
     renderedMessageIds.clear();
@@ -628,7 +653,8 @@
 
   // ── Resume Existing Chat on Page Load ─────────────────────────
   if (chatId && supabaseClient) {
-    ensureAuth().then(() => {
+    ensureAuth().then((authSuccess) => {
+      if (!authSuccess) return;
       // Check if chat is still active
       supabaseClient.from('chats').select('status').eq('id', chatId).single()
         .then(({ data, error }) => {
@@ -696,15 +722,14 @@
           imageUrl: url,
           replyTo_id: replyToData ? replyToData.id : null,
           replyTo_text: replyToData ? replyToData.text : null,
-          timestamp: new Date().toISOString(),
-          read: false,
+          timestamp: new Date().toISOString()
         });
 
         replyToData = null;
         document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
 
         supabaseClient.from('chats').update({
-          lastMessageAt: new Date().toISOString(),
+          lastMessageAt: new Date().toISOString()
         }).eq('id', chatId).then();
 
         if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
