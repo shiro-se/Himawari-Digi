@@ -6,9 +6,9 @@
 (function () {
   'use strict';
 
-  const db = window.firebaseDB;
-  if (!db) {
-    console.error('Firebase not initialized');
+  const supabase = window.supabaseClient;
+  if (!supabase) {
+    console.error('Supabase not initialized');
     return;
   }
 
@@ -17,8 +17,7 @@
   let csSession = localStorage.getItem('hd_cs_session') || '';
   let selectedChatId = null;
   let chatsData = {};
-  let activeAddedListener = null;
-  let activeChangedListener = null;
+  let activeMessagesListener = null;
   let activeTypingListener = null;
   let typingTimeout = null;
   let searchQuery = '';
@@ -135,11 +134,8 @@
 
   function checkExistingSession() {
     if (csSession && csName) {
-      // Verify session in Firebase
-      db.ref('cs-sessions/' + csSession)
-        .once('value')
-        .then((snap) => {
-          const data = snap.val();
+      supabase.from('cs_sessions').select('*').eq('id', csSession).single()
+        .then(({ data, error }) => {
           if (data && data.active) {
             showDashboard();
           } else {
@@ -206,27 +202,16 @@
     const now = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
     try {
-      // Store OTP in Firebase with 5-minute expiry, add 10s timeout
-      const otpRef = db.ref('cs-otp').push();
-      currentOtpId = otpRef.key;
-      
-      const setPromise = otpRef.set({
+      const { data, error } = await supabase.from('cs_otp').insert({
         code: otp,
-        csName: name,
-        device: deviceInfo.full,
-        location: location,
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
-        expiresAt: Date.now() + 5 * 60 * 1000,
+        generatedAt: new Date().toISOString(),
         used: false,
-      });
-
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Firebase timeout')), 10000)
-      );
-
-      await Promise.race([setPromise, timeoutPromise]);
+      }).select().single();
+      
+      if (error) throw error;
+      currentOtpId = data.id;
     } catch (e) {
-      console.error('Firebase DB error:', e);
+      console.error('Supabase DB error:', e);
       return false;
     }
 
@@ -268,16 +253,15 @@
   async function verifyOTP(inputCode) {
     if (!currentOtpId) return false;
 
-    const snap = await db.ref('cs-otp/' + currentOtpId).once('value');
-    const data = snap.val();
+    const { data } = await supabase.from('cs_otp').select('*').eq('id', currentOtpId).single();
 
     if (!data) return false;
     if (data.used) return false;
-    if (Date.now() > data.expiresAt) return false;
+    if (Date.now() > new Date(data.generatedAt).getTime() + 5 * 60 * 1000) return false;
     if (data.code !== inputCode) return false;
 
     // Mark as used
-    await db.ref('cs-otp/' + currentOtpId).update({ used: true });
+    await supabase.from('cs_otp').update({ used: true }).eq('id', currentOtpId);
     return true;
   }
 
@@ -285,11 +269,10 @@
   async function createSession(name) {
     const sessionId =
       'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
-    await db.ref('cs-sessions/' + sessionId).set({
-      csName: name,
-      device: deviceInfo.full,
-      loginAt: firebase.database.ServerValue.TIMESTAMP,
+    await supabase.from('cs_sessions').insert({
+      id: sessionId,
       active: true,
+      loginTime: new Date().toISOString(),
     });
 
     csName = name;
@@ -404,78 +387,143 @@
   }
 
   // ── Listen for Active Chats ───────────────────────────────────
-  function listenForChats() {
-    if (chatsListener) {
-      db.ref('chats').off('value', chatsListener);
+  async function listenForChats() {
+    const { data: chats } = await supabase.from('chats').select('*').eq('status', 'open');
+    const newChatsData = {};
+    if (chats) {
+      chats.forEach(c => {
+        newChatsData[c.id] = {
+          info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 },
+          messages: chatsData[c.id]?.messages || {}
+        };
+      });
+      const chatIds = chats.map(c => c.id);
+      if (chatIds.length > 0) {
+        const { data: msgs } = await supabase.from('messages').select('*').in('chat_id', chatIds);
+        if (msgs) {
+          msgs.forEach(m => {
+            newChatsData[m.chat_id].messages[m.id] = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+          });
+        }
+      }
+      
+      const prevData = chatsData || {};
+      const prevChatIds = Object.keys(prevData);
+      chatsData = newChatsData;
+
+      if (prevChatIds.length > 0) {
+        Object.keys(chatsData).forEach((id) => {
+          const chat = chatsData[id];
+          const prevChat = prevData[id];
+          if (!prevChat) {
+            notifyNewMessage('Chat baru dari ' + (chat.info?.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', id);
+          }
+        });
+      }
+      renderChatList();
+      updateSelectedChatStatus();
     }
 
-    chatsListener = db
-      .ref('chats')
-      .orderByChild('info/status')
-      .equalTo('active')
-      .on('value', (snap) => {
-        const data = snap.val() || {};
-        const prevData = chatsData || {};
-        const prevChatIds = Object.keys(prevData);
-        chatsData = data;
+    if (chatsListener) {
+      supabase.removeChannel(chatsListener);
+    }
 
-        // Check for new chats or new messages (notification)
-        if (prevChatIds.length > 0) {
-          Object.keys(data).forEach((id) => {
-            const chat = data[id];
-            const prevChat = prevData[id];
-            
-            if (!prevChat) {
-              // New chat
-              notifyNewMessage('Chat baru dari ' + (chat.info?.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', id);
-            } else if (chat.info?.lastMessageAt > (prevChat.info?.lastMessageAt || 0)) {
-              // Existing chat, new message
-              const lastMsg = getLastMessage(chat.messages);
-              if (lastMsg && lastMsg.sender === 'client') {
-                if (id !== selectedChatId || document.hidden) {
-                  // Not focused or different chat, notify
-                  notifyNewMessage('Pesan dari ' + (chat.info?.clientName || 'Client'), lastMsg.text, id);
-                } else {
-                  // Focused, just play sound
-                  if (window.playNotifSound) window.playNotifSound();
+    chatsListener = supabase.channel('chats-active')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.open' }, async (payload) => {
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          const c = payload.new;
+          const prevChat = chatsData[c.id];
+          if (!chatsData[c.id]) chatsData[c.id] = { info: {}, messages: {} };
+          chatsData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
+          
+          if (payload.eventType === 'INSERT') {
+            notifyNewMessage('Chat baru dari ' + (c.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', c.id);
+          } else if (payload.eventType === 'UPDATE') {
+            const newTime = c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0;
+            const oldTime = prevChat?.info?.lastMessageAt || 0;
+            if (newTime > oldTime) {
+              const { data: lastMsg } = await supabase.from('messages').select('*').eq('chat_id', c.id).order('timestamp', { ascending: false }).limit(1).single();
+              if (lastMsg) {
+                chatsData[c.id].messages[lastMsg.id] = { ...lastMsg, timestamp: lastMsg.timestamp ? new Date(lastMsg.timestamp).getTime() : 0, replyTo: lastMsg.replyTo_id ? { id: lastMsg.replyTo_id, text: lastMsg.replyTo_text } : null };
+                if (lastMsg.sender === 'client') {
+                  if (c.id !== selectedChatId || document.hidden) {
+                    notifyNewMessage('Pesan dari ' + (c.clientName || 'Client'), lastMsg.text, c.id);
+                  } else {
+                    if (window.playNotifSound) window.playNotifSound();
+                  }
                 }
               }
             }
-          });
-        }
-
-        renderChatList();
-
-        // Update selected chat status
-        if (selectedChatId) {
-          if (!data[selectedChatId]) {
-            detailStatus.textContent = 'Closed';
-            detailStatus.className = 'cs-detail-status closed';
-          } else {
-            const isOnline = data[selectedChatId].info?.isOnline;
-            detailStatus.textContent = isOnline ? 'Active' : 'Inactive';
-            detailStatus.className = 'cs-detail-status ' + (isOnline ? 'active' : 'inactive');
           }
+          renderChatList();
+          updateSelectedChatStatus();
+        } else if (payload.eventType === 'DELETE') {
+          delete chatsData[payload.old.id];
+          renderChatList();
+          updateSelectedChatStatus();
         }
-      });
+      })
+      .subscribe();
+  }
+
+  function updateSelectedChatStatus() {
+    if (selectedChatId) {
+      if (!chatsData[selectedChatId] && currentTab !== 'archive') {
+        detailStatus.textContent = 'Closed';
+        detailStatus.className = 'cs-detail-status closed';
+      } else {
+        const chat = chatsData[selectedChatId] || archiveData[selectedChatId];
+        if (chat) {
+          const isOnline = chat.info?.isOnline;
+          detailStatus.textContent = isOnline ? 'Active' : 'Inactive';
+          detailStatus.className = 'cs-detail-status ' + (isOnline ? 'active' : 'inactive');
+        }
+      }
+    }
   }
 
   // ── Listen for Archived Chats ─────────────────────────────────
-  function listenForArchive() {
-    if (archiveListener) {
-      db.ref('chats').off('value', archiveListener);
-    }
-    archiveListener = db
-      .ref('chats')
-      .orderByChild('info/status')
-      .equalTo('closed')
-      .limitToLast(50)
-      .on('value', (snap) => {
-        archiveData = snap.val() || {};
-        const archiveCount = document.getElementById('cs-archive-count');
-        if (archiveCount) archiveCount.textContent = Object.keys(archiveData).length;
-        if (currentTab === 'archive') renderChatList();
+  async function listenForArchive() {
+    const { data: chats } = await supabase.from('chats').select('*').eq('status', 'closed').order('lastMessageAt', { ascending: false }).limit(50);
+    if (chats) {
+      archiveData = {};
+      chats.forEach(c => {
+        archiveData[c.id] = { info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 }, messages: {} };
       });
+      const chatIds = chats.map(c => c.id);
+      if (chatIds.length > 0) {
+        const { data: msgs } = await supabase.from('messages').select('*').in('chat_id', chatIds);
+        if (msgs) {
+          msgs.forEach(m => {
+            archiveData[m.chat_id].messages[m.id] = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+          });
+        }
+      }
+      updateArchiveUI();
+    }
+
+    if (archiveListener) {
+      supabase.removeChannel(archiveListener);
+    }
+
+    archiveListener = supabase.channel('chats-archive')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.closed' }, payload => {
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          const c = payload.new;
+          if (!archiveData[c.id]) archiveData[c.id] = { info: {}, messages: {} };
+          archiveData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
+        } else if (payload.eventType === 'DELETE') {
+          delete archiveData[payload.old.id];
+        }
+        updateArchiveUI();
+      })
+      .subscribe();
+  }
+
+  function updateArchiveUI() {
+    const archiveCount = document.getElementById('cs-archive-count');
+    if (archiveCount) archiveCount.textContent = Object.keys(archiveData).length;
+    if (currentTab === 'archive') renderChatList();
   }
 
   // ── Render Chat List ──────────────────────────────────────────
@@ -573,17 +621,19 @@
 
   function detachCurrentChatListeners() {
     if (selectedChatId) {
-      if (activeAddedListener) db.ref('chats/' + selectedChatId + '/messages').off('child_added', activeAddedListener);
-      if (activeChangedListener) db.ref('chats/' + selectedChatId + '/messages').off('child_changed', activeChangedListener);
-      if (activeTypingListener) db.ref('client-typing/' + selectedChatId).off('value', activeTypingListener);
-      activeAddedListener = null;
-      activeChangedListener = null;
-      activeTypingListener = null;
+      if (activeMessagesListener) {
+        supabase.removeChannel(activeMessagesListener);
+        activeMessagesListener = null;
+      }
+      if (activeTypingListener) {
+        supabase.removeChannel(activeTypingListener);
+        activeTypingListener = null;
+      }
     }
   }
 
   // ── Select Chat ───────────────────────────────────────────────
-  function selectChat(chatId) {
+  async function selectChat(chatId) {
     detachCurrentChatListeners();
     selectedChatId = chatId;
     const chatSource = currentTab === 'archive' ? archiveData : chatsData;
@@ -605,48 +655,91 @@
     messagesEl.innerHTML = '';
     const renderedIds = new Set();
 
-    // Listen for messages
-    activeAddedListener = db
-      .ref('chats/' + chatId + '/messages')
-      .orderByChild('timestamp')
-      .on('child_added', (snap) => {
-        const msg = snap.val();
-        const msgId = snap.key;
-        if (renderedIds.has(msgId)) return;
-        renderedIds.add(msgId);
-
-        renderCSMessage(msg, msgId);
-        scrollCSMessages();
-
-        // Mark client messages as read
+    const { data: msgs } = await supabase.from('messages').select('*').eq('chat_id', chatId).order('timestamp', { ascending: true });
+    if (msgs) {
+      msgs.forEach(m => {
+        const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+        if (chatSource[chatId]) {
+          chatSource[chatId].messages[m.id] = msg;
+        }
+        renderedIds.add(m.id);
+        renderCSMessage(msg, m.id);
+        
         if (msg.sender === 'client' && !msg.read) {
-          db.ref('chats/' + chatId + '/messages/' + msgId).update({ read: true });
+          supabase.from('messages').update({ read: true }).eq('id', m.id).then();
         }
       });
+      scrollCSMessages();
+    }
 
-    // Listen for read receipts
-    activeChangedListener = db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
-      const msg = snap.val();
-      const msgId = snap.key;
-      if (msg.sender === 'cs' && msg.read) {
-        const statusEl = document.getElementById('cs-msg-status-' + msgId);
-        if (statusEl) {
-          statusEl.className = 'cs-msg-status read';
-          statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
+    // Listen for messages
+    activeMessagesListener = supabase.channel('messages-' + chatId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'chat_id=eq.' + chatId }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const m = payload.new;
+          const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+          if (chatSource[chatId]) chatSource[chatId].messages[m.id] = msg;
+          if (!renderedIds.has(m.id)) {
+            renderedIds.add(m.id);
+            renderCSMessage(msg, m.id);
+            scrollCSMessages();
+          }
+          if (msg.sender === 'client' && !msg.read) {
+            supabase.from('messages').update({ read: true }).eq('id', m.id).then();
+          }
+        } else if (payload.eventType === 'UPDATE') {
+          const m = payload.new;
+          const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+          if (chatSource[chatId]) chatSource[chatId].messages[m.id] = msg;
+          
+          if (msg.sender === 'cs' && msg.read) {
+            const statusEl = document.getElementById('cs-msg-status-' + m.id);
+            if (statusEl) {
+              statusEl.className = 'cs-msg-status read';
+              statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
+            }
+          }
+
+          const bubble = document.querySelector(`.cs-msg-bubble[data-id="${m.id}"]`);
+          if (bubble) {
+            let reactionContainer = bubble.querySelector('.cs-msg-reactions');
+            if (msg.reaction) {
+              if (!reactionContainer) {
+                reactionContainer = document.createElement('div');
+                reactionContainer.className = 'cs-msg-reactions';
+                const timeContainer = bubble.querySelector('.cs-msg-time-container');
+                if (timeContainer) {
+                  bubble.insertBefore(reactionContainer, timeContainer);
+                } else {
+                  bubble.appendChild(reactionContainer);
+                }
+              }
+              reactionContainer.innerHTML = `<span class="cs-msg-reaction">${msg.reaction}</span>`;
+            } else if (reactionContainer) {
+              reactionContainer.remove();
+            }
+          }
         }
-      }
-    });
+      })
+      .subscribe();
 
     // Listen for client typing
-    activeTypingListener = db.ref('client-typing/' + chatId).on('value', (snap) => {
-      const data = snap.val();
-      if (data && data.isTyping && Date.now() - (data.timestamp || 0) < 5000) {
-        clientTypingEl.classList.add('show');
-        scrollCSMessages();
-      } else {
-        clientTypingEl.classList.remove('show');
-      }
-    });
+    activeTypingListener = supabase.channel('typing-' + chatId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'typing_status', filter: 'chat_id=eq.' + chatId }, (payload) => {
+        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+          const data = payload.new;
+          const ts = data.client_timestamp ? new Date(data.client_timestamp).getTime() : 0;
+          if (data.client_is_typing && Date.now() - ts < 5000) {
+            clientTypingEl.classList.add('show');
+            scrollCSMessages();
+          } else {
+            clientTypingEl.classList.remove('show');
+          }
+        } else if (payload.eventType === 'DELETE') {
+          clientTypingEl.classList.remove('show');
+        }
+      })
+      .subscribe();
 
     // Archive mode: hide input area and close button
     const csInputArea = document.getElementById('cs-input-area');
@@ -696,11 +789,8 @@
       const replyHtml = msg.replyTo ? `<div class="cs-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo.text)}</div>` : '';
       
       let reactionsHtml = '';
-      if (msg.reactions) {
-        const reacts = Object.values(msg.reactions);
-        if (reacts.length > 0) {
-          reactionsHtml = `<div class="cs-msg-reactions">${reacts.map(r => `<span class="cs-msg-reaction">${r}</span>`).join('')}</div>`;
-        }
+      if (msg.reaction) {
+        reactionsHtml = `<div class="cs-msg-reactions"><span class="cs-msg-reaction">${msg.reaction}</span></div>`;
       }
 
       div.innerHTML = `
@@ -728,26 +818,28 @@
   }
 
   // ── Send Message as CS ────────────────────────────────────────
-  function sendCSMessage() {
+  async function sendCSMessage() {
     const text = chatInput.value.trim();
     if (!text || !selectedChatId) return;
 
-    db.ref('chats/' + selectedChatId + '/messages').push({
+    await supabase.from('messages').insert({
+      chat_id: selectedChatId,
       sender: 'cs',
       senderName: csName,
       text: text,
-      replyTo: csReplyToData || null,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      replyTo_id: csReplyToData ? csReplyToData.id : null,
+      replyTo_text: csReplyToData ? csReplyToData.text : null,
+      timestamp: new Date().toISOString(),
       read: true,
     });
 
     csReplyToData = null;
     document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
 
-    db.ref('chats/' + selectedChatId + '/info').update({
-      lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
+    await supabase.from('chats').update({
+      lastMessageAt: new Date().toISOString(),
       assignedCS: csName,
-    });
+    }).eq('id', selectedChatId);
 
     chatInput.value = '';
     sendBtn.disabled = true;
@@ -757,11 +849,12 @@
   // ── CS Typing Indicator ───────────────────────────────────────
   function sendCSTyping() {
     if (!selectedChatId) return;
-    db.ref('cs-typing/' + selectedChatId).set({
-      isTyping: true,
-      csName: csName,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-    });
+    supabase.from('typing_status').upsert({
+      chat_id: selectedChatId,
+      cs_is_typing: true,
+      cs_name: csName,
+      cs_timestamp: new Date().toISOString(),
+    }).then();
 
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => clearCSTyping(), 3000);
@@ -769,26 +862,27 @@
 
   function clearCSTyping() {
     if (!selectedChatId) return;
-    db.ref('cs-typing/' + selectedChatId).set({
-      isTyping: false,
-      csName: csName,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-    });
+    supabase.from('typing_status').upsert({
+      chat_id: selectedChatId,
+      cs_is_typing: false,
+      cs_name: csName,
+      cs_timestamp: new Date().toISOString(),
+    }).then();
   }
 
   // ── Close Chat ────────────────────────────────────────────────
-  function closeActiveChat() {
+  async function closeActiveChat() {
     if (!selectedChatId) return;
     if (!confirm('Tutup chat ini? Client tidak bisa mengirim pesan lagi.')) return;
 
-    db.ref('chats/' + selectedChatId + '/info').update({
+    await supabase.from('chats').update({
       status: 'closed',
-    });
+    }).eq('id', selectedChatId);
 
     // Detach listener
     detachCurrentChatListeners();
 
-    db.ref('cs-typing/' + selectedChatId).remove();
+    await supabase.from('typing_status').delete().eq('chat_id', selectedChatId);
 
     selectedChatId = null;
     chatView.style.display = 'none';
@@ -875,23 +969,29 @@
 
     // Deactivate session
     if (csSession) {
-      db.ref('cs-sessions/' + csSession).update({ active: false });
+      supabase.from('cs_sessions').update({ active: false }).eq('id', csSession).then();
     }
 
     // Clear typing
     if (selectedChatId) {
-      db.ref('cs-typing/' + selectedChatId).remove();
+      supabase.from('typing_status').delete().eq('chat_id', selectedChatId).then();
     }
 
     // Detach all listeners
     if (chatsListener) {
-      db.ref('chats').off('value', chatsListener);
+      supabase.removeChannel(chatsListener);
+      chatsListener = null;
+    }
+    if (archiveListener) {
+      supabase.removeChannel(archiveListener);
+      archiveListener = null;
     }
     detachCurrentChatListeners();
 
     clearSession();
     selectedChatId = null;
     chatsData = {};
+    archiveData = {};
 
     showLogin();
 
@@ -1090,33 +1190,37 @@
           return;
         }
         try {
-          const storage = window.firebaseStorage;
-          if (!storage) { if (window.showToast) window.showToast('Storage tidak tersedia', 'error'); return; }
-          
           sendBtn.disabled = true;
           chatInput.disabled = true;
           if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
-          const ref = storage.ref('chat-images/' + selectedChatId + '/' + Date.now() + '_' + file.name);
-          const snap = await ref.put(file);
-          const url = await snap.ref.getDownloadURL();
-          db.ref('chats/' + selectedChatId + '/messages').push({
+          const filePath = selectedChatId + '/' + Date.now() + '_' + file.name;
+          const { error: uploadError } = await supabase.storage.from('chat-images').upload(filePath, file);
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = supabase.storage.from('chat-images').getPublicUrl(filePath);
+          const url = urlData.publicUrl;
+
+          await supabase.from('messages').insert({
+            chat_id: selectedChatId,
             sender: 'cs',
             senderName: csName,
             text: '',
             imageUrl: url,
-            replyTo: csReplyToData || null,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            replyTo_id: csReplyToData ? csReplyToData.id : null,
+            replyTo_text: csReplyToData ? csReplyToData.text : null,
+            timestamp: new Date().toISOString(),
             read: true,
           });
 
           csReplyToData = null;
           document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
 
-          db.ref('chats/' + selectedChatId + '/info').update({
-            lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
+          await supabase.from('chats').update({
+            lastMessageAt: new Date().toISOString(),
             assignedCS: csName,
-          });
+          }).eq('id', selectedChatId);
+
           if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
         } catch (err) {
           console.error(err);
@@ -1217,7 +1321,14 @@
         reactions.addEventListener('click', (e) => {
           if (e.target.tagName === 'BUTTON' && csContextMsgId && selectedChatId) {
             const emoji = e.target.textContent;
-            db.ref('chats/' + selectedChatId + '/messages/' + csContextMsgId + '/reactions').push(emoji);
+            const bubble = document.querySelector(`.cs-msg-bubble[data-id="${csContextMsgId}"]`);
+            const currentReaction = bubble ? bubble.querySelector('.cs-msg-reaction') : null;
+            
+            if (currentReaction && currentReaction.textContent === emoji) {
+              supabase.from('messages').update({ reaction: null }).eq('id', csContextMsgId).then();
+            } else {
+              supabase.from('messages').update({ reaction: emoji }).eq('id', csContextMsgId).then();
+            }
             csCtxMenu.style.display = 'none';
           }
         });
@@ -1283,7 +1394,7 @@
           toast.classList.add('show');
           
           document.getElementById('toast-btn-yes').onclick = () => {
-            db.ref('chats/' + csArchiveContextMenuId).remove().then(() => {
+            supabase.from('chats').delete().eq('id', csArchiveContextMenuId).then(() => {
               toast.classList.remove('show');
               setTimeout(() => toast.remove(), 300);
               if (window.showToast) window.showToast('Chat berhasil dihapus secara permanen', 'success');

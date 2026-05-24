@@ -39,11 +39,8 @@
   let unreadCount = 0;
   let challengeAnswer = 0;
   let formOpenedAt = 0;
-  let messagesListener = null;
-  let typingListener = null;
+  let chatChannel = null;
   let typingTimeout = null;
-  let statusListener = null;
-  let messagesChangedListener = null;
   let renderedMessageIds = new Set();
   let isFirstLoad = true;
   let replyToData = null;
@@ -52,7 +49,16 @@
   let longPressTimer = null;
 
   const deviceId = window.getDeviceId();
-  const db = window.firebaseDB;
+  const supabaseClient = window.supabaseClient;
+
+  // ── Authentication ──────────────────────────────────────────────
+  async function ensureAuth() {
+    if (!supabaseClient) return;
+    const { data } = await supabaseClient.auth.getSession();
+    if (!data.session) {
+      await supabaseClient.auth.signInAnonymously();
+    }
+  }
 
   // ── Rate Limiting ─────────────────────────────────────────────
   const RATE_LIMIT = {
@@ -126,19 +132,19 @@
     // If we have an active chat, resume it
     if (chatId) {
       showChatView();
-      attachListeners();
-      
-      // Mark existing CS messages as read
-      db.ref('chats/' + chatId + '/messages')
-        .orderByChild('sender')
-        .equalTo('cs')
-        .once('value', (snap) => {
-          snap.forEach((child) => {
-            if (!child.val().read) {
-              child.ref.update({ read: true });
-            }
-          });
-        });
+      ensureAuth().then(() => {
+        attachListeners();
+        
+        // Mark existing CS messages as read
+        if (supabaseClient) {
+          supabaseClient.from('messages')
+            .update({ read: true })
+            .eq('chat_id', chatId)
+            .eq('sender', 'cs')
+            .eq('read', false)
+            .then();
+        }
+      });
     } else {
       showPrechatView();
     }
@@ -161,11 +167,11 @@
 
   // ── Client Presence ───────────────────────────────────────────
   function updatePresence() {
-    if (!chatId || !db) return;
+    if (!chatId || !supabaseClient) return;
     const isOnline = isOpen && !document.hidden;
-    db.ref('chats/' + chatId + '/info').update({
+    supabaseClient.from('chats').update({
       isOnline: isOnline
-    }).catch(() => {});
+    }).eq('id', chatId).then().catch(() => {});
   }
 
   document.addEventListener('visibilitychange', updatePresence);
@@ -279,138 +285,154 @@
     createChat();
   });
 
-  // ── Create New Chat in Firebase ───────────────────────────────
-  function createChat() {
+  // ── Create New Chat in Supabase ───────────────────────────────
+  async function createChat() {
+    await ensureAuth();
+
     chatId = 'chat_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
     localStorage.setItem('hd_chat_id', chatId);
     recordChatCreation();
 
-    const chatRef = db.ref('chats/' + chatId);
-    chatRef.child('info').set({
+    await supabaseClient.from('chats').insert({
+      id: chatId,
       clientName: clientName,
       clientEmail: clientEmail,
       status: 'active',
-      createdAt: firebase.database.ServerValue.TIMESTAMP,
-      lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
-      deviceId: deviceId,
+      isOnline: true,
+      lastMessageAt: new Date().toISOString()
     });
 
-    // Add greeting message from system
-    const lang = localStorage.getItem('lang') || 'id';
-    const greetingTemplate =
-      lang === 'en'
-        ? 'Hi {name}! 👋 How can we help you today?'
-        : 'Halo {name}! 👋 Ada yang bisa kami bantu hari ini?';
-    const greetingText = greetingTemplate.replace('{name}', clientName);
-
-    chatRef.child('messages').push({
-      sender: 'system',
-      senderName: 'HimawariDigi',
-      text: greetingText,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-      read: true,
-      isGreeting: true,
+    await supabaseClient.from('typing_status').insert({
+      chat_id: chatId,
+      client_is_typing: false,
+      cs_is_typing: false
     });
 
     renderedMessageIds.clear();
     messagesEl.innerHTML = '';
     isFirstLoad = true;
 
+    // Add greeting message locally since RLS blocks inserting 'system' messages from client
+    const lang = localStorage.getItem('lang') || 'id';
+    const greetingTemplate =
+      lang === 'en'
+        ? 'Hi {name}! 👋 How can we help you today?'
+        : 'Halo {name}! 👋 Ada yang bisa kami bantu hari ini?';
+    const greetingText = greetingTemplate.replace('{name}', clientName);
+    
+    renderMessage({
+      sender: 'system',
+      text: greetingText,
+      timestamp: new Date().toISOString()
+    }, 'local-greeting');
+
     showChatView();
     attachListeners();
   }
 
-  // ── Attach Firebase Listeners ─────────────────────────────────
-  function attachListeners() {
-    if (!chatId || !db) return;
+  // ── Attach Supabase Listeners ─────────────────────────────────
+  async function attachListeners() {
+    if (!chatId || !supabaseClient) return;
 
     detachListeners();
 
-    // Setup presence disconnect hook
-    db.ref('chats/' + chatId + '/info').onDisconnect().update({ isOnline: false });
-    updatePresence();
+    // Fetch existing messages
+    const { data: messages } = await supabaseClient
+      .from('messages')
+      .select('*')
+      .eq('chat_id', chatId)
+      .order('timestamp', { ascending: true });
 
-    // Listen for new messages
-    const msgRef = db.ref('chats/' + chatId + '/messages');
-    messagesListener = msgRef.orderByChild('timestamp').on('child_added', (snap) => {
-      const msg = snap.val();
-      const msgId = snap.key;
-
-      if (renderedMessageIds.has(msgId)) return;
-      renderedMessageIds.add(msgId);
-
-      renderMessage(msg, msgId);
+    if (messages) {
+      messages.forEach((msg) => {
+        if (!renderedMessageIds.has(msg.id)) {
+          renderedMessageIds.add(msg.id);
+          renderMessage(msg, msg.id);
+        }
+      });
       scrollToBottom();
+    }
+    
+    // Mark first load complete
+    setTimeout(() => {
+      isFirstLoad = false;
+    }, 500);
 
-      // Handle message reading/notifications
-      if (!isFirstLoad && msg.sender === 'cs') {
-        if (window.playNotifSound) window.playNotifSound();
-        if (!isOpen) {
-          unreadCount++;
-          unreadBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-          unreadBadge.style.display = 'flex';
-        } else if (!msg.read) {
-          msgRef.child(msgId).update({ read: true });
+    // Subscribe to realtime changes
+    chatChannel = supabaseClient.channel('chat-' + chatId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'chat_id=eq.' + chatId }, payload => {
+        const msg = payload.new;
+        if (payload.eventType === 'INSERT') {
+          if (!renderedMessageIds.has(msg.id)) {
+            renderedMessageIds.add(msg.id);
+            renderMessage(msg, msg.id);
+            scrollToBottom();
+
+            if (!isFirstLoad && msg.sender === 'cs') {
+              if (window.playNotifSound) window.playNotifSound();
+              if (!isOpen) {
+                unreadCount++;
+                unreadBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                unreadBadge.style.display = 'flex';
+              } else if (!msg.read) {
+                supabaseClient.from('messages').update({ read: true }).eq('id', msg.id).then();
+              }
+            }
+          }
         }
-      }
-
-      // Mark first load complete after a brief delay
-      if (isFirstLoad) {
-        setTimeout(() => {
-          isFirstLoad = false;
-        }, 500);
-      }
-    });
-
-    // Listen for read receipts
-    messagesChangedListener = db.ref('chats/' + chatId + '/messages').on('child_changed', (snap) => {
-      const msg = snap.val();
-      const msgId = snap.key;
-      if (msg.sender === 'client' && msg.read) {
-        const statusEl = document.getElementById('chat-msg-status-' + msgId);
-        if (statusEl) {
-          statusEl.className = 'chat-msg-status read';
-          statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
+        if (payload.eventType === 'UPDATE') {
+          if (msg.sender === 'client' && msg.read) {
+            const statusEl = document.getElementById('chat-msg-status-' + msg.id);
+            if (statusEl) {
+              statusEl.className = 'chat-msg-status read';
+              statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
+            }
+          }
+          
+          const bubble = document.querySelector(`.chat-msg-bubble[data-id="${msg.id}"]`);
+          if (bubble) {
+            let reactionContainer = bubble.querySelector('.chat-msg-reactions');
+            if (msg.reaction) {
+              if (!reactionContainer) {
+                reactionContainer = document.createElement('div');
+                reactionContainer.className = 'chat-msg-reactions';
+                const timeContainer = bubble.querySelector('.chat-msg-time-container');
+                if (timeContainer) {
+                  bubble.insertBefore(reactionContainer, timeContainer);
+                } else {
+                  bubble.appendChild(reactionContainer);
+                }
+              }
+              reactionContainer.innerHTML = `<span class="chat-msg-reaction">${msg.reaction}</span>`;
+            } else if (reactionContainer) {
+              reactionContainer.remove();
+            }
+          }
         }
-      }
-    });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'typing_status', filter: 'chat_id=eq.' + chatId }, payload => {
+        const data = payload.new;
+        if (data && data.cs_is_typing && Date.now() - new Date(data.cs_timestamp).getTime() < 5000) {
+          typingEl.style.display = 'flex';
+          scrollToBottom();
+        } else {
+          typingEl.style.display = 'none';
+        }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'chats', filter: 'id=eq.' + chatId }, payload => {
+        if (payload.new.status === 'closed') {
+          handleChatClosed();
+        }
+      })
+      .subscribe();
 
-    // Listen for CS typing indicator
-    const typingRef = db.ref('cs-typing/' + chatId);
-    typingListener = typingRef.on('value', (snap) => {
-      const data = snap.val();
-      if (data && data.isTyping && Date.now() - data.timestamp < 5000) {
-        typingEl.style.display = 'flex';
-        scrollToBottom();
-      } else {
-        typingEl.style.display = 'none';
-      }
-    });
-
-    // Listen for chat status changes (chat closed by CS)
-    statusListener = db.ref('chats/' + chatId + '/info/status').on('value', (snap) => {
-      if (snap.val() === 'closed') {
-        handleChatClosed();
-      }
-    });
+    updatePresence();
   }
 
   function detachListeners() {
-    if (messagesListener && chatId) {
-      db.ref('chats/' + chatId + '/messages').off('child_added', messagesListener);
-      messagesListener = null;
-    }
-    if (messagesChangedListener && chatId) {
-      db.ref('chats/' + chatId + '/messages').off('child_changed', messagesChangedListener);
-      messagesChangedListener = null;
-    }
-    if (typingListener && chatId) {
-      db.ref('cs-typing/' + chatId).off('value', typingListener);
-      typingListener = null;
-    }
-    if (statusListener && chatId) {
-      db.ref('chats/' + chatId + '/info/status').off('value', statusListener);
-      statusListener = null;
+    if (chatChannel) {
+      supabaseClient.removeChannel(chatChannel);
+      chatChannel = null;
     }
   }
 
@@ -422,7 +444,7 @@
 
     if (isSystem) {
       div.className = 'chat-msg chat-msg--system';
-      if (msg.isGreeting) {
+      if (msg.text && (msg.text.includes('👋') || msg.isGreeting)) {
         div.innerHTML = `<p data-greeting="true">${window.chatSanitize(msg.text)}</p>`;
       } else {
         div.innerHTML = `<p>${window.chatSanitize(msg.text)}</p>`;
@@ -441,15 +463,14 @@
         ? `<img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openChatLightbox('${msg.imageUrl}')" loading="lazy" />`
         : `<p>${window.chatSanitize(msg.text)}</p>`;
 
-      const replyHtml = msg.replyTo ? `<div class="chat-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo.text)}</div>` : '';
+      const replyHtml = msg.replyTo_text ? `<div class="chat-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo_text)}</div>` : '';
       
       let reactionsHtml = '';
-      if (msg.reactions) {
-        const reacts = Object.values(msg.reactions);
-        if (reacts.length > 0) {
-          reactionsHtml = `<div class="chat-msg-reactions">${reacts.map(r => `<span class="chat-msg-reaction">${r}</span>`).join('')}</div>`;
-        }
+      if (msg.reaction) {
+        reactionsHtml = `<div class="chat-msg-reactions"><span class="chat-msg-reaction">${msg.reaction}</span></div>`;
       }
+
+      const timeFormatted = msg.timestamp ? window.chatFormatTime(new Date(msg.timestamp).getTime()) : '';
 
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
@@ -458,7 +479,7 @@
           ${contentHtml}
           ${reactionsHtml}
           <div class="chat-msg-time-container">
-            <span class="chat-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+            <span class="chat-msg-time">${timeFormatted}</span>
             ${statusHtml}
           </div>
         </div>
@@ -470,7 +491,7 @@
   }
 
   // ── Send Message ──────────────────────────────────────────────
-  function sendMessage() {
+  async function sendMessage() {
     const text = chatInput.value.trim();
     if (!text || !chatId) return;
 
@@ -481,13 +502,14 @@
 
     recordMessage();
 
-    const msgRef = db.ref('chats/' + chatId + '/messages');
-    msgRef.push({
+    await supabaseClient.from('messages').insert({
+      chat_id: chatId,
       sender: 'client',
       senderName: clientName,
       text: text,
-      replyTo: replyToData || null,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      replyTo_id: replyToData ? replyToData.id : null,
+      replyTo_text: replyToData ? replyToData.text : null,
+      timestamp: new Date().toISOString(),
       read: false,
     });
 
@@ -495,9 +517,9 @@
     document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
 
     // Update last message timestamp
-    db.ref('chats/' + chatId + '/info').update({
-      lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
-    });
+    supabaseClient.from('chats').update({
+      lastMessageAt: new Date().toISOString(),
+    }).eq('id', chatId).then();
 
     chatInput.value = '';
     sendBtn.disabled = true;
@@ -508,12 +530,11 @@
 
   // ── Client Typing Indicator ───────────────────────────────────
   function sendClientTyping() {
-    if (!chatId) return;
-    db.ref('client-typing/' + chatId).set({
-      isTyping: true,
-      clientName: clientName,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-    });
+    if (!chatId || !supabaseClient) return;
+    supabaseClient.from('typing_status').update({
+      client_is_typing: true,
+      client_timestamp: new Date().toISOString()
+    }).eq('chat_id', chatId).then();
 
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
@@ -522,12 +543,11 @@
   }
 
   function clearClientTyping() {
-    if (!chatId) return;
-    db.ref('client-typing/' + chatId).set({
-      isTyping: false,
-      clientName: clientName,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-    });
+    if (!chatId || !supabaseClient) return;
+    supabaseClient.from('typing_status').update({
+      client_is_typing: false,
+      client_timestamp: new Date().toISOString()
+    }).eq('chat_id', chatId).then();
   }
 
   // ── Chat Closed Handler ───────────────────────────────────────
@@ -607,23 +627,24 @@
   }
 
   // ── Resume Existing Chat on Page Load ─────────────────────────
-  if (chatId && db) {
-    // Check if chat is still active
-    db.ref('chats/' + chatId + '/info/status')
-      .once('value')
-      .then((snap) => {
-        if (snap.val() === 'active') {
-          // Chat exists and is active, listeners will attach on open
-        } else {
-          // Chat is closed or doesn't exist, clear state
+  if (chatId && supabaseClient) {
+    ensureAuth().then(() => {
+      // Check if chat is still active
+      supabaseClient.from('chats').select('status').eq('id', chatId).single()
+        .then(({ data, error }) => {
+          if (data && data.status === 'active') {
+            // Chat exists and is active, listeners will attach on open
+          } else {
+            // Chat is closed or doesn't exist, clear state
+            localStorage.removeItem('hd_chat_id');
+            chatId = null;
+          }
+        })
+        .catch(() => {
           localStorage.removeItem('hd_chat_id');
           chatId = null;
-        }
-      })
-      .catch(() => {
-        localStorage.removeItem('hd_chat_id');
-        chatId = null;
-      });
+        });
+    });
   }
 
   // ── Image Upload ──────────────────────────────────────────────
@@ -646,10 +667,8 @@
         return;
       }
 
-      const storage = window.firebaseStorage;
-      if (!storage) {
+      if (!supabaseClient) {
         if (window.showToast) window.showToast('Storage tidak tersedia', 'error');
-        console.error('Firebase Storage is not initialized.');
         imageUploadInput.value = '';
         return;
       }
@@ -660,28 +679,33 @@
         chatInput.disabled = true;
         if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
-        const ref = storage.ref('chat-images/' + chatId + '/' + Date.now() + '_' + file.name);
-        const snap = await ref.put(file);
-        const url = await snap.ref.getDownloadURL();
+        const filePath = `${chatId}/${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabaseClient.storage.from('chat-images').upload(filePath, file);
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabaseClient.storage.from('chat-images').getPublicUrl(filePath);
+        const url = urlData.publicUrl;
 
         recordMessage();
 
-        db.ref('chats/' + chatId + '/messages').push({
+        await supabaseClient.from('messages').insert({
+          chat_id: chatId,
           sender: 'client',
           senderName: clientName,
           text: '',
           imageUrl: url,
-          replyTo: replyToData || null,
-          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          replyTo_id: replyToData ? replyToData.id : null,
+          replyTo_text: replyToData ? replyToData.text : null,
+          timestamp: new Date().toISOString(),
           read: false,
         });
 
         replyToData = null;
         document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
 
-        db.ref('chats/' + chatId + '/info').update({
-          lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
-        });
+        supabaseClient.from('chats').update({
+          lastMessageAt: new Date().toISOString(),
+        }).eq('id', chatId).then();
 
         if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
         sendClientTyping();
@@ -833,7 +857,14 @@
       reactions.addEventListener('click', (e) => {
         if (e.target.tagName === 'BUTTON' && contextMsgId && chatId) {
           const emoji = e.target.textContent;
-          db.ref('chats/' + chatId + '/messages/' + contextMsgId + '/reactions').push(emoji);
+          const bubble = document.querySelector(`.chat-msg-bubble[data-id="${contextMsgId}"]`);
+          const currentReaction = bubble ? bubble.querySelector('.chat-msg-reaction') : null;
+          
+          if (currentReaction && currentReaction.textContent === emoji) {
+            supabaseClient.from('messages').update({ reaction: null }).eq('id', contextMsgId).then();
+          } else {
+            supabaseClient.from('messages').update({ reaction: emoji }).eq('id', contextMsgId).then();
+          }
           ctxMenu.style.display = 'none';
         }
       });
