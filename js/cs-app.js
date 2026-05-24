@@ -1043,7 +1043,9 @@
     const dl = document.getElementById('cs-lightbox-download');
     if (lb && img) {
       img.src = url;
-      if (dl) { dl.href = url; dl.download = 'image_' + Date.now() + '.jpg'; }
+      img.classList.remove('zoomed');
+      if (dl) {
+        dl.href = url; dl.download = 'image_' + Date.now() + '.jpg'; }
       lb.style.display = 'flex';
     }
   };
@@ -1191,8 +1193,17 @@
     const lightbox = document.getElementById('cs-lightbox');
     const lightboxClose = document.getElementById('cs-lightbox-close');
     const lightboxOverlay = document.querySelector('.cs-lightbox-overlay');
+    const lightboxImg = document.getElementById('cs-lightbox-img');
+    
     if (lightboxClose) lightboxClose.addEventListener('click', () => { lightbox.style.display = 'none'; });
     if (lightboxOverlay) lightboxOverlay.addEventListener('click', () => { lightbox.style.display = 'none'; });
+    
+    if (lightboxImg) {
+      lightboxImg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        lightboxImg.classList.toggle('zoomed');
+      });
+    }
 
     // ── Emoji Picker ──
     const csEmojiToggle = document.getElementById('cs-emoji-toggle');

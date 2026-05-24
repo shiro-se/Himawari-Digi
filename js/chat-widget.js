@@ -314,7 +314,6 @@
 
     const { error: chatError } = await supabaseClient.from('chats').insert({
       id: chatId,
-      user_id: userId,
       clientName: clientName,
       clientEmail: clientEmail,
       status: 'active',
@@ -754,6 +753,7 @@
     const dl = document.getElementById('chat-lightbox-download');
     if (lb && img) {
       img.src = url;
+      img.classList.remove('zoomed');
       if (dl) {
         dl.href = url;
         dl.download = 'image_' + Date.now() + '.jpg';
@@ -769,8 +769,17 @@
 
   const lbClose = document.getElementById('chat-lightbox-close');
   const lbOverlay = document.querySelector('.chat-lightbox-overlay');
+  const lbImg = document.getElementById('chat-lightbox-img');
+  
   if (lbClose) lbClose.addEventListener('click', closeLightbox);
   if (lbOverlay) lbOverlay.addEventListener('click', closeLightbox);
+  
+  if (lbImg) {
+    lbImg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      lbImg.classList.toggle('zoomed');
+    });
+  }
 
   // ── Close on Escape Key ───────────────────────────────────────
   document.addEventListener('keydown', (e) => {
