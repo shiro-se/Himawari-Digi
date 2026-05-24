@@ -957,6 +957,115 @@
       }
       .cs-msg-image:hover { transform: scale(1.02); }
 
+      /* ── Emoji Picker ── */
+      .cs-emoji-picker {
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 10px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        z-index: 50;
+        animation: csFadeIn 0.2s ease;
+      }
+      .cs-emoji-btn {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 6px;
+        transition: transform 0.2s, background 0.2s;
+      }
+      .cs-emoji-btn:hover {
+        background: var(--border);
+        transform: scale(1.2);
+      }
+
+      /* ── Context Menu ── */
+      .cs-context-menu {
+        position: fixed;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 6px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+        z-index: 100000;
+        min-width: 150px;
+        animation: csFadeIn 0.15s ease;
+      }
+      .cs-context-menu button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        background: none;
+        border: none;
+        color: var(--foreground);
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 6px;
+        font-family: inherit;
+        transition: background 0.15s;
+      }
+      .cs-context-menu button:hover {
+        background: var(--border);
+      }
+      .cs-ctx-reactions {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 6px;
+        border-top: 1px solid var(--border);
+        margin-top: 4px;
+        padding-top: 8px;
+      }
+      .cs-ctx-reactions button {
+        padding: 4px;
+        width: auto;
+        font-size: 1.1rem;
+      }
+      .cs-ctx-reactions button:hover {
+        transform: scale(1.2);
+        background: none;
+      }
+
+      /* ── Message Extras (Reply/React) ── */
+      .cs-msg-reply {
+        font-size: 0.7rem;
+        color: var(--muted);
+        background: rgba(0,0,0,0.05);
+        padding: 4px 8px;
+        border-radius: 6px;
+        border-left: 2px solid var(--primary);
+        margin-bottom: 6px;
+        opacity: 0.9;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .dark .cs-msg-reply { background: rgba(255,255,255,0.05); }
+      .cs-msg-reactions {
+        display: flex;
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .cs-msg-reaction {
+        font-size: 0.75rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 2px 6px;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      }
+
       /* ── Lightbox ── */
       .cs-lightbox {
         position: fixed;
@@ -1160,11 +1269,30 @@
               </div>
               <span>Client sedang mengetik...</span>
             </div>
+            <!-- Emoji Picker -->
+            <div class="cs-emoji-picker" id="cs-emoji-picker" style="display:none">
+              <button type="button" class="cs-emoji-btn">😀</button>
+              <button type="button" class="cs-emoji-btn">😂</button>
+              <button type="button" class="cs-emoji-btn">🤣</button>
+              <button type="button" class="cs-emoji-btn">😊</button>
+              <button type="button" class="cs-emoji-btn">😍</button>
+              <button type="button" class="cs-emoji-btn">🙏</button>
+              <button type="button" class="cs-emoji-btn">👍</button>
+              <button type="button" class="cs-emoji-btn">🔥</button>
+              <button type="button" class="cs-emoji-btn">✨</button>
+              <button type="button" class="cs-emoji-btn">🎉</button>
+              <button type="button" class="cs-emoji-btn">❤️</button>
+              <button type="button" class="cs-emoji-btn">💯</button>
+            </div>
+
             <div class="cs-input-area" id="cs-input-area">
               <label class="cs-attach-btn" for="cs-image-upload" title="Kirim gambar">
                 <i class="ph ph-image"></i>
               </label>
               <input type="file" id="cs-image-upload" accept="image/*" style="display:none" />
+              <button type="button" class="cs-attach-btn" id="cs-emoji-toggle" title="Emoji">
+                <i class="ph ph-smiley"></i>
+              </button>
               <input type="text" class="cs-input" id="cs-chat-input" placeholder="Ketik pesan..." maxlength="500" autocomplete="off" />
               <button class="cs-send-btn" id="cs-chat-send" disabled>
                 <i class="ph-bold ph-paper-plane-tilt"></i>
@@ -1173,6 +1301,25 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Context Menu (Messages) -->
+    <div class="cs-context-menu" id="cs-context-menu" style="display:none">
+      <button id="cs-ctx-reply"><i class="ph ph-arrow-u-up-left"></i> Reply</button>
+      <button id="cs-ctx-fav"><i class="ph ph-star"></i> Favorite</button>
+      <div class="cs-ctx-reactions">
+        <button>👍</button>
+        <button>❤️</button>
+        <button>😂</button>
+        <button>😮</button>
+        <button>😢</button>
+        <button>🙏</button>
+      </div>
+    </div>
+
+    <!-- Context Menu (Archive) -->
+    <div class="cs-context-menu" id="cs-archive-context-menu" style="display:none">
+      <button id="cs-archive-ctx-delete" style="color: #ef4444;"><i class="ph ph-trash"></i> Hapus Permanen</button>
     </div>
 
     <!-- Scripts -->

@@ -25,6 +25,11 @@
   let currentTab = 'active';
   let archiveData = {};
   let archiveListener = null;
+  let csReplyToData = null;
+  let csContextMsgId = null;
+  let csContextMsgText = null;
+  let csLongPressTimer = null;
+  let csArchiveContextMenuId = null;
 
   // ── DOM Refs ──────────────────────────────────────────────────
   const loginView = document.getElementById('cs-login-view');
@@ -663,11 +668,23 @@
         ? `<img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openCSLightbox('${msg.imageUrl}')" loading="lazy" />`
         : `<p>${window.chatSanitize(msg.text)}</p>`;
 
+      const replyHtml = msg.replyTo ? `<div class="cs-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo.text)}</div>` : '';
+      
+      let reactionsHtml = '';
+      if (msg.reactions) {
+        const reacts = Object.values(msg.reactions);
+        if (reacts.length > 0) {
+          reactionsHtml = `<div class="cs-msg-reactions">${reacts.map(r => `<span class="cs-msg-reaction">${r}</span>`).join('')}</div>`;
+        }
+      }
+
       div.innerHTML = `
         ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
-        <div class="cs-msg-bubble">
+        <div class="cs-msg-bubble" data-id="${msgId}" data-text="${window.chatSanitize(msg.text || '[Image]')}">
           ${senderNameHtml}
+          ${replyHtml}
           ${imageHtml}
+          ${reactionsHtml}
           <div class="cs-msg-time-container">
             <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
             ${statusHtml}
@@ -694,9 +711,13 @@
       sender: 'cs',
       senderName: csName,
       text: text,
+      replyTo: csReplyToData || null,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       read: true,
     });
+
+    csReplyToData = null;
+    document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
 
     db.ref('chats/' + selectedChatId + '/info').update({
       lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
@@ -881,6 +902,7 @@
       assignedCS: chat.info?.assignedCS || '',
       messages: messages.map(m => ({
         time: m.timestamp ? new Date(m.timestamp).toLocaleString('id-ID') : '',
+        type: m.sender === 'client' ? 'Client' : m.sender === 'system' ? 'System' : 'CS',
         sender: m.sender === 'client' ? (chat.info?.clientName || 'Client') : m.sender === 'system' ? 'System' : (m.senderName || 'CS'),
         text: m.text || (m.imageUrl ? '[Image]' : ''),
       }))
@@ -1032,17 +1054,24 @@
 
     // ── Image Upload ──
     const csImageUpload = document.getElementById('cs-image-upload');
+    const csAttachLabel = document.querySelector('.cs-attach-btn[for="cs-image-upload"]');
     if (csImageUpload) {
       csImageUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file || !selectedChatId) return;
         if (file.size > 5 * 1024 * 1024) {
           if (window.showToast) window.showToast('Ukuran gambar maksimal 5MB', 'error');
+          csImageUpload.value = '';
           return;
         }
         try {
           const storage = window.firebaseStorage;
           if (!storage) { if (window.showToast) window.showToast('Storage tidak tersedia', 'error'); return; }
+          
+          sendBtn.disabled = true;
+          chatInput.disabled = true;
+          if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
+
           const ref = storage.ref('chat-images/' + selectedChatId + '/' + Date.now() + '_' + file.name);
           const snap = await ref.put(file);
           const url = await snap.ref.getDownloadURL();
@@ -1051,16 +1080,27 @@
             senderName: csName,
             text: '',
             imageUrl: url,
+            replyTo: csReplyToData || null,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             read: true,
           });
+
+          csReplyToData = null;
+          document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
+
           db.ref('chats/' + selectedChatId + '/info').update({
             lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
             assignedCS: csName,
           });
+          if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
         } catch (err) {
+          console.error(err);
           if (window.showToast) window.showToast('Gagal upload gambar', 'error');
         }
+        
+        sendBtn.disabled = !chatInput.value.trim();
+        chatInput.disabled = false;
+        if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-image"></i>';
         csImageUpload.value = '';
       });
     }
@@ -1071,6 +1111,170 @@
     const lightboxOverlay = document.querySelector('.cs-lightbox-overlay');
     if (lightboxClose) lightboxClose.addEventListener('click', () => { lightbox.style.display = 'none'; });
     if (lightboxOverlay) lightboxOverlay.addEventListener('click', () => { lightbox.style.display = 'none'; });
+
+    // ── Emoji Picker ──
+    const csEmojiToggle = document.getElementById('cs-emoji-toggle');
+    const csEmojiPicker = document.getElementById('cs-emoji-picker');
+    if (csEmojiToggle && csEmojiPicker) {
+      csEmojiToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        csEmojiPicker.style.display = csEmojiPicker.style.display === 'none' ? 'grid' : 'none';
+      });
+      csEmojiPicker.addEventListener('click', (e) => {
+        if (e.target.classList.contains('cs-emoji-btn')) {
+          chatInput.value += e.target.textContent;
+          sendBtn.disabled = !chatInput.value.trim();
+          csEmojiPicker.style.display = 'none';
+          chatInput.focus();
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (!csEmojiToggle.contains(e.target) && !csEmojiPicker.contains(e.target)) {
+          csEmojiPicker.style.display = 'none';
+        }
+      });
+    }
+
+    // ── Context Menu (Messages) ──
+    const csCtxMenu = document.getElementById('cs-context-menu');
+    function showCSContextMenu(e, msgId, msgText) {
+      e.preventDefault();
+      csContextMsgId = msgId;
+      csContextMsgText = msgText;
+      let x = e.clientX || (e.touches && e.touches[0].clientX);
+      let y = e.clientY || (e.touches && e.touches[0].clientY);
+      csCtxMenu.style.display = 'block';
+      if (x + csCtxMenu.offsetWidth > window.innerWidth) x -= csCtxMenu.offsetWidth;
+      if (y + csCtxMenu.offsetHeight > window.innerHeight) y -= csCtxMenu.offsetHeight;
+      csCtxMenu.style.left = x + 'px';
+      csCtxMenu.style.top = y + 'px';
+    }
+
+    messagesEl.addEventListener('contextmenu', (e) => {
+      const bubble = e.target.closest('.cs-msg-bubble');
+      if (bubble && bubble.dataset.id) {
+        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+      }
+    });
+
+    messagesEl.addEventListener('touchstart', (e) => {
+      const bubble = e.target.closest('.cs-msg-bubble');
+      if (bubble && bubble.dataset.id) {
+        csLongPressTimer = setTimeout(() => {
+          showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+        }, 500);
+      }
+    });
+    messagesEl.addEventListener('touchend', () => clearTimeout(csLongPressTimer));
+    messagesEl.addEventListener('touchmove', () => clearTimeout(csLongPressTimer));
+
+    if (csCtxMenu) {
+      document.getElementById('cs-ctx-reply').addEventListener('click', () => {
+        csReplyToData = { id: csContextMsgId, text: csContextMsgText };
+        document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
+        const preview = document.createElement('div');
+        preview.className = 'cs-reply-preview';
+        preview.innerHTML = `<div class="cs-msg-reply" style="margin:0 10px 5px">Replying to: ${window.chatSanitize(csContextMsgText)}</div>`;
+        const inputArea = document.getElementById('cs-input-area');
+        inputArea.insertBefore(preview, inputArea.firstChild);
+        chatInput.focus();
+        csCtxMenu.style.display = 'none';
+      });
+      document.getElementById('cs-ctx-fav').addEventListener('click', () => {
+        const favs = JSON.parse(localStorage.getItem('hd_cs_fav_msgs') || '[]');
+        if (!favs.includes(csContextMsgId)) favs.push(csContextMsgId);
+        localStorage.setItem('hd_cs_fav_msgs', JSON.stringify(favs));
+        if (window.showToast) window.showToast('Pesan ditambahkan ke favorit', 'success');
+        csCtxMenu.style.display = 'none';
+      });
+      const reactions = csCtxMenu.querySelector('.cs-ctx-reactions');
+      if (reactions) {
+        reactions.addEventListener('click', (e) => {
+          if (e.target.tagName === 'BUTTON' && csContextMsgId && selectedChatId) {
+            const emoji = e.target.textContent;
+            db.ref('chats/' + selectedChatId + '/messages/' + csContextMsgId + '/reactions').push(emoji);
+            csCtxMenu.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    // ── Context Menu (Archive) ──
+    const archiveCtxMenu = document.getElementById('cs-archive-context-menu');
+    function showArchiveContextMenu(e, id) {
+      e.preventDefault();
+      csArchiveContextMenuId = id;
+      let x = e.clientX || (e.touches && e.touches[0].clientX);
+      let y = e.clientY || (e.touches && e.touches[0].clientY);
+      archiveCtxMenu.style.display = 'block';
+      if (x + archiveCtxMenu.offsetWidth > window.innerWidth) x -= archiveCtxMenu.offsetWidth;
+      if (y + archiveCtxMenu.offsetHeight > window.innerHeight) y -= archiveCtxMenu.offsetHeight;
+      archiveCtxMenu.style.left = x + 'px';
+      archiveCtxMenu.style.top = y + 'px';
+    }
+
+    chatList.addEventListener('contextmenu', (e) => {
+      const item = e.target.closest('.cs-chat-item');
+      if (item && currentTab === 'archive') {
+        showArchiveContextMenu(e, item.dataset.id);
+      }
+    });
+
+    chatList.addEventListener('touchstart', (e) => {
+      const item = e.target.closest('.cs-chat-item');
+      if (item && currentTab === 'archive') {
+        csLongPressTimer = setTimeout(() => {
+          showArchiveContextMenu(e, item.dataset.id);
+        }, 500);
+      }
+    });
+    chatList.addEventListener('touchend', () => clearTimeout(csLongPressTimer));
+    chatList.addEventListener('touchmove', () => clearTimeout(csLongPressTimer));
+
+    if (archiveCtxMenu) {
+      document.getElementById('cs-archive-ctx-delete').addEventListener('click', () => {
+        if (csArchiveContextMenuId && window.showToast) {
+          // Toast confirm
+          const toast = document.createElement('div');
+          toast.className = 'toast toast--warning';
+          toast.innerHTML = `
+            <div class="toast-content">
+              <span>Hapus chat secara permanen?</span>
+              <div style="margin-top:8px; display:flex; gap:8px;">
+                <button id="toast-btn-yes" style="padding:4px 8px; border-radius:4px; border:none; background:var(--destructive); color:white; cursor:pointer;">Ya</button>
+                <button id="toast-btn-no" style="padding:4px 8px; border-radius:4px; border:none; background:var(--border); color:var(--foreground); cursor:pointer;">Batal</button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.classList.add('show'), 10);
+          
+          document.getElementById('toast-btn-yes').onclick = () => {
+            db.ref('chats/' + csArchiveContextMenuId).remove().then(() => {
+              toast.classList.remove('show');
+              setTimeout(() => toast.remove(), 300);
+              window.showToast('Chat berhasil dihapus secara permanen', 'success');
+              if (selectedChatId === csArchiveContextMenuId) {
+                detail.style.display = 'none';
+                detailEmpty.style.display = 'flex';
+                selectedChatId = null;
+              }
+            });
+          };
+          document.getElementById('toast-btn-no').onclick = () => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+          };
+        }
+        archiveCtxMenu.style.display = 'none';
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (csCtxMenu && !csCtxMenu.contains(e.target)) csCtxMenu.style.display = 'none';
+      if (archiveCtxMenu && !archiveCtxMenu.contains(e.target)) archiveCtxMenu.style.display = 'none';
+    });
+
   }
 
   // ── Init ──────────────────────────────────────────────────────

@@ -46,6 +46,10 @@
   let messagesChangedListener = null;
   let renderedMessageIds = new Set();
   let isFirstLoad = true;
+  let replyToData = null;
+  let contextMsgId = null;
+  let contextMsgText = null;
+  let longPressTimer = null;
 
   const deviceId = window.getDeviceId();
   const db = window.firebaseDB;
@@ -437,10 +441,22 @@
         ? `<img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openChatLightbox('${msg.imageUrl}')" loading="lazy" />`
         : `<p>${window.chatSanitize(msg.text)}</p>`;
 
+      const replyHtml = msg.replyTo ? `<div class="chat-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo.text)}</div>` : '';
+      
+      let reactionsHtml = '';
+      if (msg.reactions) {
+        const reacts = Object.values(msg.reactions);
+        if (reacts.length > 0) {
+          reactionsHtml = `<div class="chat-msg-reactions">${reacts.map(r => `<span class="chat-msg-reaction">${r}</span>`).join('')}</div>`;
+        }
+      }
+
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
-        <div class="chat-msg-bubble">
+        <div class="chat-msg-bubble" data-id="${msgId}" data-text="${window.chatSanitize(msg.text || '[Image]')}">
+          ${replyHtml}
           ${contentHtml}
+          ${reactionsHtml}
           <div class="chat-msg-time-container">
             <span class="chat-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
             ${statusHtml}
@@ -470,9 +486,13 @@
       sender: 'client',
       senderName: clientName,
       text: text,
+      replyTo: replyToData || null,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       read: false,
     });
+
+    replyToData = null;
+    document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
 
     // Update last message timestamp
     db.ref('chats/' + chatId + '/info').update({
@@ -608,6 +628,7 @@
 
   // ── Image Upload ──────────────────────────────────────────────
   const imageUploadInput = document.getElementById('chat-image-upload');
+  const chatAttachLabel = document.querySelector('.chat-attach-btn[for="chat-image-upload"]');
   if (imageUploadInput) {
     imageUploadInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
@@ -628,6 +649,7 @@
       const storage = window.firebaseStorage;
       if (!storage) {
         if (window.showToast) window.showToast('Storage tidak tersedia', 'error');
+        console.error('Firebase Storage is not initialized.');
         imageUploadInput.value = '';
         return;
       }
@@ -635,6 +657,8 @@
       try {
         // Show uploading state
         sendBtn.disabled = true;
+        chatInput.disabled = true;
+        if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
         const ref = storage.ref('chat-images/' + chatId + '/' + Date.now() + '_' + file.name);
         const snap = await ref.put(file);
@@ -647,23 +671,32 @@
           senderName: clientName,
           text: '',
           imageUrl: url,
+          replyTo: replyToData || null,
           timestamp: firebase.database.ServerValue.TIMESTAMP,
           read: false,
         });
+
+        replyToData = null;
+        document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
 
         db.ref('chats/' + chatId + '/info').update({
           lastMessageAt: firebase.database.ServerValue.TIMESTAMP,
         });
 
+        if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
         sendClientTyping();
       } catch (err) {
-        if (window.showToast) window.showToast('Gagal upload gambar', 'error');
+        console.error('Image upload failed:', err);
+        if (window.showToast) window.showToast('Gagal upload gambar. Coba lagi.', 'error');
       }
 
       sendBtn.disabled = !chatInput.value.trim();
+      chatInput.disabled = false;
+      if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-image"></i>';
       imageUploadInput.value = '';
     });
   }
+
 
   // ── Lightbox ───────────────────────────────────────────────────
   window.openChatLightbox = function (url) {
@@ -701,4 +734,110 @@
       }
     }
   });
+
+  // ── Emoji Picker ────────────────────────────────────────────────
+  const emojiToggle = document.getElementById('chat-emoji-toggle');
+  const emojiPicker = document.getElementById('chat-emoji-picker');
+  if (emojiToggle && emojiPicker) {
+    emojiToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'grid' : 'none';
+    });
+    emojiPicker.addEventListener('click', (e) => {
+      if (e.target.classList.contains('chat-emoji-btn')) {
+        chatInput.value += e.target.textContent;
+        sendBtn.disabled = !chatInput.value.trim();
+        emojiPicker.style.display = 'none';
+        chatInput.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!emojiToggle.contains(e.target) && !emojiPicker.contains(e.target)) {
+        emojiPicker.style.display = 'none';
+      }
+    });
+  }
+
+  // ── Context Menu (Right Click & Long Press) ─────────────────────
+  const ctxMenu = document.getElementById('chat-context-menu');
+  
+  function showContextMenu(e, msgId, msgText) {
+    e.preventDefault();
+    contextMsgId = msgId;
+    contextMsgText = msgText;
+    
+    // Position menu
+    let x = e.clientX || (e.touches && e.touches[0].clientX);
+    let y = e.clientY || (e.touches && e.touches[0].clientY);
+    
+    ctxMenu.style.display = 'block';
+    // Adjust if off-screen
+    if (x + ctxMenu.offsetWidth > window.innerWidth) x -= ctxMenu.offsetWidth;
+    if (y + ctxMenu.offsetHeight > window.innerHeight) y -= ctxMenu.offsetHeight;
+    
+    ctxMenu.style.left = x + 'px';
+    ctxMenu.style.top = y + 'px';
+  }
+
+  messagesEl.addEventListener('contextmenu', (e) => {
+    const bubble = e.target.closest('.chat-msg-bubble');
+    if (bubble && bubble.dataset.id) {
+      showContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+    }
+  });
+
+  messagesEl.addEventListener('touchstart', (e) => {
+    const bubble = e.target.closest('.chat-msg-bubble');
+    if (bubble && bubble.dataset.id) {
+      longPressTimer = setTimeout(() => {
+        showContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+      }, 500);
+    }
+  });
+
+  messagesEl.addEventListener('touchend', () => clearTimeout(longPressTimer));
+  messagesEl.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+
+  document.addEventListener('click', (e) => {
+    if (ctxMenu && !ctxMenu.contains(e.target)) {
+      ctxMenu.style.display = 'none';
+    }
+  });
+
+  // Context menu actions
+  if (ctxMenu) {
+    document.getElementById('chat-ctx-reply').addEventListener('click', () => {
+      replyToData = { id: contextMsgId, text: contextMsgText };
+      
+      // Show reply preview above input
+      document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
+      const preview = document.createElement('div');
+      preview.className = 'chat-reply-preview';
+      preview.innerHTML = `<div class="chat-msg-reply" style="margin:0 10px 5px">Replying to: ${window.chatSanitize(contextMsgText)}</div>`;
+      inputArea.insertBefore(preview, inputArea.firstChild);
+      
+      chatInput.focus();
+      ctxMenu.style.display = 'none';
+    });
+
+    document.getElementById('chat-ctx-fav').addEventListener('click', () => {
+      const favs = JSON.parse(localStorage.getItem('hd_fav_msgs') || '[]');
+      if (!favs.includes(contextMsgId)) favs.push(contextMsgId);
+      localStorage.setItem('hd_fav_msgs', JSON.stringify(favs));
+      if (window.showToast) window.showToast('Pesan ditambahkan ke favorit', 'success');
+      ctxMenu.style.display = 'none';
+    });
+
+    const reactions = ctxMenu.querySelector('.chat-ctx-reactions');
+    if (reactions) {
+      reactions.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON' && contextMsgId && chatId) {
+          const emoji = e.target.textContent;
+          db.ref('chats/' + chatId + '/messages/' + contextMsgId + '/reactions').push(emoji);
+          ctxMenu.style.display = 'none';
+        }
+      });
+    }
+  }
+
 })();

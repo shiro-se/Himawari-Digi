@@ -474,6 +474,22 @@
           </div>
         </div>
 
+        <!-- Emoji Picker -->
+        <div class="chat-emoji-picker" id="chat-emoji-picker" style="display:none">
+          <button type="button" class="chat-emoji-btn">😀</button>
+          <button type="button" class="chat-emoji-btn">😂</button>
+          <button type="button" class="chat-emoji-btn">🤣</button>
+          <button type="button" class="chat-emoji-btn">😊</button>
+          <button type="button" class="chat-emoji-btn">😍</button>
+          <button type="button" class="chat-emoji-btn">🙏</button>
+          <button type="button" class="chat-emoji-btn">👍</button>
+          <button type="button" class="chat-emoji-btn">🔥</button>
+          <button type="button" class="chat-emoji-btn">✨</button>
+          <button type="button" class="chat-emoji-btn">🎉</button>
+          <button type="button" class="chat-emoji-btn">❤️</button>
+          <button type="button" class="chat-emoji-btn">💯</button>
+        </div>
+
         <!-- Input Area -->
         <div id="chat-input-area" class="chat-input-area" style="display: none">
           <div class="chat-input-wrap">
@@ -481,6 +497,11 @@
               <i class="ph ph-image"></i>
             </label>
             <input type="file" id="chat-image-upload" accept="image/*" style="display:none" />
+            
+            <button type="button" class="chat-attach-btn" id="chat-emoji-toggle" title="Emoji">
+              <i class="ph ph-smiley"></i>
+            </button>
+
             <input
               type="text"
               id="chat-input"
@@ -496,6 +517,20 @@
           <div class="chat-input-footer">
             <i class="ph ph-shield-check"></i>
             <span>Secured by <strong>HimawariDigi</strong></span>
+          </div>
+        </div>
+
+        <!-- Context Menu -->
+        <div class="chat-context-menu" id="chat-context-menu" style="display:none">
+          <button id="chat-ctx-reply"><i class="ph ph-arrow-u-up-left"></i> Reply</button>
+          <button id="chat-ctx-fav"><i class="ph ph-star"></i> Favorite</button>
+          <div class="chat-ctx-reactions">
+            <button>👍</button>
+            <button>❤️</button>
+            <button>😂</button>
+            <button>😮</button>
+            <button>😢</button>
+            <button>🙏</button>
           </div>
         </div>
 
