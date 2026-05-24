@@ -31,6 +31,31 @@
   let csLongPressTimer = null;
   let csArchiveContextMenuId = null;
 
+  // ── Toast Component ──
+  window.showToast = (message, type = 'info') => {
+    let container = document.querySelector('.hd-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'hd-toast-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = `hd-toast ${type}`;
+    let icon = 'ph-info';
+    if (type === 'error') icon = 'ph-warning-circle';
+    if (type === 'success') icon = 'ph-check-circle';
+    if (type === 'warning') icon = 'ph-warning';
+    const text = typeof window.chatSanitize === 'function' ? window.chatSanitize(message) : message;
+    toast.innerHTML = `<i class="ph-fill ${icon}"></i> <span>${text}</span>`;
+    container.appendChild(toast);
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  };
+
   // ── DOM Refs ──────────────────────────────────────────────────
   const loginView = document.getElementById('cs-login-view');
   const dashView = document.getElementById('cs-dashboard-view');
@@ -1233,12 +1258,19 @@
 
     if (archiveCtxMenu) {
       document.getElementById('cs-archive-ctx-delete').addEventListener('click', () => {
-        if (csArchiveContextMenuId && window.showToast) {
+        if (csArchiveContextMenuId) {
           // Toast confirm
+          let container = document.querySelector('.hd-toast-container');
+          if (!container) {
+            container = document.createElement('div');
+            container.className = 'hd-toast-container';
+            document.body.appendChild(container);
+          }
           const toast = document.createElement('div');
-          toast.className = 'toast toast--warning';
+          toast.className = 'hd-toast warning';
           toast.innerHTML = `
-            <div class="toast-content">
+            <i class="ph-fill ph-warning"></i>
+            <div class="toast-content" style="display:flex; flex-direction:column;">
               <span>Hapus chat secara permanen?</span>
               <div style="margin-top:8px; display:flex; gap:8px;">
                 <button id="toast-btn-yes" style="padding:4px 8px; border-radius:4px; border:none; background:var(--destructive); color:white; cursor:pointer;">Ya</button>
@@ -1246,14 +1278,15 @@
               </div>
             </div>
           `;
-          document.body.appendChild(toast);
-          setTimeout(() => toast.classList.add('show'), 10);
+          container.appendChild(toast);
+          void toast.offsetWidth;
+          toast.classList.add('show');
           
           document.getElementById('toast-btn-yes').onclick = () => {
             db.ref('chats/' + csArchiveContextMenuId).remove().then(() => {
               toast.classList.remove('show');
               setTimeout(() => toast.remove(), 300);
-              window.showToast('Chat berhasil dihapus secara permanen', 'success');
+              if (window.showToast) window.showToast('Chat berhasil dihapus secara permanen', 'success');
               if (selectedChatId === csArchiveContextMenuId) {
                 detail.style.display = 'none';
                 detailEmpty.style.display = 'flex';

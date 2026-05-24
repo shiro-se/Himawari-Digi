@@ -2755,7 +2755,7 @@ footer {
 /* ── Chat Emoji Picker ── */
 .chat-emoji-picker {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: 70px;
   left: 10px;
   background: var(--card);
   border: 1px solid var(--border);
