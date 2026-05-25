@@ -1237,63 +1237,68 @@
 
       if (window.showToast) window.showToast('Mempersiapkan PDF, harap tunggu...', 'info');
 
-      let rowIndex = 0;
-
+      const container = document.createElement('div');
+      container.style.cssText = 'padding: 20px; font-family: sans-serif; color: #1e293b;';
+      
+      let html = `<h2 style="margin-bottom: 4px; color: #0f172a;">Chat History &mdash; HimawariDigi</h2>`;
+      html += `<p style="margin-top: 0; font-size: 14px; color: #475569;">`;
+      html += `Client: <strong>${data.clientName}</strong> (${data.clientEmail})<br>`;
+      html += `CS: <strong>${data.assignedCS}</strong></p>`;
+      
+      html += `<table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; word-break: break-word;">`;
+      html += `<thead><tr style="background: #6366f1; color: #ffffff; text-align: left;">`;
+      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 15%;">Waktu</th>`;
+      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 10%;">Tipe</th>`;
+      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 15%;">Pengirim</th>`;
+      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 60%;">Pesan</th>`;
+      html += `</tr></thead><tbody>`;
+      
       for (const m of data.messages) {
-        let text = m.text;
-        const imgMatch = text.match(/\[Image\] (https?:\/\/[^\s]+)/);
-        if (imgMatch) {
-          const url = imgMatch[1];
-          try {
-            const res = await fetch(url);
-            const blob = await res.blob();
-            const b64 = await new Promise((resolve) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
-              reader.readAsDataURL(blob);
-            });
-            imageMap[rowIndex] = b64;
-            text = text.replace(imgMatch[0], '');
-          } catch (e) {
-            console.warn('Gagal memuat gambar untuk PDF:', url);
-          }
+        let textHtml = '';
+        if (m.text) {
+          textHtml += `<div>${window.chatSanitize(m.text).replace(/\n/g, '<br>')}</div>`;
         }
-        tableRows.push([m.time, m.type, m.sender, text]);
-        rowIndex++;
+        
+        if (m.imageUrl) {
+          textHtml += `<div style="margin-top: 8px;"><img src="${m.imageUrl}" crossorigin="anonymous" style="max-width: 150px; max-height: 150px; border-radius: 6px; border: 1px solid #e2e8f0; object-fit: contain;"></div>`;
+        }
+        
+        if (m.reaction) {
+          textHtml += `<div style="margin-top: 6px;"><span style="display: inline-block; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 11px;">${m.reaction}</span></div>`;
+        }
+        
+        html += `<tr>`;
+        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${m.time}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${m.type}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${m.sender}</td>`;
+        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${textHtml}</td>`;
+        html += `</tr>`;
       }
+      
+      html += `</tbody></table>`;
+      container.innerHTML = html;
 
-      doc.autoTable({
-        startY: 35,
-        head: [['Waktu', 'Tipe', 'Pengirim', 'Pesan']],
-        body: tableRows,
-        styles: { fontSize: 8, cellPadding: 3 },
-        headStyles: { fillColor: [99, 102, 241] },
-        columnStyles: { 3: { cellWidth: 80 } },
-        didParseCell: function (hookData) {
-          if (hookData.section === 'body' && hookData.column.index === 3) {
-            if (imageMap[hookData.row.index]) {
-              hookData.cell.styles.minCellHeight = 35;
-            }
-          }
-        },
-        didDrawCell: function (hookData) {
-          if (hookData.section === 'body' && hookData.column.index === 3) {
-            const b64 = imageMap[hookData.row.index];
-            if (b64) {
-              const textHeight = hookData.cell.text.length * 4;
-              doc.addImage(
-                b64,
-                'JPEG',
-                hookData.cell.x + 2,
-                hookData.cell.y + textHeight + 4,
-                25,
-                25
-              );
-            }
-          }
-        },
+      // Create a wrapper to temporarily put it in the DOM for html2pdf to process styles better
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 800px; background: white;';
+      wrapper.appendChild(container);
+      document.body.appendChild(wrapper);
+
+      const opt = {
+        margin:       10,
+        filename:     filename + '.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(container).save().then(() => {
+        document.body.removeChild(wrapper);
+      }).catch((err) => {
+        document.body.removeChild(wrapper);
+        console.error('PDF Export Error:', err);
+        if (window.showToast) window.showToast('Terjadi kesalahan saat membuat PDF.', 'error');
       });
-      doc.save(filename + '.pdf');
     }
   }
 
