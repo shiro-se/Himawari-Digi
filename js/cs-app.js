@@ -6,12 +6,11 @@
 (function () {
   'use strict';
 
-  document.addEventListener('DOMContentLoaded', async () => {
-  if (!window.supabaseClient) {
+  const supabase = window.supabaseClient;
+  if (!supabase) {
     console.error('Supabase client not initialized');
     return;
   }
-  const supabase = window.supabaseClient;
 
   // --- Sound Notification ---
   window.playNotifSound = function() {
