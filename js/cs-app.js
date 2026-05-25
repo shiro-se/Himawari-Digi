@@ -1185,10 +1185,9 @@
             : m.sender === 'system'
               ? 'System'
               : m.senderName || 'CS',
-        text:
-          (m.text || '') +
-          (m.imageUrl ? (m.text ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`) : '') +
-          (m.reaction ? `\n(Reaction: ${m.reaction})` : ''),
+        text: (m.text || ''),
+        imageUrl: m.imageUrl || null,
+        reaction: m.reaction || null
       })),
     };
   }
@@ -1202,7 +1201,10 @@
     if (format === 'csv') {
       let csv = 'Waktu,Tipe,Pengirim,Pesan\n';
       data.messages.forEach((m) => {
-        csv += `"${m.time}","${m.type}","${m.sender}","${m.text.replace(/"/g, '""')}"\n`;
+        let msgText = m.text || '';
+        if (m.imageUrl) msgText += (msgText ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`);
+        if (m.reaction) msgText += `\n(Reaction: ${m.reaction})`;
+        csv += `"${m.time}","${m.type}","${m.sender}","${msgText.replace(/"/g, '""')}"\n`;
       });
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       downloadBlob(blob, filename + '.csv');
@@ -1212,34 +1214,29 @@
         return;
       }
       const ws = XLSX.utils.json_to_sheet(
-        data.messages.map((m) => ({
-          Waktu: m.time,
-          Tipe: m.type,
-          Pengirim: m.sender,
-          Pesan: m.text,
-        }))
+        data.messages.map((m) => {
+          let msgText = m.text || '';
+          if (m.imageUrl) msgText += (msgText ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`);
+          if (m.reaction) msgText += `\n(Reaction: ${m.reaction})`;
+          return {
+            Waktu: m.time,
+            Tipe: m.type,
+            Pengirim: m.sender,
+            Pesan: msgText,
+          };
+        })
       );
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Chat');
       XLSX.writeFile(wb, filename + '.xlsx');
     } else if (format === 'pdf') {
-      if (!window.jspdf) {
+      if (!window.html2pdf) {
         if (window.showToast) window.showToast('Library PDF gagal dimuat', 'error');
         return;
       }
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text('Chat History \u2014 HimawariDigi', 14, 15);
-      doc.setFontSize(10);
-      doc.text(`Client: ${data.clientName} (${data.clientEmail})`, 14, 23);
-      doc.text(`CS: ${data.assignedCS}`, 14, 29);
-
       if (window.showToast) window.showToast('Mempersiapkan PDF, harap tunggu...', 'info');
 
-      const tableRows = [];
-      const imageMap = {};
       let rowIndex = 0;
 
       for (const m of data.messages) {
