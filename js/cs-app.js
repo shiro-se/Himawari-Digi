@@ -400,6 +400,28 @@
     if (chatsListener) {
       supabase.removeChannel(chatsListener);
     }
+    
+    // Global Messages Listener to catch incoming messages instantly without fetching
+    const globalMessagesListener = supabase.channel('messages-global')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        const m = payload.new;
+        const cId = m.chat_id;
+        const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+        
+        if (chatsData[cId]) {
+          chatsData[cId].messages[m.id] = msg;
+          if (m.sender === 'client') {
+            if (cId !== selectedChatId || document.hidden) {
+              notifyNewMessage('Pesan dari ' + (chatsData[cId].info.clientName || 'Client'), m.text || '[Image]', cId);
+            } else {
+              // If active, activeMessagesListener will handle marking as read. Just play sound.
+              if (window.playNotifSound) window.playNotifSound();
+            }
+          }
+          renderChatList();
+        }
+      })
+      .subscribe();
 
     chatsListener = supabase.channel('chats-active')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, async (payload) => {
@@ -418,22 +440,6 @@
             
             if (payload.eventType === 'INSERT') {
               notifyNewMessage('Chat baru dari ' + (c.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', c.id);
-            } else if (payload.eventType === 'UPDATE') {
-              const newTime = c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0;
-              const oldTime = prevChat?.info?.lastMessageAt || 0;
-              if (newTime > oldTime) {
-                const { data: lastMsg } = await supabase.from('messages').select('*').eq('chat_id', c.id).order('timestamp', { ascending: false }).limit(1).single();
-                if (lastMsg) {
-                  chatsData[c.id].messages[lastMsg.id] = { ...lastMsg, timestamp: lastMsg.timestamp ? new Date(lastMsg.timestamp).getTime() : 0, replyTo: lastMsg.replyTo_id ? { id: lastMsg.replyTo_id, text: lastMsg.replyTo_text } : null };
-                  if (lastMsg.sender === 'client') {
-                    if (c.id !== selectedChatId || document.hidden) {
-                      notifyNewMessage('Pesan dari ' + (c.clientName || 'Client'), lastMsg.text, c.id);
-                    } else {
-                      if (window.playNotifSound) window.playNotifSound();
-                    }
-                  }
-                }
-              }
             }
           } else if (isClosed) {
             // Move from active to archive
