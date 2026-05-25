@@ -131,6 +131,57 @@ const configTemplate = `// ═════════════════�
     }
   };
 
+  /** Compress Image using Canvas API */
+  window.compressImageFile = function (file, maxWidth = 1200, quality = 0.8) {
+    return new Promise((resolve, reject) => {
+      if (!file.type.startsWith('image/')) {
+        return resolve(file); // Not an image, return original
+      }
+      // Don't compress SVGs or GIFs as it might ruin them or animation
+      if (file.type === 'image/svg+xml' || file.type === 'image/gif') {
+        return resolve(file);
+      }
+
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert back to blob, defaulting to JPEG or original type if webp
+        const outType = file.type === 'image/webp' ? 'image/webp' : 'image/jpeg';
+        
+        canvas.toBlob((blob) => {
+          if (!blob) return reject(new Error('Canvas toBlob failed'));
+          // Re-create a File object
+          const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + (outType === 'image/webp' ? '.webp' : '.jpg'), {
+            type: outType,
+            lastModified: Date.now()
+          });
+          resolve(newFile);
+        }, outType, quality);
+      };
+      
+      img.onerror = (err) => reject(err);
+      img.src = url;
+    });
+  };
+
   console.log('🔥 HimawariDigi Chat — Supabase initialized');
 })();
 `;

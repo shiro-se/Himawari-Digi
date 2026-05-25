@@ -487,12 +487,37 @@
       let textHtml = '';
 
       if (msg.imageUrl) {
-        imageHtml = `
-          <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${msg.imageUrl}')">
-            <img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
-            ${msg.text ? `<div class="chat-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
-          </div>
-        `;
+        const urlLower = msg.imageUrl.toLowerCase();
+        const isImg = urlLower.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) || !urlLower.includes('.');
+        if (isImg) {
+          imageHtml = `
+            <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${msg.imageUrl}')">
+              <img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
+              ${msg.text ? `<div class="chat-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
+            </div>
+          `;
+        } else {
+          const fileName = msg.imageUrl.split('/').pop().split('?')[0];
+          const ext = fileName.split('.').pop().toUpperCase();
+          imageHtml = `
+            <div class="chat-msg-file-bubble" style="background:#f1f5f9; padding:8px; border-radius:6px; display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; margin-bottom:4px; max-width:240px;">
+              <div style="width:36px; height:36px; background:var(--chat-primary); color:white; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:11px;">
+                ${ext}
+              </div>
+              <div style="flex:1; overflow:hidden;">
+                <div style="font-size:12px; font-weight:500; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${fileName}">
+                  ${fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName}
+                </div>
+                <a href="${msg.imageUrl}" target="_blank" download style="font-size:11px; color:var(--chat-primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
+                  <i class="ph ph-download-simple"></i> Download
+                </a>
+              </div>
+            </div>
+          `;
+          if (msg.text) {
+             textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
+          }
+        }
       } else {
         textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
       }
@@ -726,8 +751,10 @@
         chatInput.disabled = true;
         if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
-        const filePath = `${chatId}/${Date.now()}_${file.name}`;
-        const { error: uploadError } = await supabaseClient.storage.from('chat-images').upload(filePath, file);
+        const finalFile = window.compressImageFile ? await window.compressImageFile(file) : file;
+        const filePath = `${chatId}/${Date.now()}_${finalFile.name}`;
+        
+        const { error: uploadError } = await supabaseClient.storage.from('chat-images').upload(filePath, finalFile);
         if (uploadError) throw uploadError;
 
         const { data: urlData } = supabaseClient.storage.from('chat-images').getPublicUrl(filePath);
@@ -775,33 +802,64 @@
     const dl = document.getElementById('chat-lightbox-download');
     if (lb && img) {
       img.src = url;
-      img.classList.remove('zoomed');
       if (dl) {
         dl.href = url;
         dl.download = 'image_' + Date.now() + '.jpg';
       }
       lb.style.display = 'flex';
+      resetLightbox();
     }
   };
 
-  function closeLightbox() {
-    const lb = document.getElementById('chat-lightbox');
-    if (lb) lb.style.display = 'none';
-  }
-
+  const lb = document.getElementById('chat-lightbox');
   const lbClose = document.getElementById('chat-lightbox-close');
   const lbOverlay = document.querySelector('.chat-lightbox-overlay');
   const lbImg = document.getElementById('chat-lightbox-img');
-  
+  const lbZoomIn = document.getElementById('chat-lightbox-zoom-in');
+  const lbZoomOut = document.getElementById('chat-lightbox-zoom-out');
+  const lbReset = document.getElementById('chat-lightbox-reset');
+
+  let scale = 1, panning = false, pointX = 0, pointY = 0, startX = 0, startY = 0;
+  const setTransform = () => {
+    if (lbImg) lbImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+  };
+  const resetLightbox = () => {
+    scale = 1; pointX = 0; pointY = 0; setTransform();
+  };
+
+  if (lbImg) {
+    lbImg.onmousedown = (e) => {
+      e.preventDefault();
+      startX = e.clientX - pointX;
+      startY = e.clientY - pointY;
+      panning = true;
+    };
+    document.addEventListener('mouseup', () => { panning = false; });
+    document.addEventListener('mousemove', (e) => {
+      if (!panning || scale <= 1) return;
+      pointX = e.clientX - startX;
+      pointY = e.clientY - startY;
+      setTransform();
+    });
+    lbImg.onwheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      scale = Math.max(0.5, Math.min(scale + delta, 5));
+      setTransform();
+    };
+  }
+
+  if (lbZoomIn) lbZoomIn.onclick = () => { scale = Math.min(scale + 0.2, 5); setTransform(); };
+  if (lbZoomOut) lbZoomOut.onclick = () => { scale = Math.max(scale - 0.2, 0.5); setTransform(); };
+  if (lbReset) lbReset.onclick = resetLightbox;
+
+  function closeLightbox() {
+    if (lb) lb.style.display = 'none';
+    resetLightbox();
+  }
+
   if (lbClose) lbClose.addEventListener('click', closeLightbox);
   if (lbOverlay) lbOverlay.addEventListener('click', closeLightbox);
-  
-  if (lbImg) {
-    lbImg.addEventListener('click', (e) => {
-      e.stopPropagation();
-      lbImg.classList.toggle('zoomed');
-    });
-  }
 
   // ── Close on Escape Key ───────────────────────────────────────
   document.addEventListener('keydown', (e) => {

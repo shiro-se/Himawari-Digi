@@ -893,12 +893,37 @@
       let textHtml = '';
 
       if (msg.imageUrl) {
-        imageHtml = `
-          <div class="cs-msg-image-bubble" onclick="window.openCSLightbox('${msg.imageUrl}')">
-            <img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
-            ${msg.text ? `<div class="cs-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
-          </div>
-        `;
+        const urlLower = msg.imageUrl.toLowerCase();
+        const isImg = urlLower.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) || !urlLower.includes('.');
+        if (isImg) {
+          imageHtml = `
+            <div class="cs-msg-image-bubble" onclick="window.openCSLightbox('${msg.imageUrl}')">
+              <img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
+              ${msg.text ? `<div class="cs-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
+            </div>
+          `;
+        } else {
+          const fileName = msg.imageUrl.split('/').pop().split('?')[0];
+          const ext = fileName.split('.').pop().toUpperCase();
+          imageHtml = `
+            <div class="cs-msg-file-bubble" style="background:var(--bg-tertiary); padding:10px; border-radius:8px; display:flex; align-items:center; gap:12px; border:1px solid var(--border-color); margin-bottom: 5px;">
+              <div style="width:40px; height:40px; background:var(--primary); color:white; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">
+                ${ext}
+              </div>
+              <div style="flex:1; overflow:hidden;">
+                <div style="font-size:13px; font-weight:500; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${fileName}">
+                  ${fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName}
+                </div>
+                <a href="${msg.imageUrl}" target="_blank" download style="font-size:12px; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
+                  <i class="ph ph-download-simple"></i> Download File
+                </a>
+              </div>
+            </div>
+          `;
+          if (msg.text) {
+             textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
+          }
+        }
       } else {
         textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
       }
@@ -1230,84 +1255,51 @@
       XLSX.utils.book_append_sheet(wb, ws, 'Chat');
       XLSX.writeFile(wb, filename + '.xlsx');
     } else if (format === 'pdf') {
-      if (!window.html2pdf) {
+      if (!window.jspdf) {
         if (window.showToast) window.showToast('Library PDF gagal dimuat', 'error');
         return;
       }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text('Chat History \u2014 HimawariDigi', 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Client: ${data.clientName} (${data.clientEmail})`, 14, 23);
+      doc.text(`CS: ${data.assignedCS}`, 14, 29);
 
-      if (window.showToast) window.showToast('Mempersiapkan PDF, harap tunggu...', 'info');
-
-      const container = document.createElement('div');
-      container.style.cssText = 'padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #1e293b;';
-      
-      let html = `<h2 style="margin-bottom: 4px; color: #0f172a; font-family: inherit;">Chat History &mdash; HimawariDigi</h2>`;
-      html += `<p style="margin-top: 0; font-size: 14px; color: #475569;">`;
-      html += `Client: <strong>${data.clientName}</strong> (${data.clientEmail})<br>`;
-      html += `CS: <strong>${data.assignedCS}</strong></p>`;
-      
-      html += `<table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; word-break: break-word;">`;
-      html += `<thead><tr style="background: #6366f1; color: #ffffff; text-align: left;">`;
-      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 15%;">Waktu</th>`;
-      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 10%;">Tipe</th>`;
-      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 15%;">Pengirim</th>`;
-      html += `<th style="padding: 10px; border: 1px solid #cbd5e1; width: 60%;">Pesan</th>`;
-      html += `</tr></thead><tbody>`;
-      
-      for (const m of data.messages) {
-        let textHtml = '';
-        if (m.text) {
-          textHtml += `<div>${window.chatSanitize(m.text).replace(/\n/g, '<br>')}</div>`;
+      // Helper to strip non-ASCII/Emoji for jsPDF
+      const stripEmoji = (str) => {
+        if (!str) return '';
+        // Map common reactions to text
+        const rxMap = { '👍': '[Jempol]', '❤️': '[Hati]', '😂': '[Tertawa]', '😮': '[Terkejut]', '😢': '[Sedih]', '🙏': '[Terima Kasih]' };
+        for (const [e, txt] of Object.entries(rxMap)) {
+          str = str.replace(new RegExp(e, 'g'), txt);
         }
-        
-        if (m.imageUrl) {
-          textHtml += `<div style="margin-top: 8px;"><img src="${m.imageUrl}" crossorigin="anonymous" style="max-width: 150px; max-height: 150px; border-radius: 6px; border: 1px solid #e2e8f0; object-fit: contain;"></div>`;
-        }
-        
-        if (m.reaction) {
-          textHtml += `<div style="margin-top: 6px;"><span style="display: inline-block; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 11px;">${m.reaction}</span></div>`;
-        }
-        
-        html += `<tr>`;
-        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${m.time}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${m.type}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${m.sender}</td>`;
-        html += `<td style="padding: 10px; border: 1px solid #cbd5e1; vertical-align: top;">${textHtml}</td>`;
-        html += `</tr>`;
-      }
-      
-      html += `</tbody></table>`;
-      container.innerHTML = html;
-
-      // Create a wrapper to temporarily put it in the DOM for html2pdf to process styles better
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 800px; background: white;';
-      wrapper.appendChild(container);
-      document.body.appendChild(wrapper);
-
-      // Parse emojis with Twemoji for perfect rendering
-      if (window.twemoji) {
-        window.twemoji.parse(container, {
-          folder: 'svg',
-          ext: '.svg',
-          attributes: () => ({ style: 'width: 1em; height: 1em; margin: 0 0.05em 0 0.1em; vertical-align: -0.1em;' })
-        });
-      }
-
-      const opt = {
-        margin:       10,
-        filename:     filename + '.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, allowTaint: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        // Strip remaining emojis
+        return str.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
       };
 
-      html2pdf().set(opt).from(container).save().then(() => {
-        document.body.removeChild(wrapper);
-      }).catch((err) => {
-        document.body.removeChild(wrapper);
-        console.error('PDF Export Error:', err);
-        if (window.showToast) window.showToast('Terjadi kesalahan saat membuat PDF.', 'error');
+      const tableRows = [];
+      data.messages.forEach((m) => {
+        let text = stripEmoji(m.text || '');
+        if (m.imageUrl) {
+          text += text ? '\n[Gambar Dilampirkan]' : '[Gambar Dilampirkan]';
+        }
+        if (m.reaction) {
+          text += '\n(Reaction: ' + stripEmoji(m.reaction) + ')';
+        }
+        tableRows.push([m.time, m.type, m.sender, text]);
       });
+
+      doc.autoTable({
+        startY: 35,
+        head: [['Waktu', 'Tipe', 'Pengirim', 'Pesan']],
+        body: tableRows,
+        styles: { fontSize: 8, cellPadding: 3 },
+        headStyles: { fillColor: [99, 102, 241] },
+        columnStyles: { 3: { cellWidth: 80 } },
+      });
+      doc.save(filename + '.pdf');
     }
   }
 
@@ -1437,10 +1429,11 @@
           chatInput.disabled = true;
           if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
-          const filePath = selectedChatId + '/' + Date.now() + '_' + file.name;
+          const finalFile = window.compressImageFile ? await window.compressImageFile(file) : file;
+          const filePath = selectedChatId + '/' + Date.now() + '_' + finalFile.name;
           const { error: uploadError } = await supabase.storage
             .from('chat-images')
-            .upload(filePath, file);
+            .upload(filePath, finalFile);
           if (uploadError) throw uploadError;
 
           const { data: urlData } = supabase.storage.from('chat-images').getPublicUrl(filePath);
@@ -1482,27 +1475,57 @@
       });
     }
 
-    // ── Lightbox Close ──
+    // ── Lightbox Zoom & Pan ──
     const lightbox = document.getElementById('cs-lightbox');
     const lightboxClose = document.getElementById('cs-lightbox-close');
     const lightboxOverlay = document.querySelector('.cs-lightbox-overlay');
     const lightboxImg = document.getElementById('cs-lightbox-img');
-
-    if (lightboxClose)
-      lightboxClose.addEventListener('click', () => {
-        lightbox.style.display = 'none';
-      });
-    if (lightboxOverlay)
-      lightboxOverlay.addEventListener('click', () => {
-        lightbox.style.display = 'none';
-      });
+    const zoomInBtn = document.getElementById('cs-lightbox-zoom-in');
+    const zoomOutBtn = document.getElementById('cs-lightbox-zoom-out');
+    const resetBtn = document.getElementById('cs-lightbox-reset');
+    
+    let scale = 1, panning = false, pointX = 0, pointY = 0, startX = 0, startY = 0;
+    const setTransform = () => {
+      lightboxImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+    };
+    
+    const resetLightbox = () => {
+      scale = 1; pointX = 0; pointY = 0; setTransform();
+    };
 
     if (lightboxImg) {
-      lightboxImg.addEventListener('click', (e) => {
-        e.stopPropagation();
-        lightboxImg.classList.toggle('zoomed');
-      });
+      lightboxImg.onmousedown = (e) => {
+        e.preventDefault();
+        startX = e.clientX - pointX;
+        startY = e.clientY - pointY;
+        panning = true;
+      };
+      document.onmouseup = () => { panning = false; };
+      document.onmousemove = (e) => {
+        if (!panning || scale <= 1) return;
+        pointX = e.clientX - startX;
+        pointY = e.clientY - startY;
+        setTransform();
+      };
+      lightboxImg.onwheel = (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        scale = Math.max(0.5, Math.min(scale + delta, 5));
+        setTransform();
+      };
     }
+    
+    if (zoomInBtn) zoomInBtn.onclick = () => { scale = Math.min(scale + 0.2, 5); setTransform(); };
+    if (zoomOutBtn) zoomOutBtn.onclick = () => { scale = Math.max(scale - 0.2, 0.5); setTransform(); };
+    if (resetBtn) resetBtn.onclick = resetLightbox;
+
+    const closeLightbox = () => {
+      lightbox.style.display = 'none';
+      resetLightbox();
+    };
+
+    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+    if (lightboxOverlay) lightboxOverlay.addEventListener('click', closeLightbox);
 
     // ── Emoji Picker ──
     const csEmojiToggle = document.getElementById('cs-emoji-toggle');

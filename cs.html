@@ -14,7 +14,6 @@
     />
     <link rel="stylesheet" href="./css/output.css" />
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://unpkg.com/twemoji@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
 
     <style>
       /* ═══ CS DASHBOARD STYLES ═══ */
@@ -1593,7 +1592,7 @@
               <label class="cs-attach-btn" for="cs-image-upload" title="Kirim gambar">
                 <i class="ph ph-image"></i>
               </label>
-              <input type="file" id="cs-image-upload" accept="image/*" style="display: none" />
+              <input type="file" id="cs-image-upload" accept="*/*" style="display: none" />
               <button type="button" class="cs-attach-btn" id="cs-emoji-toggle" title="Emoji">
                 <i class="ph ph-smiley"></i>
               </button>
@@ -1641,24 +1640,27 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="./js/supabase-config.js"></script>
     <script src="./js/cs-app.js"></script>
 
     <!-- Lightbox -->
-    <div class="cs-lightbox" id="cs-lightbox" style="display: none">
-      <div class="cs-lightbox-overlay"></div>
-      <div class="cs-lightbox-content">
-        <img id="cs-lightbox-img" src="" alt="Preview" />
-        <div class="cs-lightbox-actions">
-          <a id="cs-lightbox-download" href="" download title="Download">
-            <i class="ph-bold ph-download-simple"></i>
-          </a>
-          <button id="cs-lightbox-close" title="Tutup">
-            <i class="ph-bold ph-x"></i>
-          </button>
-        </div>
+    <div class="cs-lightbox" id="cs-lightbox" style="display: none; align-items: center; justify-content: center;">
+      <div class="cs-lightbox-overlay" style="position: absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:999;"></div>
+      
+      <div class="cs-lightbox-toolbar" style="position:absolute; top:20px; right:20px; display:flex; gap:10px; z-index:1001;">
+        <button id="cs-lightbox-zoom-in" class="cs-lightbox-btn" title="Zoom In" style="background:rgba(255,255,255,0.1); border:none; color:white; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:0.2s;"><i class="ph ph-magnifying-glass-plus"></i></button>
+        <button id="cs-lightbox-zoom-out" class="cs-lightbox-btn" title="Zoom Out" style="background:rgba(255,255,255,0.1); border:none; color:white; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:0.2s;"><i class="ph ph-magnifying-glass-minus"></i></button>
+        <button id="cs-lightbox-reset" class="cs-lightbox-btn" title="Reset Zoom" style="background:rgba(255,255,255,0.1); border:none; color:white; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:0.2s;"><i class="ph ph-arrows-out"></i></button>
+        <a id="cs-lightbox-download" class="cs-lightbox-btn" download title="Download" style="background:rgba(255,255,255,0.1); border:none; color:white; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:0.2s; text-decoration:none;"><i class="ph ph-download-simple"></i></a>
+        <button id="cs-lightbox-close" class="cs-lightbox-btn" title="Close" style="background:rgba(255,255,255,0.1); border:none; color:white; width:40px; height:40px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:20px; transition:0.2s;"><i class="ph ph-x"></i></button>
+      </div>
+
+      <div id="cs-lightbox-img-wrapper" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; z-index:1000;">
+        <img id="cs-lightbox-img" class="cs-lightbox-img" src="" alt="Zoom" style="max-width:90%; max-height:90%; object-fit:contain; transition: transform 0.1s ease-out; cursor: grab;" draggable="false" />
       </div>
     </div>
   </body>

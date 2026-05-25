@@ -508,7 +508,7 @@
             <label class="chat-attach-btn" for="chat-image-upload" title="Kirim gambar">
               <i class="ph ph-image"></i>
             </label>
-            <input type="file" id="chat-image-upload" accept="image/*" style="display:none" />
+            <input type="file" id="chat-image-upload" accept="*/*" style="display:none" />
             
             <button type="button" class="chat-attach-btn" id="chat-emoji-toggle" title="Emoji">
               <i class="ph ph-smiley"></i>
@@ -547,18 +547,19 @@
         </div>
 
         <!-- Image Lightbox -->
-        <div class="chat-lightbox" id="chat-lightbox" style="display:none">
-          <div class="chat-lightbox-overlay"></div>
-          <div class="chat-lightbox-content">
-            <img id="chat-lightbox-img" src="" alt="Preview" />
-            <div class="chat-lightbox-actions">
-              <a id="chat-lightbox-download" href="" download title="Download">
-                <i class="ph-bold ph-download-simple"></i>
-              </a>
-              <button id="chat-lightbox-close" title="Tutup">
-                <i class="ph-bold ph-x"></i>
-              </button>
-            </div>
+        <div class="chat-lightbox" id="chat-lightbox" style="display:none; align-items:center; justify-content:center;">
+          <div class="chat-lightbox-overlay" style="position: absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:999;"></div>
+          
+          <div class="chat-lightbox-toolbar" style="position:absolute; top:15px; right:15px; display:flex; gap:8px; z-index:1001;">
+            <button id="chat-lightbox-zoom-in" title="Zoom In" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-magnifying-glass-plus"></i></button>
+            <button id="chat-lightbox-zoom-out" title="Zoom Out" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-magnifying-glass-minus"></i></button>
+            <button id="chat-lightbox-reset" title="Reset Zoom" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-arrows-out"></i></button>
+            <a id="chat-lightbox-download" download title="Download" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s; text-decoration:none;"><i class="ph ph-download-simple"></i></a>
+            <button id="chat-lightbox-close" title="Close" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-x"></i></button>
+          </div>
+
+          <div id="chat-lightbox-img-wrapper" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; z-index:1000;">
+            <img id="chat-lightbox-img" src="" alt="Preview" style="max-width:90%; max-height:90%; object-fit:contain; transition: transform 0.1s ease-out; cursor: grab;" draggable="false" />
           </div>
         </div>
       </div>
