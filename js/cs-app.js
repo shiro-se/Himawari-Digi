@@ -13,7 +13,7 @@
   }
 
   // --- Sound Notification ---
-  window.playNotifSound = function() {
+  window.playNotifSound = function () {
     const audio = document.getElementById('cs-notif-sound');
     if (audio) {
       audio.currentTime = 0;
@@ -142,7 +142,9 @@
   let resendInterval = null;
 
   async function checkExistingSession() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session && csName) {
       showDashboard();
     } else {
@@ -210,9 +212,9 @@
             cs_name: name,
             device: deviceInfo.full,
             location: location,
-            time: now
-          }
-        }
+            time: now,
+          },
+        },
       });
       if (error) throw error;
       return true;
@@ -233,7 +235,7 @@
         const { data, error } = await supabase.auth.verifyOtp({
           email: currentEmail,
           token: inputCode,
-          type: type
+          type: type,
         });
         if (!error && data.session) {
           return true; // Sukses verifikasi!
@@ -243,7 +245,7 @@
         lastError = e;
       }
     }
-    
+
     console.error('Verify error:', lastError);
     return false;
   }
@@ -306,7 +308,7 @@
     // Bersihkan kode dari spasi tersembunyi/karakter tak terlihat saat copas
     const rawCode = otpInput.value;
     const code = rawCode.replace(/[^0-9]/g, '');
-    
+
     if (code.length < 6 || code.length > 10) {
       if (window.showToast) window.showToast('Panjang kode tidak valid.', 'warning');
       return;
@@ -365,22 +367,26 @@
     const { data: chats } = await supabase.from('chats').select('*').eq('status', 'active');
     const newChatsData = {};
     if (chats) {
-      chats.forEach(c => {
+      chats.forEach((c) => {
         newChatsData[c.id] = {
           info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 },
-          messages: chatsData[c.id]?.messages || {}
+          messages: chatsData[c.id]?.messages || {},
         };
       });
-      const chatIds = chats.map(c => c.id);
+      const chatIds = chats.map((c) => c.id);
       if (chatIds.length > 0) {
         const { data: msgs } = await supabase.from('messages').select('*').in('chat_id', chatIds);
         if (msgs) {
-          msgs.forEach(m => {
-            newChatsData[m.chat_id].messages[m.id] = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+          msgs.forEach((m) => {
+            newChatsData[m.chat_id].messages[m.id] = {
+              ...m,
+              timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+              replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+            };
           });
         }
       }
-      
+
       const prevData = chatsData || {};
       const prevChatIds = Object.keys(prevData);
       chatsData = newChatsData;
@@ -390,7 +396,11 @@
           const chat = chatsData[id];
           const prevChat = prevData[id];
           if (!prevChat) {
-            notifyNewMessage('Chat baru dari ' + (chat.info?.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', id);
+            notifyNewMessage(
+              'Chat baru dari ' + (chat.info?.clientName || 'Client'),
+              'Ada chat baru yang membutuhkan respons.',
+              id
+            );
           }
         });
       }
@@ -401,68 +411,98 @@
     if (chatsListener) {
       supabase.removeChannel(chatsListener);
     }
-    
+
     if (globalMessagesListener) {
       supabase.removeChannel(globalMessagesListener);
     }
-    
+
     // Global Messages Listener to catch incoming messages instantly without fetching
-    globalMessagesListener = supabase.channel('messages-global')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-        const m = payload.new;
-        const cId = m.chat_id;
-        const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
-        
-        if (chatsData[cId]) {
-          chatsData[cId].messages[m.id] = msg;
-          if (m.sender === 'client') {
-            if (cId !== selectedChatId || document.hidden) {
-              notifyNewMessage('Pesan dari ' + (chatsData[cId].info.clientName || 'Client'), m.text || '[Image]', cId);
-            } else {
-              // If active, activeMessagesListener will handle marking as read. Just play sound.
-              if (window.playNotifSound) window.playNotifSound();
+    globalMessagesListener = supabase
+      .channel('messages-global')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        (payload) => {
+          const m = payload.new;
+          const cId = m.chat_id;
+          const msg = {
+            ...m,
+            timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+            replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+          };
+
+          if (chatsData[cId]) {
+            chatsData[cId].messages[m.id] = msg;
+            if (m.sender === 'client') {
+              if (cId !== selectedChatId || document.hidden) {
+                notifyNewMessage(
+                  'Pesan dari ' + (chatsData[cId].info.clientName || 'Client'),
+                  m.text || '[Image]',
+                  cId
+                );
+              } else {
+                // If active, activeMessagesListener will handle marking as read. Just play sound.
+                if (window.playNotifSound) window.playNotifSound();
+              }
             }
+            renderChatList();
           }
-          renderChatList();
         }
-      })
+      )
       .subscribe();
 
-    chatsListener = supabase.channel('chats-active')
+    chatsListener = supabase
+      .channel('chats-active')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, async (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const c = payload.new;
           const isClosed = c.status === 'closed';
           const isActive = c.status === 'active';
-          
+
           if (isActive) {
             const prevChat = chatsData[c.id];
             if (!chatsData[c.id]) chatsData[c.id] = { info: {}, messages: {} };
-            chatsData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
-            
+            chatsData[c.id].info = {
+              ...c,
+              lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0,
+            };
+
             // If it was in archive, remove it from archive (e.g. reopened)
             if (archiveData[c.id]) delete archiveData[c.id];
-            
+
             if (payload.eventType === 'INSERT') {
-              notifyNewMessage('Chat baru dari ' + (c.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', c.id);
+              notifyNewMessage(
+                'Chat baru dari ' + (c.clientName || 'Client'),
+                'Ada chat baru yang membutuhkan respons.',
+                c.id
+              );
             }
           } else if (isClosed) {
             // Move from active to archive
             if (chatsData[c.id]) {
               archiveData[c.id] = chatsData[c.id];
-              archiveData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
+              archiveData[c.id].info = {
+                ...c,
+                lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0,
+              };
               delete chatsData[c.id];
-              
+
               if (selectedChatId === c.id && currentTab === 'active') {
                 detailStatus.textContent = 'Closed';
                 detailStatus.className = 'cs-detail-status closed';
               }
             } else if (!archiveData[c.id]) {
               // It's a new closed chat coming in from elsewhere
-              archiveData[c.id] = { info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 }, messages: {} };
+              archiveData[c.id] = {
+                info: {
+                  ...c,
+                  lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0,
+                },
+                messages: {},
+              };
             }
           }
-          
+
           renderChatList();
           updateSelectedChatStatus();
         } else if (payload.eventType === 'DELETE') {
@@ -493,18 +533,30 @@
 
   // ── Listen for Archived Chats ─────────────────────────────────
   async function listenForArchive() {
-    const { data: chats } = await supabase.from('chats').select('*').eq('status', 'closed').order('lastMessageAt', { ascending: false }).limit(50);
+    const { data: chats } = await supabase
+      .from('chats')
+      .select('*')
+      .eq('status', 'closed')
+      .order('lastMessageAt', { ascending: false })
+      .limit(50);
     if (chats) {
       archiveData = {};
-      chats.forEach(c => {
-        archiveData[c.id] = { info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 }, messages: {} };
+      chats.forEach((c) => {
+        archiveData[c.id] = {
+          info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 },
+          messages: {},
+        };
       });
-      const chatIds = chats.map(c => c.id);
+      const chatIds = chats.map((c) => c.id);
       if (chatIds.length > 0) {
         const { data: msgs } = await supabase.from('messages').select('*').in('chat_id', chatIds);
         if (msgs) {
-          msgs.forEach(m => {
-            archiveData[m.chat_id].messages[m.id] = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+          msgs.forEach((m) => {
+            archiveData[m.chat_id].messages[m.id] = {
+              ...m,
+              timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+              replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+            };
           });
         }
       }
@@ -515,17 +567,25 @@
       supabase.removeChannel(archiveListener);
     }
 
-    archiveListener = supabase.channel('chats-archive')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.closed' }, payload => {
-        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-          const c = payload.new;
-          if (!archiveData[c.id]) archiveData[c.id] = { info: {}, messages: {} };
-          archiveData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
-        } else if (payload.eventType === 'DELETE') {
-          delete archiveData[payload.old.id];
+    archiveListener = supabase
+      .channel('chats-archive')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.closed' },
+        (payload) => {
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const c = payload.new;
+            if (!archiveData[c.id]) archiveData[c.id] = { info: {}, messages: {} };
+            archiveData[c.id].info = {
+              ...c,
+              lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0,
+            };
+          } else if (payload.eventType === 'DELETE') {
+            delete archiveData[payload.old.id];
+          }
+          updateArchiveUI();
         }
-        updateArchiveUI();
-      })
+      )
       .subscribe();
   }
 
@@ -575,13 +635,13 @@
         .join('')
         .substring(0, 2);
       const isActive = item.id === selectedChatId;
-      
+
       let preview = 'Chat baru...';
       if (item.lastMsg) {
         const prefix = item.lastMsg.sender === 'cs' ? 'You: ' : `${item.clientName}: `;
         preview = window.chatSanitize(prefix + item.lastMsg.text).substring(0, 45);
       }
-      
+
       const time = item.lastMessageAt ? window.chatRelativeTime(item.lastMessageAt) : '';
 
       html += `
@@ -593,9 +653,10 @@
           <div class="cs-chat-meta">
             <div class="cs-chat-meta-top">
               <span class="cs-chat-name">${window.chatSanitize(item.clientName || 'Unknown')}</span>
-              ${item.unread > 0 
-                ? `<div class="cs-chat-unread" style="display: inline-flex; width: auto; padding: 0 0.4rem;">${item.unread}</div>` 
-                : `<span class="cs-chat-time">${time}</span>`
+              ${
+                item.unread > 0
+                  ? `<div class="cs-chat-unread" style="display: inline-flex; width: auto; padding: 0 0.4rem;">${item.unread}</div>`
+                  : `<span class="cs-chat-time">${time}</span>`
               }
             </div>
             <div class="cs-chat-preview">${preview}</div>
@@ -666,16 +727,24 @@
     messagesEl.innerHTML = '';
     const renderedIds = new Set();
 
-    const { data: msgs } = await supabase.from('messages').select('*').eq('chat_id', chatId).order('timestamp', { ascending: true });
+    const { data: msgs } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('chat_id', chatId)
+      .order('timestamp', { ascending: true });
     if (msgs) {
-      msgs.forEach(m => {
-        const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
+      msgs.forEach((m) => {
+        const msg = {
+          ...m,
+          timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+          replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+        };
         if (chatSource[chatId]) {
           chatSource[chatId].messages[m.id] = msg;
         }
         renderedIds.add(m.id);
         renderCSMessage(msg, m.id);
-        
+
         if (msg.sender === 'client' && !msg.read) {
           supabase.from('messages').update({ read: true }).eq('id', m.id).then();
           if (chatSource[chatId]) {
@@ -688,75 +757,93 @@
     }
 
     // Listen for messages
-    activeMessagesListener = supabase.channel('messages-' + chatId)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'chat_id=eq.' + chatId }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          const m = payload.new;
-          const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
-          if (chatSource[chatId]) chatSource[chatId].messages[m.id] = msg;
-          if (!renderedIds.has(m.id)) {
-            renderedIds.add(m.id);
-            renderCSMessage(msg, m.id);
-            scrollCSMessages();
-          }
-          if (msg.sender === 'client' && !msg.read) {
-            supabase.from('messages').update({ read: true }).eq('id', m.id).then();
-            // Update local state directly to clear the unread count
-            chatsData[chatId].messages[m.id].read = true;
-            renderChatList();
-          }
-        } else if (payload.eventType === 'UPDATE') {
-          const m = payload.new;
-          const msg = { ...m, timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0, replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null };
-          if (chatSource[chatId]) chatSource[chatId].messages[m.id] = msg;
-          
-          if (msg.sender === 'cs' && msg.read) {
-            const statusEl = document.getElementById('cs-msg-status-' + m.id);
-            if (statusEl) {
-              statusEl.className = 'cs-msg-status read';
-              statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
+    activeMessagesListener = supabase
+      .channel('messages-' + chatId)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages', filter: 'chat_id=eq.' + chatId },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const m = payload.new;
+            const msg = {
+              ...m,
+              timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+              replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+            };
+            if (chatSource[chatId]) chatSource[chatId].messages[m.id] = msg;
+            if (!renderedIds.has(m.id)) {
+              renderedIds.add(m.id);
+              renderCSMessage(msg, m.id);
+              scrollCSMessages();
             }
-          }
+            if (msg.sender === 'client' && !msg.read) {
+              supabase.from('messages').update({ read: true }).eq('id', m.id).then();
+              // Update local state directly to clear the unread count
+              chatsData[chatId].messages[m.id].read = true;
+              renderChatList();
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const m = payload.new;
+            const msg = {
+              ...m,
+              timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+              replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+            };
+            if (chatSource[chatId]) chatSource[chatId].messages[m.id] = msg;
 
-          const bubble = document.querySelector(`.cs-msg-bubble[data-id="${m.id}"]`);
-          if (bubble) {
-            let reactionContainer = bubble.querySelector('.cs-msg-reactions');
-            if (msg.reaction) {
-              if (!reactionContainer) {
-                reactionContainer = document.createElement('div');
-                reactionContainer.className = 'cs-msg-reactions';
-                const timeContainer = bubble.querySelector('.cs-msg-time-container');
-                if (timeContainer) {
-                  bubble.insertBefore(reactionContainer, timeContainer);
-                } else {
-                  bubble.appendChild(reactionContainer);
-                }
+            if (msg.sender === 'cs' && msg.read) {
+              const statusEl = document.getElementById('cs-msg-status-' + m.id);
+              if (statusEl) {
+                statusEl.className = 'cs-msg-status read';
+                statusEl.innerHTML = '<i class="ph-bold ph-checks"></i>';
               }
-              reactionContainer.innerHTML = `<span class="cs-msg-reaction">${msg.reaction}</span>`;
-            } else if (reactionContainer) {
-              reactionContainer.remove();
+            }
+
+            const bubble = document.querySelector(`.cs-msg-bubble[data-id="${m.id}"]`);
+            if (bubble) {
+              let reactionContainer = bubble.querySelector('.cs-msg-reactions');
+              if (msg.reaction) {
+                if (!reactionContainer) {
+                  reactionContainer = document.createElement('div');
+                  reactionContainer.className = 'cs-msg-reactions';
+                  const timeContainer = bubble.querySelector('.cs-msg-time-container');
+                  if (timeContainer) {
+                    bubble.insertBefore(reactionContainer, timeContainer);
+                  } else {
+                    bubble.appendChild(reactionContainer);
+                  }
+                }
+                reactionContainer.innerHTML = `<span class="cs-msg-reaction">${msg.reaction}</span>`;
+              } else if (reactionContainer) {
+                reactionContainer.remove();
+              }
             }
           }
         }
-      })
+      )
       .subscribe();
 
     // Listen for client typing
-    activeTypingListener = supabase.channel('typing-' + chatId)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'typing_status', filter: 'chat_id=eq.' + chatId }, (payload) => {
-        if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
-          const data = payload.new;
-          const ts = data.client_timestamp ? new Date(data.client_timestamp).getTime() : 0;
-          if (data.client_is_typing && Date.now() - ts < 5000) {
-            clientTypingEl.classList.add('show');
-            scrollCSMessages();
-          } else {
+    activeTypingListener = supabase
+      .channel('typing-' + chatId)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'typing_status', filter: 'chat_id=eq.' + chatId },
+        (payload) => {
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const data = payload.new;
+            const ts = data.client_timestamp ? new Date(data.client_timestamp).getTime() : 0;
+            if (data.client_is_typing && Date.now() - ts < 5000) {
+              clientTypingEl.classList.add('show');
+              scrollCSMessages();
+            } else {
+              clientTypingEl.classList.remove('show');
+            }
+          } else if (payload.eventType === 'DELETE') {
             clientTypingEl.classList.remove('show');
           }
-        } else if (payload.eventType === 'DELETE') {
-          clientTypingEl.classList.remove('show');
         }
-      })
+      )
       .subscribe();
 
     // Archive mode: hide input area and close button
@@ -798,11 +885,13 @@
           : `<span id="cs-msg-status-${msgId}" class="cs-msg-status sent"><i class="ph ph-check"></i></span>`;
       }
 
-      const senderNameHtml = !isClient ? `<div class="cs-msg-sender-name">${window.chatSanitize(msg.senderName || 'CS')}</div>` : '';
+      const senderNameHtml = !isClient
+        ? `<div class="cs-msg-sender-name">${window.chatSanitize(msg.senderName || 'CS')}</div>`
+        : '';
 
       let imageHtml = '';
       let textHtml = '';
-      
+
       if (msg.imageUrl) {
         imageHtml = `
           <div class="cs-msg-image-bubble" onclick="window.openCSLightbox('${msg.imageUrl}')">
@@ -814,16 +903,16 @@
         textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
       }
 
-        let replyHtml = '';
-        if (msg.replyTo && msg.replyTo.text) {
-          replyHtml = `
+      let replyHtml = '';
+      if (msg.replyTo && msg.replyTo.text) {
+        replyHtml = `
             <div class="cs-msg-reply" onclick="window.scrollToMessage('${msg.replyTo.id}')" style="cursor: pointer;" title="Klik untuk melompat ke pesan ini">
               <div style="font-weight:600; font-size:0.75rem; color:var(--primary); margin-bottom:2px;">Replying to</div>
               <div>${window.chatSanitize(msg.replyTo.text)}</div>
             </div>
           `;
-        }
-      
+      }
+
       let reactionsHtml = '';
       if (msg.reaction) {
         // Assuming msg.reaction is a simple string for now, wrapped in the new button layout
@@ -876,12 +965,15 @@
     });
 
     csReplyToData = null;
-    document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
+    document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
 
-    await supabase.from('chats').update({
-      lastMessageAt: new Date().toISOString(),
-      assignedCS: csName,
-    }).eq('id', selectedChatId);
+    await supabase
+      .from('chats')
+      .update({
+        lastMessageAt: new Date().toISOString(),
+        assignedCS: csName,
+      })
+      .eq('id', selectedChatId);
 
     chatInput.value = '';
     sendBtn.disabled = true;
@@ -891,11 +983,14 @@
   // ── CS Typing Indicator ───────────────────────────────────────
   function sendCSTyping() {
     if (!selectedChatId) return;
-    supabase.from('typing_status').upsert({
-      chat_id: selectedChatId,
-      cs_is_typing: true,
-      cs_timestamp: new Date().toISOString(),
-    }).then();
+    supabase
+      .from('typing_status')
+      .upsert({
+        chat_id: selectedChatId,
+        cs_is_typing: true,
+        cs_timestamp: new Date().toISOString(),
+      })
+      .then();
 
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => clearCSTyping(), 3000);
@@ -903,11 +998,14 @@
 
   function clearCSTyping() {
     if (!selectedChatId) return;
-    supabase.from('typing_status').upsert({
-      chat_id: selectedChatId,
-      cs_is_typing: false,
-      cs_timestamp: new Date().toISOString(),
-    }).then();
+    supabase
+      .from('typing_status')
+      .upsert({
+        chat_id: selectedChatId,
+        cs_is_typing: false,
+        cs_timestamp: new Date().toISOString(),
+      })
+      .then();
   }
 
   // ── Close Chat ────────────────────────────────────────────────
@@ -915,9 +1013,12 @@
     if (!selectedChatId) return;
     if (!confirm('Tutup chat ini? Client tidak bisa mengirim pesan lagi.')) return;
 
-    await supabase.from('chats').update({
-      status: 'closed',
-    }).eq('id', selectedChatId);
+    await supabase
+      .from('chats')
+      .update({
+        status: 'closed',
+      })
+      .eq('id', selectedChatId);
 
     // Detach listener
     detachCurrentChatListeners();
@@ -940,7 +1041,7 @@
   function updateNotifUI() {
     const badge = document.getElementById('cs-notif-badge');
     const list = document.getElementById('cs-notif-list');
-    
+
     if (badge) {
       if (unreadNotifCount > 0) {
         badge.style.display = 'inline-block';
@@ -954,13 +1055,17 @@
       if (notifHistory.length === 0) {
         list.innerHTML = '<div class="cs-notif-empty">Belum ada notifikasi</div>';
       } else {
-        list.innerHTML = notifHistory.map(n => `
+        list.innerHTML = notifHistory
+          .map(
+            (n) => `
           <div class="cs-notif-item" onclick="const el = document.querySelector('[data-chat-id=\\'${n.chatId}\\']'); if(el) el.click();">
             <div class="cs-notif-item-title">${window.chatSanitize(n.title)}</div>
             <div class="cs-notif-item-desc">${window.chatSanitize(n.text)}</div>
             <div class="cs-notif-item-time">${window.chatRelativeTime(n.time)}</div>
           </div>
-        `).join('');
+        `
+          )
+          .join('');
       }
     }
   }
@@ -1064,38 +1169,56 @@
     const data = currentTab === 'archive' ? archiveData : chatsData;
     const chat = data[selectedChatId];
     if (!chat) return null;
-    const messages = chat.messages ? Object.values(chat.messages).sort((a,b) => (a.timestamp||0) - (b.timestamp||0)) : [];
+    const messages = chat.messages
+      ? Object.values(chat.messages).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+      : [];
     return {
       clientName: chat.info?.clientName || 'Unknown',
       clientEmail: chat.info?.clientEmail || '',
       assignedCS: chat.info?.assignedCS || '',
-      messages: messages.map(m => ({
+      messages: messages.map((m) => ({
         time: m.timestamp ? new Date(m.timestamp).toLocaleString('id-ID') : '',
         type: m.sender === 'client' ? 'Client' : m.sender === 'system' ? 'System' : 'CS',
-        sender: m.sender === 'client' ? (chat.info?.clientName || 'Client') : m.sender === 'system' ? 'System' : (m.senderName || 'CS'),
-        text: m.text || (m.imageUrl ? `[Image] ${m.imageUrl}` : ''),
-      }))
+        sender:
+          m.sender === 'client'
+            ? chat.info?.clientName || 'Client'
+            : m.sender === 'system'
+              ? 'System'
+              : m.senderName || 'CS',
+        text:
+          (m.text || '') +
+          (m.imageUrl ? (m.text ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`) : '') +
+          (m.reaction ? `\n(Reaction: ${m.reaction})` : ''),
+      })),
     };
   }
 
   async function exportChat(format) {
     const data = getChatExportData();
     if (!data) return;
-    const filename = 'chat_' + (data.clientName.replace(/\s+/g, '_')) + '_' + new Date().toISOString().slice(0,10);
+    const filename =
+      'chat_' + data.clientName.replace(/\s+/g, '_') + '_' + new Date().toISOString().slice(0, 10);
 
     if (format === 'csv') {
       let csv = 'Waktu,Tipe,Pengirim,Pesan\n';
-      data.messages.forEach(m => {
+      data.messages.forEach((m) => {
         csv += `"${m.time}","${m.type}","${m.sender}","${m.text.replace(/"/g, '""')}"\n`;
       });
-      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       downloadBlob(blob, filename + '.csv');
     } else if (format === 'excel') {
       if (!window.XLSX) {
         if (window.showToast) window.showToast('Library Excel gagal dimuat', 'error');
         return;
       }
-      const ws = XLSX.utils.json_to_sheet(data.messages.map(m => ({ Waktu: m.time, Tipe: m.type, Pengirim: m.sender, Pesan: m.text })));
+      const ws = XLSX.utils.json_to_sheet(
+        data.messages.map((m) => ({
+          Waktu: m.time,
+          Tipe: m.type,
+          Pengirim: m.sender,
+          Pesan: m.text,
+        }))
+      );
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Chat');
       XLSX.writeFile(wb, filename + '.xlsx');
@@ -1104,7 +1227,7 @@
         if (window.showToast) window.showToast('Library PDF gagal dimuat', 'error');
         return;
       }
-      
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(14);
@@ -1112,13 +1235,13 @@
       doc.setFontSize(10);
       doc.text(`Client: ${data.clientName} (${data.clientEmail})`, 14, 23);
       doc.text(`CS: ${data.assignedCS}`, 14, 29);
-      
+
       if (window.showToast) window.showToast('Mempersiapkan PDF, harap tunggu...', 'info');
-      
+
       const tableRows = [];
       const imageMap = {};
       let rowIndex = 0;
-      
+
       for (const m of data.messages) {
         let text = m.text;
         const imgMatch = text.match(/\[Image\] (https?:\/\/[^\s]+)/);
@@ -1133,7 +1256,7 @@
               reader.readAsDataURL(blob);
             });
             imageMap[rowIndex] = b64;
-            text = text.replace(imgMatch[0], '[Gambar Dilampirkan]');
+            text = text.replace(imgMatch[0], '');
           } catch (e) {
             console.warn('Gagal memuat gambar untuk PDF:', url);
           }
@@ -1141,7 +1264,7 @@
         tableRows.push([m.time, m.type, m.sender, text]);
         rowIndex++;
       }
-      
+
       doc.autoTable({
         startY: 35,
         head: [['Waktu', 'Tipe', 'Pengirim', 'Pesan']],
@@ -1149,22 +1272,29 @@
         styles: { fontSize: 8, cellPadding: 3 },
         headStyles: { fillColor: [99, 102, 241] },
         columnStyles: { 3: { cellWidth: 80 } },
-        didParseCell: function(hookData) {
+        didParseCell: function (hookData) {
           if (hookData.section === 'body' && hookData.column.index === 3) {
             if (imageMap[hookData.row.index]) {
               hookData.cell.styles.minCellHeight = 35;
             }
           }
         },
-        didDrawCell: function(hookData) {
+        didDrawCell: function (hookData) {
           if (hookData.section === 'body' && hookData.column.index === 3) {
             const b64 = imageMap[hookData.row.index];
             if (b64) {
               const textHeight = hookData.cell.text.length * 4;
-              doc.addImage(b64, 'JPEG', hookData.cell.x + 2, hookData.cell.y + textHeight + 4, 25, 25);
+              doc.addImage(
+                b64,
+                'JPEG',
+                hookData.cell.x + 2,
+                hookData.cell.y + textHeight + 4,
+                25,
+                25
+              );
             }
           }
-        }
+        },
       });
       doc.save(filename + '.pdf');
     }
@@ -1180,7 +1310,7 @@
   }
 
   // ── Lightbox ────────────────────────────────────────────────
-  window.openCSLightbox = function(url) {
+  window.openCSLightbox = function (url) {
     const lb = document.getElementById('cs-lightbox');
     const img = document.getElementById('cs-lightbox-img');
     const dl = document.getElementById('cs-lightbox-download');
@@ -1188,7 +1318,9 @@
       img.src = url;
       img.classList.remove('zoomed');
       if (dl) {
-        dl.href = url; dl.download = 'image_' + Date.now() + '.jpg'; }
+        dl.href = url;
+        dl.download = 'image_' + Date.now() + '.jpg';
+      }
       lb.style.display = 'flex';
     }
   };
@@ -1240,18 +1372,20 @@
     // ── Tab Switcher ──
     const tabActive = document.getElementById('cs-tab-active');
     const tabArchive = document.getElementById('cs-tab-archive');
-    if (tabActive) tabActive.addEventListener('click', () => {
-      currentTab = 'active';
-      tabActive.classList.add('active');
-      if (tabArchive) tabArchive.classList.remove('active');
-      renderChatList();
-    });
-    if (tabArchive) tabArchive.addEventListener('click', () => {
-      currentTab = 'archive';
-      tabArchive.classList.add('active');
-      if (tabActive) tabActive.classList.remove('active');
-      renderChatList();
-    });
+    if (tabActive)
+      tabActive.addEventListener('click', () => {
+        currentTab = 'active';
+        tabActive.classList.add('active');
+        if (tabArchive) tabArchive.classList.remove('active');
+        renderChatList();
+      });
+    if (tabArchive)
+      tabArchive.addEventListener('click', () => {
+        currentTab = 'archive';
+        tabArchive.classList.add('active');
+        if (tabActive) tabActive.classList.remove('active');
+        renderChatList();
+      });
 
     // ── Export Chat ──
     const exportBtn = document.getElementById('cs-export-btn');
@@ -1293,7 +1427,9 @@
           if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
           const filePath = selectedChatId + '/' + Date.now() + '_' + file.name;
-          const { error: uploadError } = await supabase.storage.from('chat-images').upload(filePath, file);
+          const { error: uploadError } = await supabase.storage
+            .from('chat-images')
+            .upload(filePath, file);
           if (uploadError) throw uploadError;
 
           const { data: urlData } = supabase.storage.from('chat-images').getPublicUrl(filePath);
@@ -1312,19 +1448,22 @@
           });
 
           csReplyToData = null;
-          document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
+          document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
 
-          await supabase.from('chats').update({
-            lastMessageAt: new Date().toISOString(),
-            assignedCS: csName,
-          }).eq('id', selectedChatId);
+          await supabase
+            .from('chats')
+            .update({
+              lastMessageAt: new Date().toISOString(),
+              assignedCS: csName,
+            })
+            .eq('id', selectedChatId);
 
           if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
         } catch (err) {
           console.error(err);
           if (window.showToast) window.showToast('Gagal upload gambar', 'error');
         }
-        
+
         sendBtn.disabled = !chatInput.value.trim();
         chatInput.disabled = false;
         if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-image"></i>';
@@ -1337,10 +1476,16 @@
     const lightboxClose = document.getElementById('cs-lightbox-close');
     const lightboxOverlay = document.querySelector('.cs-lightbox-overlay');
     const lightboxImg = document.getElementById('cs-lightbox-img');
-    
-    if (lightboxClose) lightboxClose.addEventListener('click', () => { lightbox.style.display = 'none'; });
-    if (lightboxOverlay) lightboxOverlay.addEventListener('click', () => { lightbox.style.display = 'none'; });
-    
+
+    if (lightboxClose)
+      lightboxClose.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+      });
+    if (lightboxOverlay)
+      lightboxOverlay.addEventListener('click', () => {
+        lightbox.style.display = 'none';
+      });
+
     if (lightboxImg) {
       lightboxImg.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1407,7 +1552,7 @@
     if (csCtxMenu) {
       document.getElementById('cs-ctx-reply').addEventListener('click', () => {
         csReplyToData = { id: csContextMsgId, text: csContextMsgText };
-        document.querySelectorAll('.cs-reply-preview').forEach(el => el.remove());
+        document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
         const preview = document.createElement('div');
         preview.className = 'cs-reply-preview';
         preview.innerHTML = `<div class="cs-msg-reply" style="margin:0 10px 5px">Replying to: ${window.chatSanitize(csContextMsgText)}</div>`;
@@ -1430,7 +1575,7 @@
             const emoji = e.target.textContent;
             const bubble = document.querySelector(`.cs-msg-bubble[data-id="${csContextMsgId}"]`);
             const currentReaction = bubble ? bubble.querySelector('.cs-msg-reaction') : null;
-            
+
             if (currentReaction && currentReaction.textContent === emoji) {
               supabase.from('messages').update({ reaction: null }).eq('id', csContextMsgId).then();
             } else {
@@ -1478,11 +1623,13 @@
       document.getElementById('cs-archive-ctx-delete').addEventListener('click', () => {
         if (csArchiveContextMenuId) {
           const modalOverlay = document.createElement('div');
-          modalOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
-          
+          modalOverlay.style.cssText =
+            'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
+
           const modalBox = document.createElement('div');
-          modalBox.style.cssText = 'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
-          
+          modalBox.style.cssText =
+            'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
+
           modalBox.innerHTML = `
             <div style="width:48px; height:48px; border-radius:50%; background:#fee2e2; color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">
               <i class="ph-bold ph-trash"></i>
@@ -1494,40 +1641,45 @@
               <button id="modal-btn-yes" style="flex:1; padding:10px; border-radius:8px; border:none; background:#ef4444; color:white; font-weight:500; cursor:pointer;">Hapus</button>
             </div>
           `;
-          
+
           modalOverlay.appendChild(modalBox);
           document.body.appendChild(modalOverlay);
-          
+
           // Animate in
           requestAnimationFrame(() => {
             modalOverlay.style.opacity = '1';
             modalBox.style.transform = 'scale(1)';
           });
-          
+
           const closeModal = () => {
             modalOverlay.style.opacity = '0';
             modalBox.style.transform = 'scale(0.95)';
             setTimeout(() => modalOverlay.remove(), 200);
           };
-          
+
           document.getElementById('modal-btn-yes').onclick = async () => {
             const btnYes = document.getElementById('modal-btn-yes');
             btnYes.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Menghapus...';
             btnYes.disabled = true;
-            
-            const { error } = await supabase.from('chats').delete().eq('id', csArchiveContextMenuId);
-            
+
+            const { error } = await supabase
+              .from('chats')
+              .delete()
+              .eq('id', csArchiveContextMenuId);
+
             if (error) {
               closeModal();
-              if (window.showToast) window.showToast('Gagal menghapus chat: ' + error.message, 'error');
+              if (window.showToast)
+                window.showToast('Gagal menghapus chat: ' + error.message, 'error');
             } else {
               closeModal();
-              if (window.showToast) window.showToast('Chat berhasil dihapus secara permanen', 'success');
+              if (window.showToast)
+                window.showToast('Chat berhasil dihapus secara permanen', 'success');
               // Optimistic delete
               if (archiveData[csArchiveContextMenuId]) delete archiveData[csArchiveContextMenuId];
               if (chatsData[csArchiveContextMenuId]) delete chatsData[csArchiveContextMenuId];
               renderChatList();
-              
+
               if (selectedChatId === csArchiveContextMenuId) {
                 detail.style.display = 'none';
                 detailEmpty.style.display = 'flex';
@@ -1535,7 +1687,7 @@
               }
             }
           };
-          
+
           document.getElementById('modal-btn-no').onclick = closeModal;
           modalOverlay.onclick = (e) => {
             if (e.target === modalOverlay) closeModal();
@@ -1547,13 +1699,13 @@
 
     document.addEventListener('click', (e) => {
       if (csCtxMenu && !csCtxMenu.contains(e.target)) csCtxMenu.style.display = 'none';
-      if (archiveCtxMenu && !archiveCtxMenu.contains(e.target)) archiveCtxMenu.style.display = 'none';
+      if (archiveCtxMenu && !archiveCtxMenu.contains(e.target))
+        archiveCtxMenu.style.display = 'none';
     });
-
   }
 
   // ── Helpers ───────────────────────────────────────────────────
-  window.scrollToMessage = function(id) {
+  window.scrollToMessage = function (id) {
     const el = document.querySelector(`.cs-msg-bubble[data-id="${id}"]`);
     if (el) {
       const container = document.getElementById('cs-messages');
