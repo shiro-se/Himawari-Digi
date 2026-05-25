@@ -17,7 +17,11 @@
 
     <style>
       /* ═══ CS DASHBOARD STYLES ═══ */
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
       body.cs-body {
         font-family: 'Inter', sans-serif;
@@ -54,7 +58,9 @@
         letter-spacing: -0.03em;
         color: var(--foreground);
       }
-      .cs-topbar-logo span { color: var(--primary); }
+      .cs-topbar-logo span {
+        color: var(--primary);
+      }
       .cs-topbar-badge {
         font-size: 0.6rem;
         font-weight: 700;
@@ -77,7 +83,11 @@
         font-size: 0.8rem;
         color: var(--muted-foreground);
       }
-      @media (min-width: 768px) { .cs-topbar-user { display: flex; } }
+      @media (min-width: 768px) {
+        .cs-topbar-user {
+          display: flex;
+        }
+      }
       .cs-topbar-user-avatar {
         width: 2rem;
         height: 2rem;
@@ -130,7 +140,7 @@
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 10px;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
         display: none;
         flex-direction: column;
         z-index: 100;
@@ -164,8 +174,12 @@
         flex-direction: column;
         gap: 0.25rem;
       }
-      .cs-notif-item:last-child { border-bottom: none; }
-      .cs-notif-item:hover { background: var(--muted); }
+      .cs-notif-item:last-child {
+        border-bottom: none;
+      }
+      .cs-notif-item:hover {
+        background: var(--muted);
+      }
       .cs-notif-item-title {
         font-weight: 600;
         font-size: 0.85rem;
@@ -211,7 +225,9 @@
           inset: 60px 0 0 0;
           z-index: 10;
         }
-        .cs-sidebar.hidden-mobile { transform: translateX(-100%); }
+        .cs-sidebar.hidden-mobile {
+          transform: translateX(-100%);
+        }
       }
 
       .cs-sidebar-header {
@@ -247,7 +263,9 @@
         outline: none;
         transition: border-color 0.2s;
       }
-      .cs-search:focus { border-color: var(--primary); }
+      .cs-search:focus {
+        border-color: var(--primary);
+      }
       .cs-search-wrap {
         position: relative;
       }
@@ -274,7 +292,9 @@
         border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
         transition: background 0.15s;
       }
-      .cs-chat-item:hover { background: var(--muted); }
+      .cs-chat-item:hover {
+        background: var(--muted);
+      }
       .cs-chat-item.active {
         background: color-mix(in srgb, var(--primary) 10%, transparent);
         border-left: 3px solid var(--primary);
@@ -364,8 +384,14 @@
         text-align: center;
         color: var(--muted-foreground);
       }
-      .cs-empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
-      .cs-empty-state p { font-size: 0.85rem; }
+      .cs-empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+      }
+      .cs-empty-state p {
+        font-size: 0.85rem;
+      }
 
       /* ── Chat Detail Area ── */
       .cs-detail {
@@ -383,7 +409,9 @@
           transform: translateX(100%);
           transition: transform 0.3s ease;
         }
-        .cs-detail.show-mobile { transform: translateX(0); }
+        .cs-detail.show-mobile {
+          transform: translateX(0);
+        }
       }
 
       .cs-detail-header {
@@ -416,7 +444,11 @@
         font-size: 1.2rem;
         flex-shrink: 0;
       }
-      @media (max-width: 767px) { .cs-back-btn { display: flex; } }
+      @media (max-width: 767px) {
+        .cs-back-btn {
+          display: flex;
+        }
+      }
 
       .cs-detail-name {
         font-size: 0.9rem;
@@ -486,11 +518,22 @@
         animation: csMsgIn 0.3s ease;
       }
       @keyframes csMsgIn {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .cs-msg--client { align-self: flex-start; }
-      .cs-msg--cs { align-self: flex-end; flex-direction: row-reverse; }
+      .cs-msg--client {
+        align-self: flex-start;
+      }
+      .cs-msg--cs {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
       .cs-msg--system {
         align-self: center;
         max-width: 90%;
@@ -559,13 +602,13 @@
         color: color-mix(in srgb, var(--primary-foreground) 60%, transparent);
       }
       .cs-msg-status.read {
-        color: #60a5fa; /* lighter blue for contrast on primary background */
+        color: #60a5fa;
       }
       .cs-msg--cs .cs-msg-status.sent {
         color: color-mix(in srgb, var(--secondary-foreground) 60%, transparent);
       }
       .cs-msg--cs .cs-msg-status.read {
-        color: #ffffff; /* solid white */
+        color: #ffffff;
       }
 
       /* ── Typing indicator ── */
@@ -577,7 +620,9 @@
         font-size: 0.75rem;
         color: var(--muted-foreground);
       }
-      .cs-typing-indicator.show { display: flex; }
+      .cs-typing-indicator.show {
+        display: flex;
+      }
       .cs-typing-dots {
         display: flex;
         gap: 3px;
@@ -589,11 +634,23 @@
         background: var(--muted-foreground);
         animation: csTypingBounce 1.4s infinite ease-in-out both;
       }
-      .cs-typing-dots span:nth-child(2) { animation-delay: 0.16s; }
-      .cs-typing-dots span:nth-child(3) { animation-delay: 0.32s; }
+      .cs-typing-dots span:nth-child(2) {
+        animation-delay: 0.16s;
+      }
+      .cs-typing-dots span:nth-child(3) {
+        animation-delay: 0.32s;
+      }
       @keyframes csTypingBounce {
-        0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-        30% { opacity: 1; transform: translateY(-4px); }
+        0%,
+        60%,
+        100% {
+          opacity: 0.3;
+          transform: translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: translateY(-4px);
+        }
       }
 
       /* ── Input ── */
@@ -617,7 +674,9 @@
         outline: none;
         transition: border-color 0.2s;
       }
-      .cs-input:focus { border-color: var(--primary); }
+      .cs-input:focus {
+        border-color: var(--primary);
+      }
       .cs-send-btn {
         width: 2.5rem;
         height: 2.5rem;
@@ -633,8 +692,15 @@
         transition: all 0.2s;
         flex-shrink: 0;
       }
-      .cs-send-btn:hover { opacity: 0.85; transform: scale(1.05); }
-      .cs-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+      .cs-send-btn:hover {
+        opacity: 0.85;
+        transform: scale(1.05);
+      }
+      .cs-send-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+      }
 
       /* ── Login Page ── */
       .cs-login-page {
@@ -652,7 +718,7 @@
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 1.5rem;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
       }
       .cs-login-logo {
         text-align: center;
@@ -664,7 +730,9 @@
         font-size: 1.5rem;
         letter-spacing: -0.03em;
       }
-      .cs-login-logo h1 span { color: var(--primary); }
+      .cs-login-logo h1 span {
+        color: var(--primary);
+      }
       .cs-login-logo p {
         font-size: 0.8rem;
         color: var(--muted-foreground);
@@ -691,7 +759,9 @@
         outline: none;
         transition: border-color 0.2s;
       }
-      .cs-login-field input:focus { border-color: var(--primary); }
+      .cs-login-field input:focus {
+        border-color: var(--primary);
+      }
       .cs-login-submit {
         width: 100%;
         padding: 0.75rem;
@@ -709,8 +779,13 @@
         gap: 0.5rem;
         margin-top: 0.5rem;
       }
-      .cs-login-submit:hover { opacity: 0.9; }
-      .cs-login-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+      .cs-login-submit:hover {
+        opacity: 0.9;
+      }
+      .cs-login-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
       .cs-login-status {
         margin-top: 1rem;
         padding: 0.75rem;
@@ -745,7 +820,9 @@
         align-items: center;
         gap: 0.5rem;
       }
-      .cs-login-device i { font-size: 1rem; }
+      .cs-login-device i {
+        font-size: 1rem;
+      }
 
       /* ── OTP Input ── */
       .cs-otp-section {
@@ -753,7 +830,9 @@
         text-align: center;
         margin-top: 1.5rem;
       }
-      .cs-otp-section.show { display: block; }
+      .cs-otp-section.show {
+        display: block;
+      }
       .cs-otp-title {
         font-size: 0.85rem;
         font-weight: 600;
@@ -773,7 +852,9 @@
         outline: none;
         transition: border-color 0.2s;
       }
-      .cs-otp-input:focus { border-color: var(--primary); }
+      .cs-otp-input:focus {
+        border-color: var(--primary);
+      }
       .cs-otp-verify {
         width: 100%;
         padding: 0.7rem;
@@ -787,8 +868,13 @@
         margin-top: 0.75rem;
         transition: opacity 0.2s;
       }
-      .cs-otp-verify:hover { opacity: 0.9; }
-      .cs-otp-verify:disabled { opacity: 0.5; cursor: not-allowed; }
+      .cs-otp-verify:hover {
+        opacity: 0.9;
+      }
+      .cs-otp-verify:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
       .cs-otp-resend {
         font-size: 0.75rem;
         color: var(--muted-foreground);
@@ -808,15 +894,25 @@
         display: inline-block;
         width: 1rem;
         height: 1rem;
-        border: 2px solid rgba(255,255,255,0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         border-top-color: currentColor;
         border-radius: 50%;
         animation: csSpin 0.6s linear infinite;
       }
-      @keyframes csSpin { to { transform: rotate(360deg); } }
+      @keyframes csSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
       @keyframes csFadeIn {
-        from { opacity: 0; transform: translateY(-8px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       /* ── Scrollbar ── */
@@ -863,7 +959,10 @@
         transition: all 0.2s ease;
         font-family: inherit;
       }
-      .cs-tab:hover { background: var(--border); color: var(--foreground); }
+      .cs-tab:hover {
+        background: var(--border);
+        color: var(--foreground);
+      }
       .cs-tab.active {
         background: var(--primary);
         color: white;
@@ -872,10 +971,10 @@
         font-size: 0.65rem;
         padding: 1px 6px;
         border-radius: 10px;
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
       }
       .cs-tab.active .cs-count-badge {
-        background: rgba(255,255,255,0.3);
+        background: rgba(255, 255, 255, 0.3);
       }
 
       /* ── Export Chat ── */
@@ -899,7 +998,10 @@
         font-family: inherit;
         transition: all 0.2s;
       }
-      .cs-export-btn:hover { border-color: var(--primary); color: var(--primary); }
+      .cs-export-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
       .cs-export-dropdown {
         display: none;
         position: absolute;
@@ -912,10 +1014,12 @@
         padding: 4px;
         z-index: 100;
         min-width: 140px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
         animation: csFadeIn 0.2s ease;
       }
-      .cs-export-dropdown.show { display: block; }
+      .cs-export-dropdown.show {
+        display: block;
+      }
       .cs-export-dropdown button {
         display: flex;
         align-items: center;
@@ -931,7 +1035,9 @@
         font-family: inherit;
         transition: background 0.15s;
       }
-      .cs-export-dropdown button:hover { background: var(--border); }
+      .cs-export-dropdown button:hover {
+        background: var(--border);
+      }
 
       /* ── Attach Button ── */
       .cs-attach-btn {
@@ -946,16 +1052,182 @@
         transition: all 0.2s;
         flex-shrink: 0;
       }
-      .cs-attach-btn:hover { color: var(--primary); background: var(--border); }
+      .cs-attach-btn:hover {
+        color: var(--primary);
+        background: var(--border);
+      }
 
-      /* ── Image Message ── */
-      .cs-msg-image {
-        max-width: 220px;
-        border-radius: 10px;
+      /* ═══════════════════════════════════════════
+         ── Image Message Bubble ──
+         Gunakan struktur berikut di JS kamu:
+         <div class="cs-msg-image-bubble">
+           <img class="cs-msg-image" src="..." />
+           <!-- caption (opsional): -->
+           <div class="cs-msg-image-caption">teks caption</div>
+         </div>
+      ═══════════════════════════════════════════ */
+      .cs-msg-image-bubble {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        max-width: 240px;
         cursor: pointer;
+      }
+      /* Bubble sent — border menggunakan secondary (hijau) agar selaras */
+      .cs-msg--cs .cs-msg-image-bubble {
+        border-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+      }
+      /* Tanpa caption: radius penuh (sudah dari wrapper) */
+      .cs-msg-image-bubble img {
+        display: block;
+        width: 100%;
+        max-width: 240px;
+        height: auto;
+        max-height: 200px;
+        object-fit: cover;
         transition: transform 0.2s;
       }
-      .cs-msg-image:hover { transform: scale(1.02); }
+      .cs-msg-image-bubble:hover img {
+        transform: scale(1.02);
+      }
+      /* Caption di bawah gambar */
+      .cs-msg-image-caption {
+        padding: 0.4rem 0.7rem 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        border-top: 1px solid var(--border);
+        /* Client bubble caption */
+        background: var(--card);
+        color: var(--foreground);
+      }
+      /* CS/sent bubble caption mengikuti warna secondary */
+      .cs-msg--cs .cs-msg-image-caption {
+        background: var(--secondary);
+        color: var(--secondary-foreground);
+        border-top-color: color-mix(in srgb, var(--secondary-foreground) 15%, transparent);
+      }
+
+      /* ═══════════════════════════════════════════
+         ── Reply Quote ──
+         Struktur HTML di dalam .cs-msg-bubble:
+         <div class="cs-msg-reply">
+           <div class="cs-msg-reply-author">Nama Pengirim</div>
+           <div class="cs-msg-reply-text">preview pesan...</div>
+         </div>
+         Atau untuk reply ke gambar tambahkan:
+           <img class="cs-msg-reply-thumb" src="..." />
+      ═══════════════════════════════════════════ */
+      .cs-msg-reply {
+        display: flex;
+        gap: 7px;
+        align-items: stretch;
+        padding: 5px 8px;
+        border-radius: 7px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        /* Client bubble: solid muted */
+        background: color-mix(in srgb, var(--muted) 80%, transparent);
+        border-left: 2.5px solid var(--primary);
+        overflow: hidden;
+      }
+      /* CS/sent bubble: transparan relatif terhadap secondary (hijau) */
+      .cs-msg--cs .cs-msg-reply {
+        background: rgba(0, 0, 0, 0.15);
+        border-left-color: rgba(255, 255, 255, 0.6);
+      }
+      .cs-msg-reply-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        flex: 1;
+      }
+      .cs-msg-reply-author {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* Author di dalam sent bubble */
+      .cs-msg--cs .cs-msg-reply-author {
+        color: rgba(255, 255, 255, 0.9);
+      }
+      .cs-msg-reply-text {
+        font-size: 0.7rem;
+        color: var(--muted-foreground);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.4;
+      }
+      /* Reply text di dalam sent bubble */
+      .cs-msg--cs .cs-msg-reply-text {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      /* Thumbnail gambar di reply (jika reply ke pesan bergambar) */
+      .cs-msg-reply-thumb {
+        width: 38px;
+        height: 38px;
+        border-radius: 5px;
+        object-fit: cover;
+        flex-shrink: 0;
+        align-self: center;
+      }
+
+      /* ═══════════════════════════════════════════
+         ── Reaction Pills ──
+         Struktur HTML di bawah .cs-msg-bubble:
+         <div class="cs-msg-reactions">
+           <button class="cs-msg-reaction mine">👍 3</button>
+           <button class="cs-msg-reaction">❤️ 1</button>
+         </div>
+         Tambahkan class "mine" jika reaksi milik CS agent.
+      ═══════════════════════════════════════════ */
+      .cs-msg-reactions {
+        display: flex;
+        gap: 4px;
+        margin-top: 5px;
+        flex-wrap: wrap;
+      }
+      /* CS messages — rata kanan */
+      .cs-msg--cs .cs-msg-reactions {
+        justify-content: flex-end;
+      }
+      .cs-msg-reaction {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        padding: 2px 8px 2px 6px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: transform 0.15s;
+        /* Default: orang lain */
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--foreground);
+        line-height: 1.6;
+      }
+      .cs-msg-reaction:hover {
+        transform: scale(1.08);
+      }
+      .cs-msg-reaction .cs-reaction-count {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--muted-foreground);
+      }
+      /* "mine" — reaksi yang dipilih sendiri oleh CS agent */
+      .cs-msg-reaction.mine {
+        border-width: 1.5px;
+        border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+      }
+      .cs-msg-reaction.mine .cs-reaction-count {
+        color: var(--primary);
+      }
 
       /* ── Emoji Picker ── */
       .cs-emoji-picker {
@@ -980,7 +1252,9 @@
         cursor: pointer;
         padding: 4px;
         border-radius: 6px;
-        transition: transform 0.2s, background 0.2s;
+        transition:
+          transform 0.2s,
+          background 0.2s;
       }
       .cs-emoji-btn:hover {
         background: var(--border);
@@ -1036,36 +1310,6 @@
         background: none;
       }
 
-      /* ── Message Extras (Reply/React) ── */
-      .cs-msg-reply {
-        font-size: 0.7rem;
-        color: var(--muted);
-        background: rgba(0,0,0,0.05);
-        padding: 4px 8px;
-        border-radius: 6px;
-        border-left: 2px solid var(--primary);
-        margin-bottom: 6px;
-        opacity: 0.9;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .dark .cs-msg-reply { background: rgba(255,255,255,0.05); }
-      .cs-msg-reactions {
-        display: flex;
-        gap: 4px;
-        margin-top: 4px;
-      }
-      .cs-msg-reaction {
-        font-size: 0.75rem;
-        background: var(--card);
-        border: 1px solid var(--border);
-        padding: 2px 6px;
-        border-radius: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      }
-
       /* ── Lightbox ── */
       .cs-lightbox {
         position: fixed;
@@ -1078,7 +1322,7 @@
       .cs-lightbox-overlay {
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0.85);
+        background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(4px);
       }
       .cs-lightbox-content {
@@ -1092,7 +1336,7 @@
         max-height: 90vh;
         object-fit: contain;
         border-radius: 8px;
-        box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
         transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         cursor: zoom-in;
       }
@@ -1114,7 +1358,7 @@
         height: 44px;
         border-radius: 50%;
         border: none;
-        background: rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.2);
         color: white;
         display: flex;
         align-items: center;
@@ -1123,10 +1367,12 @@
         font-size: 1.25rem;
         transition: all 0.2s;
         text-decoration: none;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
       .cs-lightbox-actions a:hover,
-      .cs-lightbox-actions button:hover { background: rgba(255,255,255,0.4); }
+      .cs-lightbox-actions button:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
     </style>
   </head>
   <body class="cs-body">
@@ -1141,7 +1387,14 @@
         <form id="cs-login-form">
           <div class="cs-login-field">
             <label for="cs-login-name">Nama CS</label>
-            <input type="text" id="cs-login-name" required placeholder="Nama tampilan CS" minlength="2" maxlength="30" />
+            <input
+              type="text"
+              id="cs-login-name"
+              required
+              placeholder="Nama tampilan CS"
+              minlength="2"
+              maxlength="30"
+            />
           </div>
           <button type="submit" id="cs-login-submit" class="cs-login-submit">
             <i class="ph-bold ph-sign-in"></i>
@@ -1152,10 +1405,17 @@
         <!-- OTP Section -->
         <div id="cs-otp-section" class="cs-otp-section">
           <p class="cs-otp-title">Masukkan kode verifikasi</p>
-          <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 0.75rem;">
+          <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 0.75rem">
             Kode telah dikirim ke <strong>himawaridigi@gmail.com</strong>
           </p>
-          <input type="text" id="cs-otp-input" class="cs-otp-input" maxlength="10" placeholder="00000000" inputmode="numeric" />
+          <input
+            type="text"
+            id="cs-otp-input"
+            class="cs-otp-input"
+            maxlength="10"
+            placeholder="00000000"
+            inputmode="numeric"
+          />
           <button id="cs-otp-verify" class="cs-otp-verify" disabled>Verifikasi</button>
           <div class="cs-otp-resend" id="cs-otp-resend">
             <button id="cs-otp-resend-btn" disabled>Kirim ulang kode</button>
@@ -1173,7 +1433,7 @@
     </div>
 
     <!-- ═══ DASHBOARD VIEW ═══ -->
-    <div id="cs-dashboard-view" style="display: none; height: 100vh; flex-direction: column;">
+    <div id="cs-dashboard-view" style="display: none; height: 100vh; flex-direction: column">
       <!-- Topbar -->
       <div class="cs-topbar">
         <div class="cs-topbar-left">
@@ -1185,10 +1445,10 @@
             <div class="cs-topbar-user-avatar" id="cs-topbar-avatar">CS</div>
             <span id="cs-topbar-name">CS Agent</span>
           </div>
-          <div class="cs-notif-wrapper" style="position: relative;">
+          <div class="cs-notif-wrapper" style="position: relative">
             <button class="cs-topbar-btn" id="cs-notif-toggle" title="Notifikasi">
               <i class="ph-bold ph-bell"></i>
-              <span class="cs-notif-badge" id="cs-notif-badge" style="display:none">0</span>
+              <span class="cs-notif-badge" id="cs-notif-badge" style="display: none">0</span>
             </button>
             <div class="cs-notif-dropdown" id="cs-notif-dropdown">
               <div class="cs-notif-dropdown-header">Notifikasi</div>
@@ -1199,9 +1459,9 @@
           </div>
           <button class="cs-topbar-btn" id="cs-theme-toggle" title="Toggle tema">
             <i class="ph ph-moon" id="cs-theme-moon"></i>
-            <i class="ph ph-sun" id="cs-theme-sun" style="display:none"></i>
+            <i class="ph ph-sun" id="cs-theme-sun" style="display: none"></i>
           </button>
-          <button class="cs-topbar-btn" id="cs-logout-btn" title="Logout" style="color: #ef4444;">
+          <button class="cs-topbar-btn" id="cs-logout-btn" title="Logout" style="color: #ef4444">
             <i class="ph-bold ph-sign-out"></i>
           </button>
         </div>
@@ -1224,7 +1484,12 @@
             </div>
             <div class="cs-search-wrap">
               <i class="ph ph-magnifying-glass"></i>
-              <input type="text" class="cs-search" id="cs-search-input" placeholder="Cari nama client..." />
+              <input
+                type="text"
+                class="cs-search"
+                id="cs-search-input"
+                placeholder="Cari nama client..."
+              />
             </div>
           </div>
           <div class="cs-chat-list" id="cs-chat-list">
@@ -1238,13 +1503,16 @@
         <!-- Detail -->
         <div class="cs-detail" id="cs-detail">
           <!-- Empty State -->
-          <div class="cs-empty-state" id="cs-detail-empty" style="height:100%">
+          <div class="cs-empty-state" id="cs-detail-empty" style="height: 100%">
             <i class="ph ph-chats-circle"></i>
             <p>Pilih chat dari sidebar untuk memulai</p>
           </div>
 
           <!-- Chat View (hidden by default) -->
-          <div id="cs-chat-view" style="display:none; flex:1; display:none; flex-direction:column; height:100%;">
+          <div
+            id="cs-chat-view"
+            style="display: none; flex: 1; display: none; flex-direction: column; height: 100%"
+          >
             <div class="cs-detail-header">
               <div class="cs-detail-header-left">
                 <button class="cs-back-btn" id="cs-back-btn">
@@ -1257,7 +1525,7 @@
                 <span class="cs-detail-status active" id="cs-detail-status">Active</span>
               </div>
               <div class="cs-detail-actions">
-                <div class="cs-export-wrapper" style="position:relative">
+                <div class="cs-export-wrapper" style="position: relative">
                   <button class="cs-export-btn" id="cs-export-btn" title="Export chat">
                     <i class="ph-bold ph-download-simple"></i> Export
                   </button>
@@ -1275,13 +1543,11 @@
             </div>
             <div class="cs-messages" id="cs-messages"></div>
             <div class="cs-typing-indicator" id="cs-client-typing">
-              <div class="cs-typing-dots">
-                <span></span><span></span><span></span>
-              </div>
+              <div class="cs-typing-dots"><span></span><span></span><span></span></div>
               <span>Client sedang mengetik...</span>
             </div>
             <!-- Emoji Picker -->
-            <div class="cs-emoji-picker" id="cs-emoji-picker" style="display:none; left:56px;">
+            <div class="cs-emoji-picker" id="cs-emoji-picker" style="display: none; left: 56px">
               <button type="button" class="cs-emoji-btn">😀</button>
               <button type="button" class="cs-emoji-btn">😂</button>
               <button type="button" class="cs-emoji-btn">🤣</button>
@@ -1312,11 +1578,18 @@
               <label class="cs-attach-btn" for="cs-image-upload" title="Kirim gambar">
                 <i class="ph ph-image"></i>
               </label>
-              <input type="file" id="cs-image-upload" accept="image/*" style="display:none" />
+              <input type="file" id="cs-image-upload" accept="image/*" style="display: none" />
               <button type="button" class="cs-attach-btn" id="cs-emoji-toggle" title="Emoji">
                 <i class="ph ph-smiley"></i>
               </button>
-              <input type="text" class="cs-input" id="cs-chat-input" placeholder="Ketik pesan..." maxlength="500" autocomplete="off" />
+              <input
+                type="text"
+                class="cs-input"
+                id="cs-chat-input"
+                placeholder="Ketik pesan..."
+                maxlength="500"
+                autocomplete="off"
+              />
               <button class="cs-send-btn" id="cs-chat-send" disabled>
                 <i class="ph-bold ph-paper-plane-tilt"></i>
               </button>
@@ -1327,7 +1600,7 @@
     </div>
 
     <!-- Context Menu (Messages) -->
-    <div class="cs-context-menu" id="cs-context-menu" style="display:none">
+    <div class="cs-context-menu" id="cs-context-menu" style="display: none">
       <button id="cs-ctx-reply"><i class="ph ph-arrow-u-up-left"></i> Reply</button>
       <button id="cs-ctx-fav"><i class="ph ph-star"></i> Favorite</button>
       <div class="cs-ctx-reactions">
@@ -1341,8 +1614,10 @@
     </div>
 
     <!-- Context Menu (Archive) -->
-    <div class="cs-context-menu" id="cs-archive-context-menu" style="display:none">
-      <button id="cs-archive-ctx-delete" style="color: #ef4444;"><i class="ph ph-trash"></i> Hapus Permanen</button>
+    <div class="cs-context-menu" id="cs-archive-context-menu" style="display: none">
+      <button id="cs-archive-ctx-delete" style="color: #ef4444">
+        <i class="ph ph-trash"></i> Hapus Permanen
+      </button>
     </div>
 
     <!-- Scripts -->
@@ -1352,7 +1627,7 @@
     <script src="./js/cs-app.js"></script>
 
     <!-- Lightbox -->
-    <div class="cs-lightbox" id="cs-lightbox" style="display:none">
+    <div class="cs-lightbox" id="cs-lightbox" style="display: none">
       <div class="cs-lightbox-overlay"></div>
       <div class="cs-lightbox-content">
         <img id="cs-lightbox-img" src="" alt="Preview" />
