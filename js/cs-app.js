@@ -880,7 +880,6 @@
     supabase.from('typing_status').upsert({
       chat_id: selectedChatId,
       cs_is_typing: true,
-      cs_name: csName,
       cs_timestamp: new Date().toISOString(),
     }).then();
 
@@ -893,7 +892,6 @@
     supabase.from('typing_status').upsert({
       chat_id: selectedChatId,
       cs_is_typing: false,
-      cs_name: csName,
       cs_timestamp: new Date().toISOString(),
     }).then();
   }
