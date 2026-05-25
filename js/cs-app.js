@@ -1104,6 +1104,7 @@
         if (window.showToast) window.showToast('Library PDF gagal dimuat', 'error');
         return;
       }
+      
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(14);
@@ -1111,13 +1112,59 @@
       doc.setFontSize(10);
       doc.text(`Client: ${data.clientName} (${data.clientEmail})`, 14, 23);
       doc.text(`CS: ${data.assignedCS}`, 14, 29);
+      
+      if (window.showToast) window.showToast('Mempersiapkan PDF, harap tunggu...', 'info');
+      
+      const tableRows = [];
+      const imageMap = {};
+      let rowIndex = 0;
+      
+      for (const m of data.messages) {
+        let text = m.text;
+        const imgMatch = text.match(/\[Image\] (https?:\/\/[^\s]+)/);
+        if (imgMatch) {
+          const url = imgMatch[1];
+          try {
+            const res = await fetch(url);
+            const blob = await res.blob();
+            const b64 = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.readAsDataURL(blob);
+            });
+            imageMap[rowIndex] = b64;
+            text = text.replace(imgMatch[0], '[Gambar Dilampirkan]');
+          } catch (e) {
+            console.warn('Gagal memuat gambar untuk PDF:', url);
+          }
+        }
+        tableRows.push([m.time, m.type, m.sender, text]);
+        rowIndex++;
+      }
+      
       doc.autoTable({
         startY: 35,
         head: [['Waktu', 'Tipe', 'Pengirim', 'Pesan']],
-        body: data.messages.map(m => [m.time, m.type, m.sender, m.text]),
+        body: tableRows,
         styles: { fontSize: 8, cellPadding: 3 },
         headStyles: { fillColor: [99, 102, 241] },
-        columnStyles: { 2: { cellWidth: 'auto' } },
+        columnStyles: { 3: { cellWidth: 80 } },
+        didParseCell: function(hookData) {
+          if (hookData.section === 'body' && hookData.column.index === 3) {
+            if (imageMap[hookData.row.index]) {
+              hookData.cell.styles.minCellHeight = 35;
+            }
+          }
+        },
+        didDrawCell: function(hookData) {
+          if (hookData.section === 'body' && hookData.column.index === 3) {
+            const b64 = imageMap[hookData.row.index];
+            if (b64) {
+              const textHeight = hookData.cell.text.length * 4;
+              doc.addImage(b64, 'JPEG', hookData.cell.x + 2, hookData.cell.y + textHeight + 4, 25, 25);
+            }
+          }
+        }
       });
       doc.save(filename + '.pdf');
     }
@@ -1430,37 +1477,51 @@
     if (archiveCtxMenu) {
       document.getElementById('cs-archive-ctx-delete').addEventListener('click', () => {
         if (csArchiveContextMenuId) {
-          // Toast confirm
-          let container = document.querySelector('.hd-toast-container');
-          if (!container) {
-            container = document.createElement('div');
-            container.className = 'hd-toast-container';
-            document.body.appendChild(container);
-          }
-          const toast = document.createElement('div');
-          toast.className = 'hd-toast warning';
-          toast.innerHTML = `
-            <i class="ph-fill ph-warning"></i>
-            <div class="toast-content" style="display:flex; flex-direction:column;">
-              <span>Hapus chat secara permanen?</span>
-              <div style="margin-top:8px; display:flex; gap:8px;">
-                <button id="toast-btn-yes" style="padding:4px 8px; border-radius:4px; border:none; background:var(--destructive); color:white; cursor:pointer;">Ya</button>
-                <button id="toast-btn-no" style="padding:4px 8px; border-radius:4px; border:none; background:var(--border); color:var(--foreground); cursor:pointer;">Batal</button>
-              </div>
+          const modalOverlay = document.createElement('div');
+          modalOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
+          
+          const modalBox = document.createElement('div');
+          modalBox.style.cssText = 'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
+          
+          modalBox.innerHTML = `
+            <div style="width:48px; height:48px; border-radius:50%; background:#fee2e2; color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">
+              <i class="ph-bold ph-trash"></i>
+            </div>
+            <h3 style="margin:0 0 8px; color:var(--foreground); font-size:1.1rem; font-weight:600;">Hapus Obrolan Permanen?</h3>
+            <p style="margin:0 0 24px; color:var(--text-muted); font-size:0.9rem;">Tindakan ini tidak dapat dibatalkan. Semua riwayat percakapan dengan klien ini akan hilang selamanya.</p>
+            <div style="display:flex; gap:12px; justify-content:center;">
+              <button id="modal-btn-no" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--foreground); font-weight:500; cursor:pointer;">Batal</button>
+              <button id="modal-btn-yes" style="flex:1; padding:10px; border-radius:8px; border:none; background:#ef4444; color:white; font-weight:500; cursor:pointer;">Hapus</button>
             </div>
           `;
-          container.appendChild(toast);
-          void toast.offsetWidth;
-          toast.classList.add('show');
           
-          document.getElementById('toast-btn-yes').onclick = async () => {
+          modalOverlay.appendChild(modalBox);
+          document.body.appendChild(modalOverlay);
+          
+          // Animate in
+          requestAnimationFrame(() => {
+            modalOverlay.style.opacity = '1';
+            modalBox.style.transform = 'scale(1)';
+          });
+          
+          const closeModal = () => {
+            modalOverlay.style.opacity = '0';
+            modalBox.style.transform = 'scale(0.95)';
+            setTimeout(() => modalOverlay.remove(), 200);
+          };
+          
+          document.getElementById('modal-btn-yes').onclick = async () => {
+            const btnYes = document.getElementById('modal-btn-yes');
+            btnYes.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Menghapus...';
+            btnYes.disabled = true;
+            
             const { error } = await supabase.from('chats').delete().eq('id', csArchiveContextMenuId);
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
             
             if (error) {
+              closeModal();
               if (window.showToast) window.showToast('Gagal menghapus chat: ' + error.message, 'error');
             } else {
+              closeModal();
               if (window.showToast) window.showToast('Chat berhasil dihapus secara permanen', 'success');
               // Optimistic delete
               if (archiveData[csArchiveContextMenuId]) delete archiveData[csArchiveContextMenuId];
@@ -1474,9 +1535,10 @@
               }
             }
           };
-          document.getElementById('toast-btn-no').onclick = () => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
+          
+          document.getElementById('modal-btn-no').onclick = closeModal;
+          modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) closeModal();
           };
         }
         archiveCtxMenu.style.display = 'none';
