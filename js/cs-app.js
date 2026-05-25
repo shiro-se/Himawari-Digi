@@ -1238,9 +1238,9 @@
       if (window.showToast) window.showToast('Mempersiapkan PDF, harap tunggu...', 'info');
 
       const container = document.createElement('div');
-      container.style.cssText = 'padding: 20px; font-family: sans-serif; color: #1e293b;';
+      container.style.cssText = 'padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; color: #1e293b;';
       
-      let html = `<h2 style="margin-bottom: 4px; color: #0f172a;">Chat History &mdash; HimawariDigi</h2>`;
+      let html = `<h2 style="margin-bottom: 4px; color: #0f172a; font-family: inherit;">Chat History &mdash; HimawariDigi</h2>`;
       html += `<p style="margin-top: 0; font-size: 14px; color: #475569;">`;
       html += `Client: <strong>${data.clientName}</strong> (${data.clientEmail})<br>`;
       html += `CS: <strong>${data.assignedCS}</strong></p>`;
@@ -1284,11 +1284,20 @@
       wrapper.appendChild(container);
       document.body.appendChild(wrapper);
 
+      // Parse emojis with Twemoji for perfect rendering
+      if (window.twemoji) {
+        window.twemoji.parse(container, {
+          folder: 'svg',
+          ext: '.svg',
+          attributes: () => ({ style: 'width: 1em; height: 1em; margin: 0 0.05em 0 0.1em; vertical-align: -0.1em;' })
+        });
+      }
+
       const opt = {
         margin:       10,
         filename:     filename + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+        html2canvas:  { scale: 2, useCORS: true, letterRendering: true, allowTaint: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
