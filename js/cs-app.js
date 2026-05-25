@@ -17,11 +17,12 @@
     const audio = document.getElementById('cs-notif-sound');
     if (audio) {
       audio.currentTime = 0;
-      audio.play().catch(e => console.log('Audio autoplay prevented:', e));
+      audio.play().catch(() => {});
     }
   };
 
   // ── State ─────────────────────────────────────────────────────
+  let globalMessagesListener = null;
   let csName = localStorage.getItem('hd_cs_name') || '';
   let selectedChatId = null;
   let chatsData = {};
@@ -401,8 +402,12 @@
       supabase.removeChannel(chatsListener);
     }
     
+    if (globalMessagesListener) {
+      supabase.removeChannel(globalMessagesListener);
+    }
+    
     // Global Messages Listener to catch incoming messages instantly without fetching
-    const globalMessagesListener = supabase.channel('messages-global')
+    globalMessagesListener = supabase.channel('messages-global')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
         const m = payload.new;
         const cId = m.chat_id;
@@ -546,7 +551,9 @@
       })
       .sort((a, b) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0));
 
-    chatCount.textContent = items.length;
+    chatCount.textContent = Object.keys(chatsData).length;
+    const archiveCount = document.getElementById('cs-archive-count');
+    if (archiveCount) archiveCount.textContent = Object.keys(archiveData).length;
 
     if (items.length === 0) {
       chatListEmpty.style.display = 'flex';
@@ -807,14 +814,15 @@
         textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
       }
 
-      const replyHtml = msg.replyTo 
-        ? `<div class="cs-msg-reply">
-             <div class="cs-msg-reply-inner">
-               <div class="cs-msg-reply-author">Membalas pesan</div>
-               <div class="cs-msg-reply-text">${window.chatSanitize(msg.replyTo.text)}</div>
-             </div>
-           </div>` 
-        : '';
+        let replyHtml = '';
+        if (msg.replyTo && msg.replyTo.text) {
+          replyHtml = `
+            <div class="cs-msg-reply" onclick="window.scrollToMessage('${msg.replyTo.id}')" style="cursor: pointer;" title="Klik untuk melompat ke pesan ini">
+              <div style="font-weight:600; font-size:0.75rem; color:var(--primary); margin-bottom:2px;">Replying to</div>
+              <div>${window.chatSanitize(msg.replyTo.text)}</div>
+            </div>
+          `;
+        }
       
       let reactionsHtml = '';
       if (msg.reaction) {
@@ -1065,7 +1073,7 @@
         time: m.timestamp ? new Date(m.timestamp).toLocaleString('id-ID') : '',
         type: m.sender === 'client' ? 'Client' : m.sender === 'system' ? 'System' : 'CS',
         sender: m.sender === 'client' ? (chat.info?.clientName || 'Client') : m.sender === 'system' ? 'System' : (m.senderName || 'CS'),
-        text: m.text || (m.imageUrl ? '[Image]' : ''),
+        text: m.text || (m.imageUrl ? `[Image] ${m.imageUrl}` : ''),
       }))
     };
   }
@@ -1076,9 +1084,9 @@
     const filename = 'chat_' + (data.clientName.replace(/\s+/g, '_')) + '_' + new Date().toISOString().slice(0,10);
 
     if (format === 'csv') {
-      let csv = 'Waktu,Pengirim,Pesan\n';
+      let csv = 'Waktu,Tipe,Pengirim,Pesan\n';
       data.messages.forEach(m => {
-        csv += `"${m.time}","${m.sender}","${m.text.replace(/"/g, '""')}"\n`;
+        csv += `"${m.time}","${m.type}","${m.sender}","${m.text.replace(/"/g, '""')}"\n`;
       });
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       downloadBlob(blob, filename + '.csv');
@@ -1087,7 +1095,7 @@
         if (window.showToast) window.showToast('Library Excel gagal dimuat', 'error');
         return;
       }
-      const ws = XLSX.utils.json_to_sheet(data.messages.map(m => ({ Waktu: m.time, Pengirim: m.sender, Pesan: m.text })));
+      const ws = XLSX.utils.json_to_sheet(data.messages.map(m => ({ Waktu: m.time, Tipe: m.type, Pengirim: m.sender, Pesan: m.text })));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Chat');
       XLSX.writeFile(wb, filename + '.xlsx');
@@ -1105,8 +1113,8 @@
       doc.text(`CS: ${data.assignedCS}`, 14, 29);
       doc.autoTable({
         startY: 35,
-        head: [['Waktu', 'Pengirim', 'Pesan']],
-        body: data.messages.map(m => [m.time, m.sender, m.text]),
+        head: [['Waktu', 'Tipe', 'Pengirim', 'Pesan']],
+        body: data.messages.map(m => [m.time, m.type, m.sender, m.text]),
         styles: { fontSize: 8, cellPadding: 3 },
         headStyles: { fillColor: [99, 102, 241] },
         columnStyles: { 2: { cellWidth: 'auto' } },
@@ -1404,7 +1412,7 @@
     chatList.addEventListener('contextmenu', (e) => {
       const item = e.target.closest('.cs-chat-item');
       if (item && currentTab === 'archive') {
-        showArchiveContextMenu(e, item.dataset.id);
+        showArchiveContextMenu(e, item.dataset.chatId);
       }
     });
 
@@ -1412,7 +1420,7 @@
       const item = e.target.closest('.cs-chat-item');
       if (item && currentTab === 'archive') {
         csLongPressTimer = setTimeout(() => {
-          showArchiveContextMenu(e, item.dataset.id);
+          showArchiveContextMenu(e, item.dataset.chatId);
         }, 500);
       }
     });
@@ -1481,6 +1489,21 @@
     });
 
   }
+
+  // ── Helpers ───────────────────────────────────────────────────
+  window.scrollToMessage = function(id) {
+    const el = document.querySelector(`.cs-msg-bubble[data-id="${id}"]`);
+    if (el) {
+      const container = document.getElementById('cs-messages');
+      container.scrollTo({ top: el.offsetTop - container.offsetTop - 20, behavior: 'smooth' });
+      const oldBg = el.style.backgroundColor;
+      el.style.transition = 'background-color 0.3s';
+      el.style.backgroundColor = 'rgba(0, 122, 255, 0.2)';
+      setTimeout(() => {
+        el.style.backgroundColor = oldBg || '';
+      }, 1500);
+    }
+  };
 
   // ── Init ──────────────────────────────────────────────────────
   checkExistingSession();
