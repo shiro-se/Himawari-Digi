@@ -746,15 +746,37 @@
 
       const senderNameHtml = !isClient ? `<div class="cs-msg-sender-name">${window.chatSanitize(msg.senderName || 'CS')}</div>` : '';
 
-      const imageHtml = msg.imageUrl 
-        ? `<img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openCSLightbox('${msg.imageUrl}')" loading="lazy" />`
-        : `<p>${window.chatSanitize(msg.text)}</p>`;
+      let imageHtml = '';
+      let textHtml = '';
+      
+      if (msg.imageUrl) {
+        imageHtml = `
+          <div class="cs-msg-image-bubble" onclick="window.openCSLightbox('${msg.imageUrl}')">
+            <img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
+            ${msg.text ? `<div class="cs-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
+          </div>
+        `;
+      } else {
+        textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
+      }
 
-      const replyHtml = msg.replyTo ? `<div class="cs-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo.text)}</div>` : '';
+      const replyHtml = msg.replyTo 
+        ? `<div class="cs-msg-reply">
+             <div class="cs-msg-reply-inner">
+               <div class="cs-msg-reply-author">Membalas pesan</div>
+               <div class="cs-msg-reply-text">${window.chatSanitize(msg.replyTo.text)}</div>
+             </div>
+           </div>` 
+        : '';
       
       let reactionsHtml = '';
       if (msg.reaction) {
-        reactionsHtml = `<div class="cs-msg-reactions"><span class="cs-msg-reaction">${msg.reaction}</span></div>`;
+        // Assuming msg.reaction is a simple string for now, wrapped in the new button layout
+        reactionsHtml = `
+          <div class="cs-msg-reactions">
+            <button class="cs-msg-reaction">${msg.reaction} <span class="cs-reaction-count">1</span></button>
+          </div>
+        `;
       }
 
       div.innerHTML = `
@@ -763,6 +785,7 @@
           ${senderNameHtml}
           ${replyHtml}
           ${imageHtml}
+          ${textHtml}
           ${reactionsHtml}
           <div class="cs-msg-time-container">
             <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>

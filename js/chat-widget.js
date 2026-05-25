@@ -483,15 +483,36 @@
           : `<span id="chat-msg-status-${msgId}" class="chat-msg-status sent"><i class="ph ph-check"></i></span>`;
       }
 
-      const contentHtml = msg.imageUrl
-        ? `<img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" onclick="window.openChatLightbox('${msg.imageUrl}')" loading="lazy" />`
-        : `<p>${window.chatSanitize(msg.text)}</p>`;
+      let imageHtml = '';
+      let textHtml = '';
 
-      const replyHtml = msg.replyTo_text ? `<div class="chat-msg-reply">Replying to:<br/>${window.chatSanitize(msg.replyTo_text)}</div>` : '';
+      if (msg.imageUrl) {
+        imageHtml = `
+          <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${msg.imageUrl}')">
+            <img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
+            ${msg.text ? `<div class="chat-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
+          </div>
+        `;
+      } else {
+        textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
+      }
+
+      const replyHtml = msg.replyTo_text 
+        ? `<div class="chat-msg-reply">
+             <div class="chat-msg-reply-inner">
+               <div class="chat-msg-reply-author">Membalas pesan</div>
+               <div class="chat-msg-reply-text">${window.chatSanitize(msg.replyTo_text)}</div>
+             </div>
+           </div>` 
+        : '';
       
       let reactionsHtml = '';
       if (msg.reaction) {
-        reactionsHtml = `<div class="chat-msg-reactions"><span class="chat-msg-reaction">${msg.reaction}</span></div>`;
+        reactionsHtml = `
+          <div class="chat-msg-reactions">
+            <button class="chat-msg-reaction">${msg.reaction} <span class="chat-reaction-count">1</span></button>
+          </div>
+        `;
       }
 
       const timeFormatted = msg.timestamp ? window.chatFormatTime(new Date(msg.timestamp).getTime()) : '';
@@ -500,7 +521,8 @@
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
         <div class="chat-msg-bubble" data-id="${msgId}" data-text="${window.chatSanitize(msg.text || '[Image]')}">
           ${replyHtml}
-          ${contentHtml}
+          ${imageHtml}
+          ${textHtml}
           ${reactionsHtml}
           <div class="chat-msg-time-container">
             <span class="chat-msg-time">${timeFormatted}</span>
