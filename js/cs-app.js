@@ -6,11 +6,21 @@
 (function () {
   'use strict';
 
-  const supabase = window.supabaseClient;
-  if (!supabase) {
-    console.error('Supabase not initialized');
+  document.addEventListener('DOMContentLoaded', async () => {
+  if (!window.supabaseClient) {
+    console.error('Supabase client not initialized');
     return;
   }
+  const supabase = window.supabaseClient;
+
+  // --- Sound Notification ---
+  window.playNotifSound = function() {
+    const audio = document.getElementById('cs-notif-sound');
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(e => console.log('Audio autoplay prevented:', e));
+    }
+  };
 
   // ── State ─────────────────────────────────────────────────────
   let csName = localStorage.getItem('hd_cs_name') || '';
@@ -393,36 +403,61 @@
     }
 
     chatsListener = supabase.channel('chats-active')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.active' }, async (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, async (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const c = payload.new;
-          const prevChat = chatsData[c.id];
-          if (!chatsData[c.id]) chatsData[c.id] = { info: {}, messages: {} };
-          chatsData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
+          const isClosed = c.status === 'closed';
+          const isActive = c.status === 'active';
           
-          if (payload.eventType === 'INSERT') {
-            notifyNewMessage('Chat baru dari ' + (c.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', c.id);
-          } else if (payload.eventType === 'UPDATE') {
-            const newTime = c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0;
-            const oldTime = prevChat?.info?.lastMessageAt || 0;
-            if (newTime > oldTime) {
-              const { data: lastMsg } = await supabase.from('messages').select('*').eq('chat_id', c.id).order('timestamp', { ascending: false }).limit(1).single();
-              if (lastMsg) {
-                chatsData[c.id].messages[lastMsg.id] = { ...lastMsg, timestamp: lastMsg.timestamp ? new Date(lastMsg.timestamp).getTime() : 0, replyTo: lastMsg.replyTo_id ? { id: lastMsg.replyTo_id, text: lastMsg.replyTo_text } : null };
-                if (lastMsg.sender === 'client') {
-                  if (c.id !== selectedChatId || document.hidden) {
-                    notifyNewMessage('Pesan dari ' + (c.clientName || 'Client'), lastMsg.text, c.id);
-                  } else {
-                    if (window.playNotifSound) window.playNotifSound();
+          if (isActive) {
+            const prevChat = chatsData[c.id];
+            if (!chatsData[c.id]) chatsData[c.id] = { info: {}, messages: {} };
+            chatsData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
+            
+            // If it was in archive, remove it from archive (e.g. reopened)
+            if (archiveData[c.id]) delete archiveData[c.id];
+            
+            if (payload.eventType === 'INSERT') {
+              notifyNewMessage('Chat baru dari ' + (c.clientName || 'Client'), 'Ada chat baru yang membutuhkan respons.', c.id);
+            } else if (payload.eventType === 'UPDATE') {
+              const newTime = c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0;
+              const oldTime = prevChat?.info?.lastMessageAt || 0;
+              if (newTime > oldTime) {
+                const { data: lastMsg } = await supabase.from('messages').select('*').eq('chat_id', c.id).order('timestamp', { ascending: false }).limit(1).single();
+                if (lastMsg) {
+                  chatsData[c.id].messages[lastMsg.id] = { ...lastMsg, timestamp: lastMsg.timestamp ? new Date(lastMsg.timestamp).getTime() : 0, replyTo: lastMsg.replyTo_id ? { id: lastMsg.replyTo_id, text: lastMsg.replyTo_text } : null };
+                  if (lastMsg.sender === 'client') {
+                    if (c.id !== selectedChatId || document.hidden) {
+                      notifyNewMessage('Pesan dari ' + (c.clientName || 'Client'), lastMsg.text, c.id);
+                    } else {
+                      if (window.playNotifSound) window.playNotifSound();
+                    }
                   }
                 }
               }
             }
+          } else if (isClosed) {
+            // Move from active to archive
+            if (chatsData[c.id]) {
+              archiveData[c.id] = chatsData[c.id];
+              archiveData[c.id].info = { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 };
+              delete chatsData[c.id];
+              
+              if (selectedChatId === c.id && currentTab === 'active') {
+                detailStatus.textContent = 'Closed';
+                detailStatus.className = 'cs-detail-status closed';
+              }
+            } else if (!archiveData[c.id]) {
+              // It's a new closed chat coming in from elsewhere
+              archiveData[c.id] = { info: { ...c, lastMessageAt: c.lastMessageAt ? new Date(c.lastMessageAt).getTime() : 0 }, messages: {} };
+            }
           }
+          
           renderChatList();
           updateSelectedChatStatus();
         } else if (payload.eventType === 'DELETE') {
-          delete chatsData[payload.old.id];
+          if (chatsData[payload.old.id]) delete chatsData[payload.old.id];
+          if (archiveData[payload.old.id]) delete archiveData[payload.old.id];
           renderChatList();
           updateSelectedChatStatus();
         }
@@ -631,8 +666,12 @@
         
         if (msg.sender === 'client' && !msg.read) {
           supabase.from('messages').update({ read: true }).eq('id', m.id).then();
+          if (chatSource[chatId]) {
+            chatSource[chatId].messages[m.id].read = true;
+          }
         }
       });
+      renderChatList();
       scrollCSMessages();
     }
 
@@ -650,6 +689,9 @@
           }
           if (msg.sender === 'client' && !msg.read) {
             supabase.from('messages').update({ read: true }).eq('id', m.id).then();
+            // Update local state directly to clear the unread count
+            chatsData[chatId].messages[m.id].read = true;
+            renderChatList();
           }
         } else if (payload.eventType === 'UPDATE') {
           const m = payload.new;
@@ -921,6 +963,14 @@
     unreadNotifCount++;
     updateNotifUI();
 
+    const bellIcon = document.querySelector('#cs-notif-toggle i');
+    if (bellIcon) {
+      bellIcon.classList.remove('animate-ring');
+      void bellIcon.offsetWidth; // trigger reflow
+      bellIcon.classList.add('animate-ring');
+      setTimeout(() => bellIcon.classList.remove('animate-ring'), 1000);
+    }
+
     if (window.playNotifSound) window.playNotifSound();
 
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -1030,14 +1080,19 @@
       const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
       downloadBlob(blob, filename + '.csv');
     } else if (format === 'excel') {
-      await loadScript('https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js');
+      if (!window.XLSX) {
+        if (window.showToast) window.showToast('Library Excel gagal dimuat', 'error');
+        return;
+      }
       const ws = XLSX.utils.json_to_sheet(data.messages.map(m => ({ Waktu: m.time, Pengirim: m.sender, Pesan: m.text })));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Chat');
       XLSX.writeFile(wb, filename + '.xlsx');
     } else if (format === 'pdf') {
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js');
+      if (!window.jspdf) {
+        if (window.showToast) window.showToast('Library PDF gagal dimuat', 'error');
+        return;
+      }
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(14);
@@ -1387,17 +1442,26 @@
           void toast.offsetWidth;
           toast.classList.add('show');
           
-          document.getElementById('toast-btn-yes').onclick = () => {
-            supabase.from('chats').delete().eq('id', csArchiveContextMenuId).then(() => {
-              toast.classList.remove('show');
-              setTimeout(() => toast.remove(), 300);
+          document.getElementById('toast-btn-yes').onclick = async () => {
+            const { error } = await supabase.from('chats').delete().eq('id', csArchiveContextMenuId);
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+            
+            if (error) {
+              if (window.showToast) window.showToast('Gagal menghapus chat: ' + error.message, 'error');
+            } else {
               if (window.showToast) window.showToast('Chat berhasil dihapus secara permanen', 'success');
+              // Optimistic delete
+              if (archiveData[csArchiveContextMenuId]) delete archiveData[csArchiveContextMenuId];
+              if (chatsData[csArchiveContextMenuId]) delete chatsData[csArchiveContextMenuId];
+              renderChatList();
+              
               if (selectedChatId === csArchiveContextMenuId) {
                 detail.style.display = 'none';
                 detailEmpty.style.display = 'flex';
                 selectedChatId = null;
               }
-            });
+            }
           };
           document.getElementById('toast-btn-no').onclick = () => {
             toast.classList.remove('show');

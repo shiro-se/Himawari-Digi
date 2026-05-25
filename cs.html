@@ -132,6 +132,20 @@
         border: 2px solid var(--card);
         pointer-events: none;
       }
+      .animate-ring {
+        animation: ring 1s ease-in-out;
+      }
+      @keyframes ring {
+        0% { transform: rotate(0); }
+        10% { transform: rotate(15deg); }
+        20% { transform: rotate(-10deg); }
+        30% { transform: rotate(5deg); }
+        40% { transform: rotate(-5deg); }
+        50% { transform: rotate(2deg); }
+        60% { transform: rotate(-2deg); }
+        70% { transform: rotate(0); }
+        100% { transform: rotate(0); }
+      }
       .cs-notif-dropdown {
         position: absolute;
         top: calc(100% + 0.5rem);
@@ -1620,9 +1634,15 @@
       </button>
     </div>
 
+    <!-- Audio Notification -->
+    <audio id="cs-notif-sound" src="/assets/notification_alert.mp3" preload="auto"></audio>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="./js/supabase-config.js"></script>
     <script src="./js/cs-app.js"></script>
 
