@@ -462,7 +462,7 @@
 
     // Global Messages Listener to catch incoming messages instantly without fetching
     globalMessagesListener = supabase
-      .channel('messages-global')
+      .channel('messages-global-' + Date.now())
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages' },
@@ -496,7 +496,7 @@
       .subscribe();
 
     chatsListener = supabase
-      .channel('chats-active')
+      .channel('chats-active-' + Date.now())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, async (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
           const c = payload.new;
@@ -612,7 +612,7 @@
     }
 
     archiveListener = supabase
-      .channel('chats-archive')
+      .channel('chats-archive-' + Date.now())
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'chats', filter: 'status=eq.closed' },
@@ -802,7 +802,7 @@
 
     // Listen for messages
     activeMessagesListener = supabase
-      .channel('messages-' + chatId)
+      .channel('messages-' + chatId + '-' + Date.now())
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'messages', filter: 'chat_id=eq.' + chatId },
@@ -869,7 +869,7 @@
 
     // Listen for client typing
     activeTypingListener = supabase
-      .channel('typing-' + chatId)
+      .channel('typing-' + chatId + '-' + Date.now())
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'typing_status', filter: 'chat_id=eq.' + chatId },

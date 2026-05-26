@@ -383,7 +383,7 @@
     }, 500);
 
     // Subscribe to realtime changes
-    chatChannel = supabaseClient.channel('chat-' + chatId)
+    chatChannel = supabaseClient.channel('chat-' + chatId + '-' + Date.now())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: 'chat_id=eq.' + chatId }, payload => {
         const msg = payload.new;
         if (payload.eventType === 'INSERT') {
