@@ -64,6 +64,50 @@
     }, 3000);
   };
 
+  // ── Modal Konfirmasi Generik ──────────────────────────────────────
+  window.showConfirmModal = function({ title, text, icon = 'ph-warning', iconBg = '#fee2e2', iconColor = '#ef4444', confirmText = 'Ya', confirmBg = '#ef4444', onConfirm }) {
+    const modalOverlay = document.createElement('div');
+    modalOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
+
+    const modalBox = document.createElement('div');
+    modalBox.style.cssText = 'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
+
+    modalBox.innerHTML = `
+      <div style="width:48px; height:48px; border-radius:50%; background:${iconBg}; color:${iconColor}; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">
+        <i class="ph-bold ${icon}"></i>
+      </div>
+      <h3 style="margin:0 0 8px; color:var(--foreground); font-size:1.1rem; font-weight:600;">${title}</h3>
+      <p style="margin:0 0 24px; color:var(--text-muted); font-size:0.9rem;">${text}</p>
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <button id="hd-modal-btn-no" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--foreground); font-weight:500; cursor:pointer; transition:background 0.2s;">Batal</button>
+        <button id="hd-modal-btn-yes" style="flex:1; padding:10px; border-radius:8px; border:none; background:${confirmBg}; color:white; font-weight:500; cursor:pointer; transition:opacity 0.2s;">${confirmText}</button>
+      </div>
+    `;
+
+    modalOverlay.appendChild(modalBox);
+    document.body.appendChild(modalOverlay);
+
+    requestAnimationFrame(() => {
+      modalOverlay.style.opacity = '1';
+      modalBox.style.transform = 'scale(1)';
+    });
+
+    const closeModal = () => {
+      modalOverlay.style.opacity = '0';
+      modalBox.style.transform = 'scale(0.95)';
+      setTimeout(() => modalOverlay.remove(), 200);
+    };
+
+    document.getElementById('hd-modal-btn-no').onclick = closeModal;
+    document.getElementById('hd-modal-btn-yes').onclick = async () => {
+      const btnYes = document.getElementById('hd-modal-btn-yes');
+      btnYes.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Proses...';
+      btnYes.disabled = true;
+      if (onConfirm) await onConfirm(closeModal);
+      else closeModal();
+    };
+  };
+
   // ── DOM Refs ──────────────────────────────────────────────────
   const loginView = document.getElementById('cs-login-view');
   const dashView = document.getElementById('cs-dashboard-view');
@@ -1036,27 +1080,39 @@
   // ── Close Chat ────────────────────────────────────────────────
   async function closeActiveChat() {
     if (!selectedChatId) return;
-    if (!confirm('Tutup chat ini? Client tidak bisa mengirim pesan lagi.')) return;
 
-    await supabase
-      .from('chats')
-      .update({
-        status: 'closed',
-      })
-      .eq('id', selectedChatId);
+    window.showConfirmModal({
+      title: 'Tutup Chat?',
+      text: 'Client tidak akan bisa mengirim pesan lagi ke obrolan ini.',
+      icon: 'ph-x-circle',
+      iconBg: '#fef3c7',
+      iconColor: '#d97706',
+      confirmText: 'Tutup',
+      confirmBg: '#d97706',
+      onConfirm: async (closeModal) => {
+        await supabase
+          .from('chats')
+          .update({
+            status: 'closed',
+          })
+          .eq('id', selectedChatId);
 
-    // Detach listener
-    detachCurrentChatListeners();
+        // Detach listener
+        detachCurrentChatListeners();
 
-    await supabase.from('typing_status').delete().eq('chat_id', selectedChatId);
+        await supabase.from('typing_status').delete().eq('chat_id', selectedChatId);
 
-    selectedChatId = null;
-    chatView.style.display = 'none';
-    detailEmpty.style.display = 'flex';
+        selectedChatId = null;
+        chatView.style.display = 'none';
+        detailEmpty.style.display = 'flex';
 
-    // Mobile: back to sidebar
-    detail.classList.remove('show-mobile');
-    sidebar.classList.remove('hidden-mobile');
+        // Mobile: back to sidebar
+        detail.classList.remove('show-mobile');
+        sidebar.classList.remove('hidden-mobile');
+
+        closeModal();
+      }
+    });
   }
 
   // ── Notifications ─────────────────────────────────────────────
@@ -1143,39 +1199,49 @@
 
   // ── Logout ────────────────────────────────────────────────────
   async function logout() {
-    if (!confirm('Logout dari CS Dashboard?')) return;
+    window.showConfirmModal({
+      title: 'Logout?',
+      text: 'Anda akan keluar dari CS Dashboard HimawariDigi.',
+      icon: 'ph-sign-out',
+      iconBg: '#fee2e2',
+      iconColor: '#ef4444',
+      confirmText: 'Logout',
+      confirmBg: '#ef4444',
+      onConfirm: async (closeModal) => {
+        // Clear typing
+        if (selectedChatId) {
+          supabase.from('typing_status').delete().eq('chat_id', selectedChatId).then();
+        }
 
-    // Clear typing
-    if (selectedChatId) {
-      supabase.from('typing_status').delete().eq('chat_id', selectedChatId).then();
-    }
+        // Detach all listeners
+        if (chatsListener) {
+          supabase.removeChannel(chatsListener);
+          chatsListener = null;
+        }
+        if (archiveListener) {
+          supabase.removeChannel(archiveListener);
+          archiveListener = null;
+        }
+        detachCurrentChatListeners();
 
-    // Detach all listeners
-    if (chatsListener) {
-      supabase.removeChannel(chatsListener);
-      chatsListener = null;
-    }
-    if (archiveListener) {
-      supabase.removeChannel(archiveListener);
-      archiveListener = null;
-    }
-    detachCurrentChatListeners();
+        await supabase.auth.signOut();
+        clearSession();
+        selectedChatId = null;
+        chatsData = {};
+        archiveData = {};
 
-    await supabase.auth.signOut();
-    clearSession();
-    selectedChatId = null;
-    chatsData = {};
-    archiveData = {};
+        showLogin();
 
-    showLogin();
-
-    // Reset login form
-    loginForm.style.display = 'block';
-    otpSection.classList.remove('show');
-    loginSubmit.disabled = false;
-    loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
-    loginNameInput.value = '';
-    loginStatus.className = 'cs-login-status';
+        // Reset login form
+        loginForm.style.display = 'block';
+        otpSection.classList.remove('show');
+        loginSubmit.disabled = false;
+        loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
+        loginNameInput.value = '';
+        loginStatus.className = 'cs-login-status';
+        closeModal();
+      }
+    });
   }
 
   // ── Export Chat ────────────────────────────────────────────
@@ -1470,7 +1536,7 @@
 
         sendBtn.disabled = !chatInput.value.trim();
         chatInput.disabled = false;
-        if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-image"></i>';
+        if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-paperclip"></i>';
         csImageUpload.value = '';
       });
     }
@@ -1656,76 +1722,41 @@
     if (archiveCtxMenu) {
       document.getElementById('cs-archive-ctx-delete').addEventListener('click', () => {
         if (csArchiveContextMenuId) {
-          const modalOverlay = document.createElement('div');
-          modalOverlay.style.cssText =
-            'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
+          window.showConfirmModal({
+            title: 'Hapus Obrolan Permanen?',
+            text: 'Tindakan ini tidak dapat dibatalkan. Semua riwayat percakapan dengan klien ini akan hilang selamanya.',
+            icon: 'ph-trash',
+            iconBg: '#fee2e2',
+            iconColor: '#ef4444',
+            confirmText: 'Hapus',
+            confirmBg: '#ef4444',
+            onConfirm: async (closeModal) => {
+              const { error } = await supabase
+                .from('chats')
+                .delete()
+                .eq('id', csArchiveContextMenuId);
 
-          const modalBox = document.createElement('div');
-          modalBox.style.cssText =
-            'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
+              if (error) {
+                closeModal();
+                if (window.showToast)
+                  window.showToast('Gagal menghapus chat: ' + error.message, 'error');
+              } else {
+                closeModal();
+                if (window.showToast)
+                  window.showToast('Chat berhasil dihapus secara permanen', 'success');
+                // Optimistic delete
+                if (archiveData[csArchiveContextMenuId]) delete archiveData[csArchiveContextMenuId];
+                if (chatsData[csArchiveContextMenuId]) delete chatsData[csArchiveContextMenuId];
+                renderChatList();
 
-          modalBox.innerHTML = `
-            <div style="width:48px; height:48px; border-radius:50%; background:#fee2e2; color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">
-              <i class="ph-bold ph-trash"></i>
-            </div>
-            <h3 style="margin:0 0 8px; color:var(--foreground); font-size:1.1rem; font-weight:600;">Hapus Obrolan Permanen?</h3>
-            <p style="margin:0 0 24px; color:var(--text-muted); font-size:0.9rem;">Tindakan ini tidak dapat dibatalkan. Semua riwayat percakapan dengan klien ini akan hilang selamanya.</p>
-            <div style="display:flex; gap:12px; justify-content:center;">
-              <button id="modal-btn-no" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--foreground); font-weight:500; cursor:pointer;">Batal</button>
-              <button id="modal-btn-yes" style="flex:1; padding:10px; border-radius:8px; border:none; background:#ef4444; color:white; font-weight:500; cursor:pointer;">Hapus</button>
-            </div>
-          `;
-
-          modalOverlay.appendChild(modalBox);
-          document.body.appendChild(modalOverlay);
-
-          // Animate in
-          requestAnimationFrame(() => {
-            modalOverlay.style.opacity = '1';
-            modalBox.style.transform = 'scale(1)';
-          });
-
-          const closeModal = () => {
-            modalOverlay.style.opacity = '0';
-            modalBox.style.transform = 'scale(0.95)';
-            setTimeout(() => modalOverlay.remove(), 200);
-          };
-
-          document.getElementById('modal-btn-yes').onclick = async () => {
-            const btnYes = document.getElementById('modal-btn-yes');
-            btnYes.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Menghapus...';
-            btnYes.disabled = true;
-
-            const { error } = await supabase
-              .from('chats')
-              .delete()
-              .eq('id', csArchiveContextMenuId);
-
-            if (error) {
-              closeModal();
-              if (window.showToast)
-                window.showToast('Gagal menghapus chat: ' + error.message, 'error');
-            } else {
-              closeModal();
-              if (window.showToast)
-                window.showToast('Chat berhasil dihapus secara permanen', 'success');
-              // Optimistic delete
-              if (archiveData[csArchiveContextMenuId]) delete archiveData[csArchiveContextMenuId];
-              if (chatsData[csArchiveContextMenuId]) delete chatsData[csArchiveContextMenuId];
-              renderChatList();
-
-              if (selectedChatId === csArchiveContextMenuId) {
-                detail.style.display = 'none';
-                detailEmpty.style.display = 'flex';
-                selectedChatId = null;
+                if (selectedChatId === csArchiveContextMenuId) {
+                  detail.style.display = 'none';
+                  detailEmpty.style.display = 'flex';
+                  selectedChatId = null;
+                }
               }
             }
-          };
-
-          document.getElementById('modal-btn-no').onclick = closeModal;
-          modalOverlay.onclick = (e) => {
-            if (e.target === modalOverlay) closeModal();
-          };
+          });
         }
         archiveCtxMenu.style.display = 'none';
       });

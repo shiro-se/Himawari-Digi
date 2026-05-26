@@ -789,7 +789,7 @@
 
       sendBtn.disabled = !chatInput.value.trim();
       chatInput.disabled = false;
-      if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-image"></i>';
+      if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-paperclip"></i>';
       imageUploadInput.value = '';
     });
   }
