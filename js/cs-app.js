@@ -40,6 +40,10 @@
   let csLongPressTimer = null;
   let csArchiveContextMenuId = null;
 
+  window.csClearReply = function() {
+    csReplyToData = null;
+  };
+
   // ── Toast Component ──
   window.showToast = (message, type = 'info') => {
     let container = document.querySelector('.hd-toast-container');
@@ -930,10 +934,11 @@
 
             // Update pinned header
             if (msg.is_pinned !== undefined) {
-               if (msg.is_pinned) updateCSPinnedHeader(msg.text);
+               if (bubble) bubble.dataset.pinned = Boolean(msg.is_pinned);
+               if (msg.is_pinned) updateCSPinnedHeader(msg.text, msg.id);
                else {
-                 const pinnedTextEl = document.getElementById('cs-pinned-text');
-                 if (pinnedTextEl && pinnedTextEl.textContent === msg.text) {
+                 const csPinnedHeader = document.getElementById('cs-pinned-header');
+                 if (csPinnedHeader && csPinnedHeader.dataset.id === msg.id) {
                    updateCSPinnedHeader(null);
                  }
                }
@@ -1074,7 +1079,7 @@
 
       div.innerHTML = `
         ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
-        <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}">
+        <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-pinned="${Boolean(msg.is_pinned)}">
           <div class="cs-msg-options" onclick="window.showCSContextMenuFromBtn(event, this)">
             <i class="ph-bold ph-dots-three-vertical"></i>
           </div>
@@ -1105,15 +1110,35 @@
   const csPinnedHeader = document.getElementById('cs-pinned-header');
   const csPinnedTextEl = document.getElementById('cs-pinned-text');
 
-  function updateCSPinnedHeader(text) {
+  function updateCSPinnedHeader(text, id) {
     if (text) {
       csPinnedHeader.style.display = 'flex';
+      csPinnedHeader.style.cursor = 'pointer';
       csPinnedTextEl.textContent = text;
+      if (id) csPinnedHeader.dataset.id = id;
     } else {
       csPinnedHeader.style.display = 'none';
       csPinnedTextEl.textContent = '';
+      csPinnedHeader.removeAttribute('data-id');
     }
   }
+
+  csPinnedHeader.addEventListener('click', () => {
+    const id = csPinnedHeader.dataset.id;
+    if (id) {
+      const msgEl = document.querySelector(`.cs-msg-bubble[data-id="${id}"]`);
+      if (msgEl) {
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight effect
+        msgEl.style.transition = 'background-color 0.5s';
+        const originalBg = msgEl.style.backgroundColor;
+        msgEl.style.backgroundColor = 'var(--primary-light)';
+        setTimeout(() => {
+          msgEl.style.backgroundColor = originalBg;
+        }, 1500);
+      }
+    }
+  });
 
   function scrollCSMessages() {
     requestAnimationFrame(() => {
@@ -1781,7 +1806,7 @@
     const csCtxMenu = document.getElementById('cs-context-menu');
     let csContextMsgSender = null;
 
-    function showCSContextMenu(e, msgId, msgText, sender) {
+    function showCSContextMenu(e, msgId, msgText, sender, isPinnedStr) {
       e.preventDefault();
       csContextMsgId = msgId;
       csContextMsgText = msgText;
@@ -1790,6 +1815,15 @@
       const editBtn = document.getElementById('cs-ctx-edit');
       if (editBtn) {
         editBtn.style.display = csContextMsgSender === 'cs' ? 'flex' : 'none';
+      }
+
+      const pinBtn = document.getElementById('cs-ctx-pin');
+      if (pinBtn) {
+        if (isPinnedStr === 'true') {
+          pinBtn.innerHTML = '<i class="ph ph-push-pin-slash"></i> Lepas Sematan';
+        } else {
+          pinBtn.innerHTML = '<i class="ph ph-push-pin"></i> Sematkan';
+        }
       }
 
       let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
@@ -1805,14 +1839,14 @@
       e.stopPropagation();
       const bubble = btn.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
-        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.pinned);
       }
     };
 
     messagesEl.addEventListener('contextmenu', (e) => {
       const bubble = e.target.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
-        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.pinned);
       }
     });
 
@@ -1820,7 +1854,7 @@
       const bubble = e.target.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
         csLongPressTimer = setTimeout(() => {
-          showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+          showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.pinned);
         }, 500);
       }
     });
@@ -1833,7 +1867,11 @@
         document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
         const preview = document.createElement('div');
         preview.className = 'cs-reply-preview';
-        preview.innerHTML = `<div class="cs-msg-reply" style="margin:0 10px 5px">Replying to: ${window.chatSanitize(csContextMsgText)}</div>`;
+        preview.innerHTML = `
+          <div class="cs-msg-reply" style="margin:0 10px 5px; display:flex; justify-content:space-between; align-items:center;">
+            <div><span style="font-weight:bold; color:var(--primary);">Replying to:</span> ${window.chatSanitize(csContextMsgText)}</div>
+            <i class="ph ph-x" style="cursor:pointer;" onclick="this.parentElement.parentElement.remove(); window.csClearReply();"></i>
+          </div>`;
         const inputArea = document.getElementById('cs-input-area');
         inputArea.insertBefore(preview, inputArea.firstChild);
         chatInput.focus();

@@ -465,7 +465,7 @@
 
           // Update pinned header
           if (msg.is_pinned !== undefined) {
-             if (msg.is_pinned) updatePinnedHeader(msg.text);
+             if (msg.is_pinned) updatePinnedHeader(msg.text, msg.id);
              // Note: if unpinned we just leave it or hide it, let's hide if we unpinned the currently showing one
              else {
                const pinnedTextEl = document.getElementById('chat-pinned-text');
@@ -609,7 +609,7 @@
       
       // Update sticky header if message is pinned
       if (msg.is_pinned) {
-        updatePinnedHeader(msg.text);
+        updatePinnedHeader(msg.text, msg.id);
       }
     }
 
@@ -621,15 +621,35 @@
   const pinnedHeader = document.getElementById('chat-pinned-header');
   const pinnedTextEl = document.getElementById('chat-pinned-text');
 
-  function updatePinnedHeader(text) {
+  function updatePinnedHeader(text, id) {
     if (text) {
       pinnedHeader.style.display = 'flex';
+      pinnedHeader.style.cursor = 'pointer';
       pinnedTextEl.textContent = text;
+      if (id) pinnedHeader.dataset.id = id;
     } else {
       pinnedHeader.style.display = 'none';
       pinnedTextEl.textContent = '';
+      pinnedHeader.removeAttribute('data-id');
     }
   }
+
+  pinnedHeader.addEventListener('click', () => {
+    const id = pinnedHeader.dataset.id;
+    if (id) {
+      const msgEl = document.querySelector(`.chat-msg-bubble[data-id="${id}"]`);
+      if (msgEl) {
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Highlight effect
+        msgEl.style.transition = 'background-color 0.5s';
+        const originalBg = msgEl.style.backgroundColor;
+        msgEl.style.backgroundColor = 'var(--primary-light)';
+        setTimeout(() => {
+          msgEl.style.backgroundColor = originalBg;
+        }, 1500);
+      }
+    }
+  });
 
   // ── Send Message ──────────────────────────────────────────────
   async function sendMessage() {
@@ -1049,7 +1069,11 @@
       document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
       const preview = document.createElement('div');
       preview.className = 'chat-reply-preview';
-      preview.innerHTML = `<div class="chat-msg-reply" style="margin:0 10px 5px">Replying to: ${window.chatSanitize(contextMsgText)}</div>`;
+      preview.innerHTML = `
+        <div class="chat-msg-reply" style="margin:0 10px 5px; display:flex; justify-content:space-between; align-items:center;">
+          <div><span style="font-weight:bold; color:var(--primary);">Replying to:</span> ${window.chatSanitize(contextMsgText)}</div>
+          <i class="ph ph-x" style="cursor:pointer;" onclick="this.parentElement.parentElement.remove(); window.chatClearReply();"></i>
+        </div>`;
       inputArea.insertBefore(preview, inputArea.firstChild);
       
       chatInput.focus();
