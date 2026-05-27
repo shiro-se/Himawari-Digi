@@ -191,6 +191,51 @@
     updatePresence();
   }
 
+  // ── Helpers ───────────────────────────────────────────────────
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+    return outputArray;
+  }
+
+  const PUBLIC_VAPID_KEY = 'BJgkti3bRXGoIaPq5bt3S346p0yhbw4GC8zAw7e8c7ulFpoa3huVb5PghF3jGWULnq0RpS2Hgs-jPTMXYJMyRus';
+
+  async function subscribeToPush(currentChatId) {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      try {
+        const register = await navigator.serviceWorker.register('/sw.js');
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+
+        const subscription = await register.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
+        });
+
+        const subData = JSON.parse(JSON.stringify(subscription));
+        
+        await supabaseClient.from('push_subscriptions').upsert({
+          role: 'client',
+          chat_id: currentChatId,
+          endpoint: subData.endpoint,
+          auth: subData.keys.auth,
+          p256dh: subData.keys.p256dh,
+          last_updated: new Date().toISOString()
+        }, { onConflict: 'endpoint' });
+      } catch (e) {
+        console.error('Push registration failed', e);
+      }
+    }
+  }
+
+  function formatTime(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
   // ── Client Presence ───────────────────────────────────────────
   function updatePresence() {
     if (!chatId || !supabaseClient) return;
@@ -367,6 +412,7 @@
 
     showChatView();
     attachListeners();
+    subscribeToPush(chatId);
     isCreatingChat = false;
   }
 
