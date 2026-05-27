@@ -580,6 +580,42 @@
         font-size: 0.85rem;
         line-height: 1.5;
         word-break: break-word;
+        position: relative;
+      }
+      .cs-msg-options {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--card);
+        border: 1px solid var(--border);
+        color: var(--foreground);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        z-index: 10;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .cs-msg--client .cs-msg-options {
+        left: calc(100% + 5px);
+      }
+      .cs-msg--cs .cs-msg-options {
+        right: calc(100% + 5px);
+      }
+      @media (hover: hover) and (pointer: fine) {
+        .cs-msg-bubble:hover .cs-msg-options {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
+      .cs-msg-options:hover {
+        background: var(--border);
       }
       .cs-msg--client .cs-msg-bubble {
         background: var(--card);
@@ -605,6 +641,17 @@
         font-size: 0.6rem;
         color: var(--muted-foreground);
       }
+      .cs-msg-fav-icon {
+        color: #fbbf24;
+        font-size: 0.7rem;
+        margin-left: 2px;
+      }
+      .cs-msg-edited-text {
+        font-size: 0.6rem;
+        opacity: 0.6;
+        font-style: italic;
+        margin-right: 4px;
+      }
       .cs-msg--cs .cs-msg-time {
         color: color-mix(in srgb, var(--secondary-foreground) 80%, transparent);
       }
@@ -617,6 +664,59 @@
       }
       .cs-msg-status.read {
         color: #60a5fa;
+      }
+      
+      /* ── Pinned Header ── */
+      .cs-pinned-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      }
+      .cs-pinned-icon {
+        color: var(--primary);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+      }
+      .cs-pinned-content {
+        flex: 1;
+        overflow: hidden;
+      }
+      .cs-pinned-title {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 2px;
+      }
+      .cs-pinned-text {
+        font-size: 0.75rem;
+        color: var(--foreground);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .cs-pinned-close {
+        background: none;
+        border: none;
+        color: var(--muted-foreground);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .cs-pinned-close:hover {
+        background: var(--border);
+        color: var(--foreground);
       }
       .cs-msg--cs .cs-msg-status.sent {
         color: color-mix(in srgb, var(--secondary-foreground) 60%, transparent);
@@ -1555,6 +1655,16 @@
                 </button>
               </div>
             </div>
+            <!-- Pinned Header -->
+            <div id="cs-pinned-header" class="cs-pinned-header" style="display: none">
+              <div class="cs-pinned-icon"><i class="ph-fill ph-push-pin"></i></div>
+              <div class="cs-pinned-content">
+                <div class="cs-pinned-title">Pesan Disematkan</div>
+                <div class="cs-pinned-text" id="cs-pinned-text"></div>
+              </div>
+              <button id="cs-pinned-close" class="cs-pinned-close" title="Lepas sematan"><i class="ph ph-x"></i></button>
+            </div>
+            
             <div class="cs-messages" id="cs-messages"></div>
             <div class="cs-typing-indicator" id="cs-client-typing">
               <div class="cs-typing-dots"><span></span><span></span><span></span></div>
@@ -1616,6 +1726,9 @@
     <!-- Context Menu (Messages) -->
     <div class="cs-context-menu" id="cs-context-menu" style="display: none">
       <button id="cs-ctx-reply"><i class="ph ph-arrow-u-up-left"></i> Reply</button>
+      <button id="cs-ctx-copy"><i class="ph ph-copy"></i> Salin</button>
+      <button id="cs-ctx-edit"><i class="ph ph-pencil-simple"></i> Edit</button>
+      <button id="cs-ctx-pin"><i class="ph ph-push-pin"></i> Sematkan</button>
       <button id="cs-ctx-fav"><i class="ph ph-star"></i> Favorite</button>
       <div class="cs-ctx-reactions">
         <button>👍</button>

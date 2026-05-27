@@ -34,7 +34,7 @@
   let archiveData = {};
   let archiveListener = null;
   let csReplyToData = null;
-  let csContextMsgId = null;
+  let csEditingMsgId = null;
   let csContextMsgText = null;
   let csLongPressTimer = null;
   let csArchiveContextMenuId = null;
@@ -895,6 +895,20 @@
 
             const bubble = document.querySelector(`.cs-msg-bubble[data-id="${m.id}"]`);
             if (bubble) {
+              // Update Text and Edit status
+              if (msg.is_edited && bubble.dataset.text !== msg.text) {
+                bubble.dataset.text = msg.text;
+                const pTags = bubble.querySelectorAll('p');
+                if (pTags.length > 0) {
+                  pTags[pTags.length - 1].innerHTML = window.chatSanitize(msg.text);
+                }
+                const timeContainer = bubble.querySelector('.cs-msg-time-container');
+                if (timeContainer && !timeContainer.querySelector('.cs-msg-edited-text')) {
+                  timeContainer.insertAdjacentHTML('afterbegin', '<span class="cs-msg-edited-text">(diedit)</span>');
+                }
+              }
+
+              // Update Reactions
               let reactionContainer = bubble.querySelector('.cs-msg-reactions');
               if (msg.reaction) {
                 if (!reactionContainer) {
@@ -907,10 +921,21 @@
                     bubble.appendChild(reactionContainer);
                   }
                 }
-                reactionContainer.innerHTML = `<span class="cs-msg-reaction">${window.chatSanitize(msg.reaction)}</span>`;
+                reactionContainer.innerHTML = `<button class="cs-msg-reaction">${window.chatSanitize(msg.reaction)} <span class="cs-reaction-count">1</span></button>`;
               } else if (reactionContainer) {
                 reactionContainer.remove();
               }
+            }
+
+            // Update pinned header
+            if (msg.is_pinned !== undefined) {
+               if (msg.is_pinned) updateCSPinnedHeader(msg.text);
+               else {
+                 const pinnedTextEl = document.getElementById('cs-pinned-text');
+                 if (pinnedTextEl && pinnedTextEl.textContent === msg.text) {
+                   updateCSPinnedHeader(null);
+                 }
+               }
             }
           }
         }
@@ -1042,23 +1067,58 @@
         `;
       }
 
+      const isEdited = msg.is_edited ? '<span class="cs-msg-edited-text">(diedit)</span>' : '';
+      const favs = JSON.parse(localStorage.getItem('hd_cs_fav_msgs') || '[]');
+      const isFav = favs.includes(msgId) ? '<i class="ph-fill ph-star cs-msg-fav-icon"></i>' : '';
+
       div.innerHTML = `
         ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
-        <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}">
+        <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}">
+          <div class="cs-msg-options" onclick="window.showCSContextMenuFromBtn(event, this)">
+            <i class="ph-bold ph-dots-three-vertical"></i>
+          </div>
           ${senderNameHtml}
           ${replyHtml}
           ${imageHtml}
           ${textHtml}
           ${reactionsHtml}
           <div class="cs-msg-time-container">
+            ${isEdited}
             <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+            ${isFav}
             ${statusHtml}
           </div>
         </div>
       `;
+      
+      // Update sticky header if message is pinned
+      if (msg.is_pinned) {
+        updateCSPinnedHeader(msg.text);
+      }
     }
 
     messagesEl.appendChild(div);
+  }
+
+  // ── Pinned Header Logic ───────────────────────────────────────
+  const csPinnedHeader = document.getElementById('cs-pinned-header');
+  const csPinnedTextEl = document.getElementById('cs-pinned-text');
+  const csPinnedCloseBtn = document.getElementById('cs-pinned-close');
+
+  function updateCSPinnedHeader(text) {
+    if (text) {
+      csPinnedHeader.style.display = 'flex';
+      csPinnedTextEl.textContent = text;
+    } else {
+      csPinnedHeader.style.display = 'none';
+      csPinnedTextEl.textContent = '';
+    }
+  }
+
+  if (csPinnedCloseBtn) {
+    csPinnedCloseBtn.addEventListener('click', () => {
+      updateCSPinnedHeader(null);
+    });
   }
 
   function scrollCSMessages() {
@@ -1074,30 +1134,39 @@
 
     isSendingCS = true;
     const savedReply = csReplyToData;
+    const savedEditId = csEditingMsgId;
     csReplyToData = null;
+    csEditingMsgId = null;
     document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
     chatInput.value = '';
     sendBtn.disabled = true;
 
     try {
-      await supabase.from('messages').insert({
-        chat_id: selectedChatId,
-        sender: 'cs',
-        senderName: csName,
-        text: text,
-        replyTo_id: savedReply ? savedReply.id : null,
-        replyTo_text: savedReply ? savedReply.text : null,
-        timestamp: new Date().toISOString(),
-        read: true,
-      });
+      if (savedEditId) {
+        await supabase.from('messages').update({
+          text: text,
+          is_edited: true
+        }).eq('id', savedEditId);
+      } else {
+        await supabase.from('messages').insert({
+          chat_id: selectedChatId,
+          sender: 'cs',
+          senderName: csName,
+          text: text,
+          replyTo_id: savedReply ? savedReply.id : null,
+          replyTo_text: savedReply ? savedReply.text : null,
+          timestamp: new Date().toISOString(),
+          read: true,
+        });
 
-      await supabase
-        .from('chats')
-        .update({
-          lastMessageAt: new Date().toISOString(),
-          assignedCS: csName,
-        })
-        .eq('id', selectedChatId);
+        await supabase
+          .from('chats')
+          .update({
+            lastMessageAt: new Date().toISOString(),
+            assignedCS: csName,
+          })
+          .eq('id', selectedChatId);
+      }
 
       clearCSTyping();
     } catch (err) {
@@ -1716,12 +1785,21 @@
 
     // ── Context Menu (Messages) ──
     const csCtxMenu = document.getElementById('cs-context-menu');
-    function showCSContextMenu(e, msgId, msgText) {
+    let csContextMsgSender = null;
+
+    function showCSContextMenu(e, msgId, msgText, sender) {
       e.preventDefault();
       csContextMsgId = msgId;
       csContextMsgText = msgText;
-      let x = e.clientX || (e.touches && e.touches[0].clientX);
-      let y = e.clientY || (e.touches && e.touches[0].clientY);
+      csContextMsgSender = sender;
+
+      const editBtn = document.getElementById('cs-ctx-edit');
+      if (editBtn) {
+        editBtn.style.display = csContextMsgSender === 'cs' ? 'flex' : 'none';
+      }
+
+      let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+      let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
       csCtxMenu.style.display = 'block';
       if (x + csCtxMenu.offsetWidth > window.innerWidth) x -= csCtxMenu.offsetWidth;
       if (y + csCtxMenu.offsetHeight > window.innerHeight) y -= csCtxMenu.offsetHeight;
@@ -1729,10 +1807,18 @@
       csCtxMenu.style.top = y + 'px';
     }
 
+    window.showCSContextMenuFromBtn = function(e, btn) {
+      e.stopPropagation();
+      const bubble = btn.closest('.cs-msg-bubble');
+      if (bubble && bubble.dataset.id) {
+        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+      }
+    };
+
     messagesEl.addEventListener('contextmenu', (e) => {
       const bubble = e.target.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
-        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
       }
     });
 
@@ -1740,7 +1826,7 @@
       const bubble = e.target.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
         csLongPressTimer = setTimeout(() => {
-          showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+          showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
         }, 500);
       }
     });
@@ -1761,11 +1847,84 @@
       });
       document.getElementById('cs-ctx-fav').addEventListener('click', () => {
         const favs = JSON.parse(localStorage.getItem('hd_cs_fav_msgs') || '[]');
-        if (!favs.includes(csContextMsgId)) favs.push(csContextMsgId);
+        if (!favs.includes(csContextMsgId)) {
+          favs.push(csContextMsgId);
+          if (window.showToast) window.showToast('Pesan ditambahkan ke favorit', 'success');
+        } else {
+          favs.splice(favs.indexOf(csContextMsgId), 1);
+          if (window.showToast) window.showToast('Pesan dihapus dari favorit', 'info');
+        }
         localStorage.setItem('hd_cs_fav_msgs', JSON.stringify(favs));
-        if (window.showToast) window.showToast('Pesan ditambahkan ke favorit', 'success');
+        
+        // Update DOM visually without reloading
+        const bubble = document.querySelector(`.cs-msg-bubble[data-id="${csContextMsgId}"]`);
+        if (bubble) {
+          let favIcon = bubble.querySelector('.cs-msg-fav-icon');
+          if (favs.includes(csContextMsgId)) {
+            if (!favIcon) {
+              const timeContainer = bubble.querySelector('.cs-msg-time-container');
+              if (timeContainer) {
+                const timeSpan = timeContainer.querySelector('.cs-msg-time');
+                if (timeSpan) {
+                  timeSpan.insertAdjacentHTML('afterend', '<i class="ph-fill ph-star cs-msg-fav-icon"></i>');
+                }
+              }
+            }
+          } else if (favIcon) {
+            favIcon.remove();
+          }
+        }
         csCtxMenu.style.display = 'none';
       });
+
+      const btnCopy = document.getElementById('cs-ctx-copy');
+      if (btnCopy) {
+        btnCopy.addEventListener('click', () => {
+          navigator.clipboard.writeText(csContextMsgText).then(() => {
+            if (window.showToast) window.showToast('Teks disalin ke clipboard', 'success');
+          });
+          csCtxMenu.style.display = 'none';
+        });
+      }
+
+      const btnPin = document.getElementById('cs-ctx-pin');
+      if (btnPin) {
+        btnPin.addEventListener('click', () => {
+          supabase.from('messages').select('is_pinned').eq('id', csContextMsgId).single().then(({data}) => {
+            if (data) {
+              const newStatus = !data.is_pinned;
+              supabase.from('messages').update({ is_pinned: newStatus }).eq('id', csContextMsgId).then(() => {
+                 if (window.showToast) window.showToast(newStatus ? 'Pesan disematkan' : 'Sematan dilepas', 'success');
+                 if (!newStatus) updateCSPinnedHeader(null);
+                 else updateCSPinnedHeader(csContextMsgText);
+              });
+            }
+          });
+          csCtxMenu.style.display = 'none';
+        });
+      }
+
+      const btnEdit = document.getElementById('cs-ctx-edit');
+      if (btnEdit) {
+        btnEdit.addEventListener('click', () => {
+          csEditingMsgId = csContextMsgId;
+          chatInput.value = csContextMsgText;
+          chatInput.focus();
+          
+          document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
+          const preview = document.createElement('div');
+          preview.className = 'cs-reply-preview';
+          preview.innerHTML = `
+            <div class="cs-msg-reply" style="margin:0 10px 5px; display:flex; justify-content:space-between; align-items:center;">
+              <div><span style="font-weight:bold; color:var(--primary);">Mengedit pesan:</span> ${window.chatSanitize(csContextMsgText)}</div>
+              <i class="ph ph-x" style="cursor:pointer;" onclick="this.parentElement.parentElement.remove(); csEditingMsgId = null; document.getElementById('cs-chat-input').value='';"></i>
+            </div>`;
+          const inputArea = document.getElementById('cs-input-area');
+          inputArea.insertBefore(preview, inputArea.firstChild);
+          
+          csCtxMenu.style.display = 'none';
+        });
+      }
       const reactions = csCtxMenu.querySelector('.cs-ctx-reactions');
       if (reactions) {
         reactions.addEventListener('click', (e) => {

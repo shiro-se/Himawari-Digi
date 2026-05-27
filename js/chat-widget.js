@@ -41,6 +41,7 @@
   let formOpenedAt = 0;
   let chatChannel = null;
   let typingTimeout = null;
+  let editingMsgId = null;
   let renderedMessageIds = new Set();
   let isFirstLoad = true;
   let replyToData = null;
@@ -430,6 +431,20 @@
           
           const bubble = document.querySelector(`.chat-msg-bubble[data-id="${msg.id}"]`);
           if (bubble) {
+            // Update Text and Edit status
+            if (msg.is_edited && bubble.dataset.text !== msg.text) {
+              bubble.dataset.text = msg.text;
+              const pTags = bubble.querySelectorAll('p');
+              if (pTags.length > 0) {
+                pTags[pTags.length - 1].innerHTML = window.chatSanitize(msg.text);
+              }
+              const timeContainer = bubble.querySelector('.chat-msg-time-container');
+              if (timeContainer && !timeContainer.querySelector('.chat-msg-edited-text')) {
+                timeContainer.insertAdjacentHTML('afterbegin', '<span class="chat-msg-edited-text">(diedit)</span>');
+              }
+            }
+
+            // Update Reactions
             let reactionContainer = bubble.querySelector('.chat-msg-reactions');
             if (msg.reaction) {
               if (!reactionContainer) {
@@ -442,10 +457,22 @@
                   bubble.appendChild(reactionContainer);
                 }
               }
-              reactionContainer.innerHTML = `<span class="chat-msg-reaction">${msg.reaction}</span>`;
+              reactionContainer.innerHTML = `<button class="chat-msg-reaction">${window.chatSanitize(msg.reaction)} <span class="chat-reaction-count">1</span></button>`;
             } else if (reactionContainer) {
               reactionContainer.remove();
             }
+          }
+
+          // Update pinned header
+          if (msg.is_pinned !== undefined) {
+             if (msg.is_pinned) updatePinnedHeader(msg.text);
+             // Note: if unpinned we just leave it or hide it, let's hide if we unpinned the currently showing one
+             else {
+               const pinnedTextEl = document.getElementById('chat-pinned-text');
+               if (pinnedTextEl && pinnedTextEl.textContent === msg.text) {
+                 updatePinnedHeader(null);
+               }
+             }
           }
         }
       })
@@ -557,24 +584,60 @@
       }
 
       const timeFormatted = msg.timestamp ? window.chatFormatTime(new Date(msg.timestamp).getTime()) : '';
+      const isEdited = msg.is_edited ? '<span class="chat-msg-edited-text">(diedit)</span>' : '';
+      const favs = JSON.parse(localStorage.getItem('hd_fav_msgs') || '[]');
+      const isFav = favs.includes(msgId) ? '<i class="ph-fill ph-star chat-msg-fav-icon"></i>' : '';
 
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
-        <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}">
+        <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}">
+          <div class="chat-msg-options" onclick="window.showContextMenuFromBtn(event, this)">
+            <i class="ph-bold ph-dots-three-vertical"></i>
+          </div>
           ${replyHtml}
           ${imageHtml}
           ${textHtml}
           ${reactionsHtml}
           <div class="chat-msg-time-container">
+            ${isEdited}
             <span class="chat-msg-time">${timeFormatted}</span>
+            ${isFav}
             ${statusHtml}
           </div>
         </div>
       `;
+      
+      // Update sticky header if message is pinned
+      if (msg.is_pinned) {
+        updatePinnedHeader(msg.text);
+      }
     }
 
     div.classList.add('chat-msg--anim');
     messagesEl.appendChild(div);
+  }
+
+  // ── Pinned Header Logic ───────────────────────────────────────
+  const pinnedHeader = document.getElementById('chat-pinned-header');
+  const pinnedTextEl = document.getElementById('chat-pinned-text');
+  const pinnedCloseBtn = document.getElementById('chat-pinned-close');
+
+  function updatePinnedHeader(text) {
+    if (text) {
+      pinnedHeader.style.display = 'flex';
+      pinnedTextEl.textContent = text;
+    } else {
+      pinnedHeader.style.display = 'none';
+      pinnedTextEl.textContent = '';
+    }
+  }
+
+  if (pinnedCloseBtn) {
+    pinnedCloseBtn.addEventListener('click', () => {
+      // Find currently pinned message and unpin it locally for now (until next refresh)
+      // Note: Ideally we would have a way to know WHICH message is pinned, but we can just hide the header.
+      updatePinnedHeader(null);
+    });
   }
 
   // ── Send Message ──────────────────────────────────────────────
@@ -589,26 +652,35 @@
 
     recordMessage();
     const savedReply = replyToData;
+    const savedEditId = editingMsgId;
     replyToData = null;
+    editingMsgId = null;
     document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
     chatInput.value = '';
     sendBtn.disabled = true;
 
     try {
-      await supabaseClient.from('messages').insert({
-        chat_id: chatId,
-        sender: 'client',
-        senderName: clientName,
-        text: text,
-        replyTo_id: savedReply ? savedReply.id : null,
-        replyTo_text: savedReply ? savedReply.text : null,
-        timestamp: new Date().toISOString(),
-        read: false,
-      });
+      if (savedEditId) {
+        await supabaseClient.from('messages').update({
+          text: text,
+          is_edited: true
+        }).eq('id', savedEditId);
+      } else {
+        await supabaseClient.from('messages').insert({
+          chat_id: chatId,
+          sender: 'client',
+          senderName: clientName,
+          text: text,
+          replyTo_id: savedReply ? savedReply.id : null,
+          replyTo_text: savedReply ? savedReply.text : null,
+          timestamp: new Date().toISOString(),
+          read: false,
+        });
 
-      supabaseClient.from('chats').update({
-        lastMessageAt: new Date().toISOString(),
-      }).eq('id', chatId).then();
+        supabaseClient.from('chats').update({
+          lastMessageAt: new Date().toISOString(),
+        }).eq('id', chatId).then();
+      }
 
       clearClientTyping();
     } catch (err) {
@@ -917,15 +989,23 @@
 
   // ── Context Menu (Right Click & Long Press) ─────────────────────
   const ctxMenu = document.getElementById('chat-context-menu');
+  let contextMsgSender = null;
   
-  function showContextMenu(e, msgId, msgText) {
+  function showContextMenu(e, msgId, msgText, sender) {
     e.preventDefault();
     contextMsgId = msgId;
     contextMsgText = msgText;
+    contextMsgSender = sender;
     
+    // Hide/Show Edit button based on sender
+    const editBtn = document.getElementById('chat-ctx-edit');
+    if (editBtn) {
+      editBtn.style.display = contextMsgSender === 'client' ? 'flex' : 'none';
+    }
+
     // Position menu
-    let x = e.clientX || (e.touches && e.touches[0].clientX);
-    let y = e.clientY || (e.touches && e.touches[0].clientY);
+    let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
     
     ctxMenu.style.display = 'block';
     // Adjust if off-screen
@@ -936,10 +1016,18 @@
     ctxMenu.style.top = y + 'px';
   }
 
+  window.showContextMenuFromBtn = function(e, btn) {
+    e.stopPropagation();
+    const bubble = btn.closest('.chat-msg-bubble');
+    if (bubble && bubble.dataset.id) {
+      showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+    }
+  };
+
   messagesEl.addEventListener('contextmenu', (e) => {
     const bubble = e.target.closest('.chat-msg-bubble');
     if (bubble && bubble.dataset.id) {
-      showContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+      showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
     }
   });
 
@@ -947,7 +1035,7 @@
     const bubble = e.target.closest('.chat-msg-bubble');
     if (bubble && bubble.dataset.id) {
       longPressTimer = setTimeout(() => {
-        showContextMenu(e, bubble.dataset.id, bubble.dataset.text);
+        showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
       }, 500);
     }
   });
@@ -979,11 +1067,85 @@
 
     document.getElementById('chat-ctx-fav').addEventListener('click', () => {
       const favs = JSON.parse(localStorage.getItem('hd_fav_msgs') || '[]');
-      if (!favs.includes(contextMsgId)) favs.push(contextMsgId);
+      if (!favs.includes(contextMsgId)) {
+        favs.push(contextMsgId);
+        if (window.showToast) window.showToast('Pesan ditambahkan ke favorit', 'success');
+      } else {
+        favs.splice(favs.indexOf(contextMsgId), 1);
+        if (window.showToast) window.showToast('Pesan dihapus dari favorit', 'info');
+      }
       localStorage.setItem('hd_fav_msgs', JSON.stringify(favs));
-      if (window.showToast) window.showToast('Pesan ditambahkan ke favorit', 'success');
+      
+      // Update DOM visually without reloading
+      const bubble = document.querySelector(`.chat-msg-bubble[data-id="${contextMsgId}"]`);
+      if (bubble) {
+        let favIcon = bubble.querySelector('.chat-msg-fav-icon');
+        if (favs.includes(contextMsgId)) {
+          if (!favIcon) {
+            const timeContainer = bubble.querySelector('.chat-msg-time-container');
+            if (timeContainer) {
+              const timeSpan = timeContainer.querySelector('.chat-msg-time');
+              if (timeSpan) {
+                timeSpan.insertAdjacentHTML('afterend', '<i class="ph-fill ph-star chat-msg-fav-icon"></i>');
+              }
+            }
+          }
+        } else if (favIcon) {
+          favIcon.remove();
+        }
+      }
       ctxMenu.style.display = 'none';
     });
+
+    const btnCopy = document.getElementById('chat-ctx-copy');
+    if (btnCopy) {
+      btnCopy.addEventListener('click', () => {
+        navigator.clipboard.writeText(contextMsgText).then(() => {
+          if (window.showToast) window.showToast('Teks disalin ke clipboard', 'success');
+        });
+        ctxMenu.style.display = 'none';
+      });
+    }
+
+    const btnPin = document.getElementById('chat-ctx-pin');
+    if (btnPin) {
+      btnPin.addEventListener('click', () => {
+        // Toggle pin status (we will fetch current first)
+        supabaseClient.from('messages').select('is_pinned').eq('id', contextMsgId).single().then(({data}) => {
+          if (data) {
+            const newStatus = !data.is_pinned;
+            supabaseClient.from('messages').update({ is_pinned: newStatus }).eq('id', contextMsgId).then(() => {
+               if (window.showToast) window.showToast(newStatus ? 'Pesan disematkan' : 'Sematan dilepas', 'success');
+               if (!newStatus) updatePinnedHeader(null);
+               else updatePinnedHeader(contextMsgText);
+            });
+          }
+        });
+        ctxMenu.style.display = 'none';
+      });
+    }
+
+    const btnEdit = document.getElementById('chat-ctx-edit');
+    if (btnEdit) {
+      btnEdit.addEventListener('click', () => {
+        editingMsgId = contextMsgId;
+        chatInput.value = contextMsgText;
+        chatInput.focus();
+        
+        // Show edit preview above input
+        document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
+        const preview = document.createElement('div');
+        preview.className = 'chat-reply-preview';
+        preview.innerHTML = `
+          <div class="chat-msg-reply" style="margin:0 10px 5px; display:flex; justify-content:space-between; align-items:center;">
+            <div><span style="font-weight:bold; color:var(--chat-primary);">Mengedit pesan:</span> ${window.chatSanitize(contextMsgText)}</div>
+            <i class="ph ph-x" style="cursor:pointer;" onclick="this.parentElement.parentElement.remove(); editingMsgId = null; chatInput.value='';"></i>
+          </div>`;
+        inputArea.insertBefore(preview, inputArea.firstChild);
+        
+        ctxMenu.style.display = 'none';
+      });
+    }
 
     const reactions = ctxMenu.querySelector('.chat-ctx-reactions');
     if (reactions) {

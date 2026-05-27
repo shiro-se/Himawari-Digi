@@ -2563,6 +2563,42 @@ footer {
   word-break: break-word;
   position: relative;
 }
+
+.chat-msg-options {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.chat-msg--client .chat-msg-options {
+  right: calc(100% + 5px);
+}
+.chat-msg--cs .chat-msg-options {
+  left: calc(100% + 5px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .chat-msg-bubble:hover .chat-msg-options {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+.chat-msg-options:hover {
+  background: var(--border);
+}
 .chat-msg--client .chat-msg-bubble {
   background: var(--primary);
   color: var(--primary-foreground);
@@ -2584,6 +2620,19 @@ footer {
   opacity: 0.6;
 }
 
+.chat-msg-fav-icon {
+  color: #fbbf24;
+  font-size: 0.7rem;
+  margin-left: 2px;
+}
+
+.chat-msg-edited-text {
+  font-size: 0.6rem;
+  opacity: 0.6;
+  font-style: italic;
+  margin-right: 4px;
+}
+
 .chat-msg-status {
   font-size: 0.8rem;
   line-height: 1;
@@ -2596,6 +2645,59 @@ footer {
 
 .chat-msg-status.read {
   color: #ffffff;
+}
+
+/* ── Pinned Header ── */
+.chat-pinned-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.chat-pinned-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+.chat-pinned-content {
+  flex: 1;
+  overflow: hidden;
+}
+.chat-pinned-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.chat-pinned-text {
+  font-size: 0.75rem;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-pinned-close {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.chat-pinned-close:hover {
+  background: var(--border);
+  color: var(--foreground);
 }
 
 /* ── New Chat Button ── */
