@@ -620,7 +620,6 @@
   // ── Pinned Header Logic ───────────────────────────────────────
   const pinnedHeader = document.getElementById('chat-pinned-header');
   const pinnedTextEl = document.getElementById('chat-pinned-text');
-  const pinnedCloseBtn = document.getElementById('chat-pinned-close');
 
   function updatePinnedHeader(text) {
     if (text) {
@@ -630,14 +629,6 @@
       pinnedHeader.style.display = 'none';
       pinnedTextEl.textContent = '';
     }
-  }
-
-  if (pinnedCloseBtn) {
-    pinnedCloseBtn.addEventListener('click', () => {
-      // Find currently pinned message and unpin it locally for now (until next refresh)
-      // Note: Ideally we would have a way to know WHICH message is pinned, but we can just hide the header.
-      updatePinnedHeader(null);
-    });
   }
 
   // ── Send Message ──────────────────────────────────────────────
@@ -1102,24 +1093,6 @@
       btnCopy.addEventListener('click', () => {
         navigator.clipboard.writeText(contextMsgText).then(() => {
           if (window.showToast) window.showToast('Teks disalin ke clipboard', 'success');
-        });
-        ctxMenu.style.display = 'none';
-      });
-    }
-
-    const btnPin = document.getElementById('chat-ctx-pin');
-    if (btnPin) {
-      btnPin.addEventListener('click', () => {
-        // Toggle pin status (we will fetch current first)
-        supabaseClient.from('messages').select('is_pinned').eq('id', contextMsgId).single().then(({data}) => {
-          if (data) {
-            const newStatus = !data.is_pinned;
-            supabaseClient.from('messages').update({ is_pinned: newStatus }).eq('id', contextMsgId).then(() => {
-               if (window.showToast) window.showToast(newStatus ? 'Pesan disematkan' : 'Sematan dilepas', 'success');
-               if (!newStatus) updatePinnedHeader(null);
-               else updatePinnedHeader(contextMsgText);
-            });
-          }
         });
         ctxMenu.style.display = 'none';
       });

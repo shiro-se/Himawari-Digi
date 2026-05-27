@@ -1103,7 +1103,6 @@
   // ── Pinned Header Logic ───────────────────────────────────────
   const csPinnedHeader = document.getElementById('cs-pinned-header');
   const csPinnedTextEl = document.getElementById('cs-pinned-text');
-  const csPinnedCloseBtn = document.getElementById('cs-pinned-close');
 
   function updateCSPinnedHeader(text) {
     if (text) {
@@ -1113,12 +1112,6 @@
       csPinnedHeader.style.display = 'none';
       csPinnedTextEl.textContent = '';
     }
-  }
-
-  if (csPinnedCloseBtn) {
-    csPinnedCloseBtn.addEventListener('click', () => {
-      updateCSPinnedHeader(null);
-    });
   }
 
   function scrollCSMessages() {
@@ -1893,11 +1886,20 @@
           supabase.from('messages').select('is_pinned').eq('id', csContextMsgId).single().then(({data}) => {
             if (data) {
               const newStatus = !data.is_pinned;
-              supabase.from('messages').update({ is_pinned: newStatus }).eq('id', csContextMsgId).then(() => {
-                 if (window.showToast) window.showToast(newStatus ? 'Pesan disematkan' : 'Sematan dilepas', 'success');
-                 if (!newStatus) updateCSPinnedHeader(null);
-                 else updateCSPinnedHeader(csContextMsgText);
-              });
+              
+              if (newStatus) {
+                supabase.from('messages').update({ is_pinned: false }).eq('chat_id', selectedChatId).eq('is_pinned', true).then(() => {
+                  supabase.from('messages').update({ is_pinned: true }).eq('id', csContextMsgId).then(() => {
+                    if (window.showToast) window.showToast('Pesan disematkan', 'success');
+                    updateCSPinnedHeader(csContextMsgText);
+                  });
+                });
+              } else {
+                supabase.from('messages').update({ is_pinned: false }).eq('id', csContextMsgId).then(() => {
+                  if (window.showToast) window.showToast('Sematan dilepas', 'success');
+                  updateCSPinnedHeader(null);
+                });
+              }
             }
           });
           csCtxMenu.style.display = 'none';
