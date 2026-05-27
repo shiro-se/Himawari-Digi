@@ -8,13 +8,8 @@
   "theme_color": "#0d9488",
   "icons": [
     {
-      "src": "/img/himawari-logo.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "/img/himawari-logo.png",
-      "sizes": "512x512",
+      "src": "/assets/logo/logo-dark.png",
+      "sizes": "192x192 512x512",
       "type": "image/png"
     }
   ]

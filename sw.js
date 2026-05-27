@@ -10,8 +10,8 @@ self.addEventListener('push', function(event) {
     const title = data.title || 'HimawariDigi Chat';
     const options = {
       body: data.body || 'Anda memiliki pesan baru.',
-      icon: '/img/himawari-logo.png', // Fallback icon (you can change this to a real path)
-      badge: '/img/himawari-logo.png', // Small icon for Android status bar
+      icon: '/assets/logo/logo-dark.png', 
+      badge: '/assets/logo/logo-dark.png',
       vibrate: [200, 100, 200],
       data: {
         url: data.url || '/'
