@@ -1014,6 +1014,17 @@
       editBtn.style.display = contextMsgSender === 'client' ? 'flex' : 'none';
     }
 
+    // Toggle Favorite text
+    const favBtn = document.getElementById('chat-ctx-fav');
+    if (favBtn) {
+      const favs = JSON.parse(localStorage.getItem('hd_fav_msgs') || '[]');
+      if (favs.includes(msgId)) {
+        favBtn.innerHTML = '<i class="ph-fill ph-star"></i> Hapus Favorit';
+      } else {
+        favBtn.innerHTML = '<i class="ph ph-star"></i> Favorit';
+      }
+    }
+
     // Position menu
     let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
     let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
@@ -1057,6 +1068,31 @@
   document.addEventListener('click', (e) => {
     if (ctxMenu && !ctxMenu.contains(e.target)) {
       ctxMenu.style.display = 'none';
+    }
+    
+    // Delegate click for reaction removal
+    const reactionBtn = e.target.closest('.chat-msg-reaction');
+    if (reactionBtn) {
+      const bubble = reactionBtn.closest('.chat-msg-bubble');
+      if (bubble && bubble.dataset.id) {
+        const msgId = bubble.dataset.id;
+        const myReactions = JSON.parse(localStorage.getItem('hd_my_reactions') || '[]');
+        if (myReactions.includes(msgId)) {
+          supabaseClient.from('messages').update({ reaction: null }).eq('id', msgId).then(() => {
+            myReactions.splice(myReactions.indexOf(msgId), 1);
+            localStorage.setItem('hd_my_reactions', JSON.stringify(myReactions));
+          });
+        } else {
+          let emoji = reactionBtn.textContent.trim().split(' ')[0];
+          if (reactionBtn.childNodes.length > 0) {
+            emoji = reactionBtn.childNodes[0].nodeValue.trim();
+          }
+          supabaseClient.from('messages').update({ reaction: emoji }).eq('id', msgId).then(() => {
+            myReactions.push(msgId);
+            localStorage.setItem('hd_my_reactions', JSON.stringify(myReactions));
+          });
+        }
+      }
     }
   });
 
@@ -1151,11 +1187,19 @@
           const emoji = e.target.textContent;
           const bubble = document.querySelector(`.chat-msg-bubble[data-id="${contextMsgId}"]`);
           const currentReaction = bubble ? bubble.querySelector('.chat-msg-reaction') : null;
+          const myReactions = JSON.parse(localStorage.getItem('hd_my_reactions') || '[]');
           
-          if (currentReaction && currentReaction.textContent === emoji) {
-            supabaseClient.from('messages').update({ reaction: null }).eq('id', contextMsgId).then();
+          if (currentReaction && currentReaction.textContent.includes(emoji)) {
+            supabaseClient.from('messages').update({ reaction: null }).eq('id', contextMsgId).then(() => {
+              const index = myReactions.indexOf(contextMsgId);
+              if (index > -1) myReactions.splice(index, 1);
+              localStorage.setItem('hd_my_reactions', JSON.stringify(myReactions));
+            });
           } else {
-            supabaseClient.from('messages').update({ reaction: emoji }).eq('id', contextMsgId).then();
+            supabaseClient.from('messages').update({ reaction: emoji }).eq('id', contextMsgId).then(() => {
+              if (!myReactions.includes(contextMsgId)) myReactions.push(contextMsgId);
+              localStorage.setItem('hd_my_reactions', JSON.stringify(myReactions));
+            });
           }
           ctxMenu.style.display = 'none';
         }

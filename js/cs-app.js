@@ -1826,6 +1826,17 @@
         }
       }
 
+      // Toggle Favorite text
+      const favBtn = document.getElementById('cs-ctx-fav');
+      if (favBtn) {
+        const favs = JSON.parse(localStorage.getItem('hd_cs_fav_msgs') || '[]');
+        if (favs.includes(msgId)) {
+          favBtn.innerHTML = '<i class="ph-fill ph-star"></i> Hapus Favorit';
+        } else {
+          favBtn.innerHTML = '<i class="ph ph-star"></i> Favorit';
+        }
+      }
+
       let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
       let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
       csCtxMenu.style.display = 'block';
@@ -1973,11 +1984,19 @@
             const emoji = e.target.textContent;
             const bubble = document.querySelector(`.cs-msg-bubble[data-id="${csContextMsgId}"]`);
             const currentReaction = bubble ? bubble.querySelector('.cs-msg-reaction') : null;
+            const myReactions = JSON.parse(localStorage.getItem('hd_cs_my_reactions') || '[]');
 
-            if (currentReaction && currentReaction.textContent === emoji) {
-              supabase.from('messages').update({ reaction: null }).eq('id', csContextMsgId).then();
+            if (currentReaction && currentReaction.textContent.includes(emoji)) {
+              supabase.from('messages').update({ reaction: null }).eq('id', csContextMsgId).then(() => {
+                const index = myReactions.indexOf(csContextMsgId);
+                if (index > -1) myReactions.splice(index, 1);
+                localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+              });
             } else {
-              supabase.from('messages').update({ reaction: emoji }).eq('id', csContextMsgId).then();
+              supabase.from('messages').update({ reaction: emoji }).eq('id', csContextMsgId).then(() => {
+                if (!myReactions.includes(csContextMsgId)) myReactions.push(csContextMsgId);
+                localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+              });
             }
             csCtxMenu.style.display = 'none';
           }
@@ -2061,9 +2080,38 @@
     }
 
     document.addEventListener('click', (e) => {
-      if (csCtxMenu && !csCtxMenu.contains(e.target)) csCtxMenu.style.display = 'none';
+      if (csCtxMenu && !csCtxMenu.contains(e.target)) {
+        csCtxMenu.style.display = 'none';
+      }
       if (archiveCtxMenu && !archiveCtxMenu.contains(e.target))
         archiveCtxMenu.style.display = 'none';
+    });
+
+    messagesEl.addEventListener('click', (e) => {
+      // Delegate click for reaction removal
+      const reactionBtn = e.target.closest('.cs-msg-reaction');
+      if (reactionBtn) {
+        const bubble = reactionBtn.closest('.cs-msg-bubble');
+        if (bubble && bubble.dataset.id) {
+          const msgId = bubble.dataset.id;
+          const myReactions = JSON.parse(localStorage.getItem('hd_cs_my_reactions') || '[]');
+          if (myReactions.includes(msgId)) {
+            supabase.from('messages').update({ reaction: null }).eq('id', msgId).then(() => {
+              myReactions.splice(myReactions.indexOf(msgId), 1);
+              localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+            });
+          } else {
+            let emoji = reactionBtn.textContent.trim().split(' ')[0];
+            if (reactionBtn.childNodes.length > 0) {
+              emoji = reactionBtn.childNodes[0].nodeValue.trim();
+            }
+            supabase.from('messages').update({ reaction: emoji }).eq('id', msgId).then(() => {
+              myReactions.push(msgId);
+              localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+            });
+          }
+        }
+      }
     });
   }
 
