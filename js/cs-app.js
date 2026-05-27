@@ -35,6 +35,7 @@
   let archiveListener = null;
   let csReplyToData = null;
   let csEditingMsgId = null;
+  let csContextMsgId = null;
   let csContextMsgText = null;
   let csLongPressTimer = null;
   let csArchiveContextMenuId = null;
