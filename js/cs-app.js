@@ -65,12 +65,26 @@
   };
 
   // ── Modal Konfirmasi Generik ──────────────────────────────────────
-  window.showConfirmModal = function({ title, text, icon = 'ph-warning', iconBg = '#fee2e2', iconColor = '#ef4444', confirmText = 'Ya', confirmBg = '#ef4444', onConfirm }) {
+  window.showConfirmModal = function ({
+    title,
+    text,
+    icon = 'ph-warning',
+    iconBg = '#fee2e2',
+    iconColor = '#ef4444',
+    confirmText = 'Ya',
+    confirmBg = '#ef4444',
+    onConfirm,
+  }) {
+    if (document.querySelector('[data-hd-modal-overlay]')) return;
+
     const modalOverlay = document.createElement('div');
-    modalOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
+    modalOverlay.setAttribute('data-hd-modal-overlay', '');
+    modalOverlay.style.cssText =
+      'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; opacity:0; transition:opacity 0.2s ease;';
 
     const modalBox = document.createElement('div');
-    modalBox.style.cssText = 'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
+    modalBox.style.cssText =
+      'background:var(--background, #fff); border-radius:12px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); transform:scale(0.95); transition:transform 0.2s ease; text-align:center;';
 
     modalBox.innerHTML = `
       <div style="width:48px; height:48px; border-radius:50%; background:${iconBg}; color:${iconColor}; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:24px;">
@@ -79,8 +93,8 @@
       <h3 style="margin:0 0 8px; color:var(--foreground); font-size:1.1rem; font-weight:600;">${title}</h3>
       <p style="margin:0 0 24px; color:var(--text-muted); font-size:0.9rem;">${text}</p>
       <div style="display:flex; gap:12px; justify-content:center;">
-        <button id="hd-modal-btn-no" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--foreground); font-weight:500; cursor:pointer; transition:background 0.2s;">Batal</button>
-        <button id="hd-modal-btn-yes" style="flex:1; padding:10px; border-radius:8px; border:none; background:${confirmBg}; color:white; font-weight:500; cursor:pointer; transition:opacity 0.2s;">${confirmText}</button>
+        <button class="hd-modal-btn-no" style="flex:1; padding:10px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--foreground); font-weight:500; cursor:pointer; transition:background 0.2s;">Batal</button>
+        <button class="hd-modal-btn-yes" style="flex:1; padding:10px; border-radius:8px; border:none; background:${confirmBg}; color:white; font-weight:500; cursor:pointer; transition:opacity 0.2s;">${confirmText}</button>
       </div>
     `;
 
@@ -96,17 +110,53 @@
       modalOverlay.style.opacity = '0';
       modalBox.style.transform = 'scale(0.95)';
       setTimeout(() => modalOverlay.remove(), 200);
+      document.removeEventListener('keydown', escHandler);
     };
 
-    document.getElementById('hd-modal-btn-no').onclick = closeModal;
-    document.getElementById('hd-modal-btn-yes').onclick = async () => {
-      const btnYes = document.getElementById('hd-modal-btn-yes');
+    const escHandler = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    document.addEventListener('keydown', escHandler);
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+    modalBox.querySelector('.hd-modal-btn-no').onclick = closeModal;
+    modalBox.querySelector('.hd-modal-btn-yes').onclick = async () => {
+      const btnYes = modalBox.querySelector('.hd-modal-btn-yes');
       btnYes.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Proses...';
       btnYes.disabled = true;
-      if (onConfirm) await onConfirm(closeModal);
-      else closeModal();
+      try {
+        if (onConfirm) await onConfirm(closeModal);
+        else closeModal();
+      } catch (err) {
+        closeModal();
+        if (window.showToast) window.showToast('Terjadi kesalahan.', 'error');
+      }
     };
   };
+
+  // ── Sanitize Helpers ─────────────────────────────────────────
+  function escapeAttr(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  function safeUrl(url) {
+    if (!url) return '';
+    try {
+      const u = new URL(url);
+      return ['https:', 'http:'].includes(u.protocol) ? url : '';
+    } catch {
+      return '';
+    }
+  }
+
+  let isSendingCS = false;
 
   // ── DOM Refs ──────────────────────────────────────────────────
   const loginView = document.getElementById('cs-login-view');
@@ -181,7 +231,7 @@
   // LOGIN FLOW
   // ═══════════════════════════════════════════════════════════════
 
-  let currentEmail = window.EMAILJS_CONFIG?.recipientEmail || 'himawaridigi@gmail.com';
+  let currentEmail = window.CS_EMAIL;
   let resendCooldown = 0;
   let resendInterval = null;
 
@@ -857,7 +907,7 @@
                     bubble.appendChild(reactionContainer);
                   }
                 }
-                reactionContainer.innerHTML = `<span class="cs-msg-reaction">${msg.reaction}</span>`;
+                reactionContainer.innerHTML = `<span class="cs-msg-reaction">${window.chatSanitize(msg.reaction)}</span>`;
               } else if (reactionContainer) {
                 reactionContainer.remove();
               }
@@ -941,8 +991,8 @@
         const isImg = urlLower.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) || !urlLower.includes('.');
         if (isImg) {
           imageHtml = `
-            <div class="cs-msg-image-bubble" onclick="window.openCSLightbox('${msg.imageUrl}')">
-              <img class="cs-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
+            <div class="cs-msg-image-bubble" onclick="window.openCSLightbox('${escapeAttr(safeUrl(msg.imageUrl))}')">
+              <img class="cs-msg-image" src="${escapeAttr(safeUrl(msg.imageUrl))}" alt="Image" loading="lazy" />
               ${msg.text ? `<div class="cs-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
             </div>
           `;
@@ -955,17 +1005,17 @@
                 ${ext}
               </div>
               <div style="flex:1; overflow:hidden;">
-                <div style="font-size:13px; font-weight:500; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${fileName}">
-                  ${fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName}
+                <div style="font-size:13px; font-weight:500; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
+                  ${escapeAttr(fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName)}
                 </div>
-                <a href="${msg.imageUrl}" target="_blank" download style="font-size:12px; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
+                <a href="${escapeAttr(safeUrl(msg.imageUrl))}" target="_blank" download style="font-size:12px; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
                   <i class="ph ph-download-simple"></i> Download File
                 </a>
               </div>
             </div>
           `;
           if (msg.text) {
-             textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
+            textHtml = `<p>${window.chatSanitize(msg.text)}</p>`;
           }
         }
       } else {
@@ -975,7 +1025,7 @@
       let replyHtml = '';
       if (msg.replyTo && msg.replyTo.text) {
         replyHtml = `
-            <div class="cs-msg-reply" onclick="window.scrollToMessage('${msg.replyTo.id}')" style="cursor: pointer;" title="Klik untuk melompat ke pesan ini">
+            <div class="cs-msg-reply" onclick="window.scrollToMessage('${escapeAttr(msg.replyTo.id)}')" style="cursor: pointer;" title="Klik untuk melompat ke pesan ini">
               <div style="font-weight:600; font-size:0.75rem; color:var(--primary); margin-bottom:2px;">Replying to</div>
               <div>${window.chatSanitize(msg.replyTo.text)}</div>
             </div>
@@ -987,14 +1037,14 @@
         // Assuming msg.reaction is a simple string for now, wrapped in the new button layout
         reactionsHtml = `
           <div class="cs-msg-reactions">
-            <button class="cs-msg-reaction">${msg.reaction} <span class="cs-reaction-count">1</span></button>
+            <button class="cs-msg-reaction">${window.chatSanitize(msg.reaction)} <span class="cs-reaction-count">1</span></button>
           </div>
         `;
       }
 
       div.innerHTML = `
         ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
-        <div class="cs-msg-bubble" data-id="${msgId}" data-text="${window.chatSanitize(msg.text || '[Image]')}">
+        <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}">
           ${senderNameHtml}
           ${replyHtml}
           ${imageHtml}
@@ -1020,33 +1070,43 @@
   // ── Send Message as CS ────────────────────────────────────────
   async function sendCSMessage() {
     const text = chatInput.value.trim();
-    if (!text || !selectedChatId) return;
+    if (!text || !selectedChatId || isSendingCS) return;
 
-    await supabase.from('messages').insert({
-      chat_id: selectedChatId,
-      sender: 'cs',
-      senderName: csName,
-      text: text,
-      replyTo_id: csReplyToData ? csReplyToData.id : null,
-      replyTo_text: csReplyToData ? csReplyToData.text : null,
-      timestamp: new Date().toISOString(),
-      read: true,
-    });
-
+    isSendingCS = true;
+    const savedReply = csReplyToData;
     csReplyToData = null;
     document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
-
-    await supabase
-      .from('chats')
-      .update({
-        lastMessageAt: new Date().toISOString(),
-        assignedCS: csName,
-      })
-      .eq('id', selectedChatId);
-
     chatInput.value = '';
     sendBtn.disabled = true;
-    clearCSTyping();
+
+    try {
+      await supabase.from('messages').insert({
+        chat_id: selectedChatId,
+        sender: 'cs',
+        senderName: csName,
+        text: text,
+        replyTo_id: savedReply ? savedReply.id : null,
+        replyTo_text: savedReply ? savedReply.text : null,
+        timestamp: new Date().toISOString(),
+        read: true,
+      });
+
+      await supabase
+        .from('chats')
+        .update({
+          lastMessageAt: new Date().toISOString(),
+          assignedCS: csName,
+        })
+        .eq('id', selectedChatId);
+
+      clearCSTyping();
+    } catch (err) {
+      chatInput.value = text;
+      sendBtn.disabled = false;
+      if (window.showToast) window.showToast('Gagal mengirim pesan. Coba lagi.', 'error');
+    } finally {
+      isSendingCS = false;
+    }
   }
 
   // ── CS Typing Indicator ───────────────────────────────────────
@@ -1111,7 +1171,7 @@
         sidebar.classList.remove('hidden-mobile');
 
         closeModal();
-      }
+      },
     });
   }
 
@@ -1214,6 +1274,10 @@
         }
 
         // Detach all listeners
+        if (globalMessagesListener) {
+          supabase.removeChannel(globalMessagesListener);
+          globalMessagesListener = null;
+        }
         if (chatsListener) {
           supabase.removeChannel(chatsListener);
           chatsListener = null;
@@ -1223,6 +1287,10 @@
           archiveListener = null;
         }
         detachCurrentChatListeners();
+        if (resendInterval) {
+          clearInterval(resendInterval);
+          resendInterval = null;
+        }
 
         await supabase.auth.signOut();
         clearSession();
@@ -1240,7 +1308,7 @@
         loginNameInput.value = '';
         loginStatus.className = 'cs-login-status';
         closeModal();
-      }
+      },
     });
   }
 
@@ -1276,9 +1344,9 @@
             : m.sender === 'system'
               ? 'System'
               : m.senderName || 'CS',
-        text: (m.text || ''),
+        text: m.text || '',
         imageUrl: m.imageUrl || null,
-        reaction: m.reaction || null
+        reaction: m.reaction || null,
       })),
     };
   }
@@ -1293,7 +1361,7 @@
       let csv = 'Waktu,Tipe,Pengirim,Pesan\n';
       data.messages.forEach((m) => {
         let msgText = m.text || '';
-        if (m.imageUrl) msgText += (msgText ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`);
+        if (m.imageUrl) msgText += msgText ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`;
         if (m.reaction) msgText += `\n(Reaction: ${m.reaction})`;
         csv += `"${m.time}","${m.type}","${m.sender}","${msgText.replace(/"/g, '""')}"\n`;
       });
@@ -1307,7 +1375,7 @@
       const ws = XLSX.utils.json_to_sheet(
         data.messages.map((m) => {
           let msgText = m.text || '';
-          if (m.imageUrl) msgText += (msgText ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`);
+          if (m.imageUrl) msgText += msgText ? `\n[Image] ${m.imageUrl}` : `[Image] ${m.imageUrl}`;
           if (m.reaction) msgText += `\n(Reaction: ${m.reaction})`;
           return {
             Waktu: m.time,
@@ -1337,12 +1405,24 @@
       const stripEmoji = (str) => {
         if (!str) return '';
         // Map common reactions to text
-        const rxMap = { '👍': '[Jempol]', '❤️': '[Hati]', '😂': '[Tertawa]', '😮': '[Terkejut]', '😢': '[Sedih]', '🙏': '[Terima Kasih]' };
+        const rxMap = {
+          '👍': '[Jempol]',
+          '❤️': '[Hati]',
+          '😂': '[Tertawa]',
+          '😮': '[Terkejut]',
+          '😢': '[Sedih]',
+          '🙏': '[Terima Kasih]',
+        };
         for (const [e, txt] of Object.entries(rxMap)) {
           str = str.replace(new RegExp(e, 'g'), txt);
         }
         // Strip remaining emojis
-        return str.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+        return str
+          .replace(
+            /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+            ''
+          )
+          .trim();
       };
 
       const tableRows = [];
@@ -1549,14 +1629,22 @@
     const zoomInBtn = document.getElementById('cs-lightbox-zoom-in');
     const zoomOutBtn = document.getElementById('cs-lightbox-zoom-out');
     const resetBtn = document.getElementById('cs-lightbox-reset');
-    
-    let scale = 1, panning = false, pointX = 0, pointY = 0, startX = 0, startY = 0;
+
+    let scale = 1,
+      panning = false,
+      pointX = 0,
+      pointY = 0,
+      startX = 0,
+      startY = 0;
     const setTransform = () => {
       lightboxImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
     };
-    
+
     const resetLightbox = () => {
-      scale = 1; pointX = 0; pointY = 0; setTransform();
+      scale = 1;
+      pointX = 0;
+      pointY = 0;
+      setTransform();
     };
 
     if (lightboxImg) {
@@ -1566,7 +1654,9 @@
         startY = e.clientY - pointY;
         panning = true;
       };
-      document.onmouseup = () => { panning = false; };
+      document.onmouseup = () => {
+        panning = false;
+      };
       document.onmousemove = (e) => {
         if (!panning || scale <= 1) return;
         pointX = e.clientX - startX;
@@ -1580,9 +1670,17 @@
         setTransform();
       };
     }
-    
-    if (zoomInBtn) zoomInBtn.onclick = () => { scale = Math.min(scale + 0.2, 5); setTransform(); };
-    if (zoomOutBtn) zoomOutBtn.onclick = () => { scale = Math.max(scale - 0.2, 0.5); setTransform(); };
+
+    if (zoomInBtn)
+      zoomInBtn.onclick = () => {
+        scale = Math.min(scale + 0.2, 5);
+        setTransform();
+      };
+    if (zoomOutBtn)
+      zoomOutBtn.onclick = () => {
+        scale = Math.max(scale - 0.2, 0.5);
+        setTransform();
+      };
     if (resetBtn) resetBtn.onclick = resetLightbox;
 
     const closeLightbox = () => {
@@ -1755,7 +1853,7 @@
                   selectedChatId = null;
                 }
               }
-            }
+            },
           });
         }
         archiveCtxMenu.style.display = 'none';

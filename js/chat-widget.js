@@ -47,9 +47,19 @@
   let contextMsgId = null;
   let contextMsgText = null;
   let longPressTimer = null;
+  let isCreatingChat = false;
 
-  const deviceId = window.getDeviceId();
   const supabaseClient = window.supabaseClient;
+
+  // ── Sanitize Helpers ─────────────────────────────────────────
+  function escapeAttr(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function safeUrl(url) {
+    if (!url) return '';
+    try { const u = new URL(url); return ['https:','http:'].includes(u.protocol) ? url : ''; } catch { return ''; }
+  }
 
   // ── Authentication ──────────────────────────────────────────────
   async function ensureAuth() {
@@ -302,8 +312,11 @@
 
   // ── Create New Chat in Supabase ───────────────────────────────
   async function createChat() {
+    if (isCreatingChat) return;
+    isCreatingChat = true;
+
     const authSuccess = await ensureAuth();
-    if (!authSuccess) return;
+    if (!authSuccess) { isCreatingChat = false; return; }
 
     const { data: authData } = await supabaseClient.auth.getSession();
     const userId = authData?.session?.user?.id;
@@ -324,6 +337,7 @@
     if (chatError) {
       console.error('Chat error:', chatError);
       if (window.showToast) window.showToast('Gagal memulai obrolan (Akses Ditolak)', 'error');
+      isCreatingChat = false;
       return;
     }
 
@@ -352,6 +366,7 @@
 
     showChatView();
     attachListeners();
+    isCreatingChat = false;
   }
 
   // ── Attach Supabase Listeners ─────────────────────────────────
@@ -454,6 +469,7 @@
   }
 
   function detachListeners() {
+    if (typingTimeout) { clearTimeout(typingTimeout); typingTimeout = null; }
     if (chatChannel) {
       supabaseClient.removeChannel(chatChannel);
       chatChannel = null;
@@ -491,8 +507,8 @@
         const isImg = urlLower.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) || !urlLower.includes('.');
         if (isImg) {
           imageHtml = `
-            <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${msg.imageUrl}')">
-              <img class="chat-msg-image" src="${msg.imageUrl}" alt="Image" loading="lazy" />
+            <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${escapeAttr(safeUrl(msg.imageUrl))}')">
+              <img class="chat-msg-image" src="${escapeAttr(safeUrl(msg.imageUrl))}" alt="Image" loading="lazy" />
               ${msg.text ? `<div class="chat-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
             </div>
           `;
@@ -505,10 +521,10 @@
                 ${ext}
               </div>
               <div style="flex:1; overflow:hidden;">
-                <div style="font-size:12px; font-weight:500; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${fileName}">
-                  ${fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName}
+                <div style="font-size:12px; font-weight:500; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
+                  ${escapeAttr(fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName)}
                 </div>
-                <a href="${msg.imageUrl}" target="_blank" download style="font-size:11px; color:var(--chat-primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
+                <a href="${escapeAttr(safeUrl(msg.imageUrl))}" target="_blank" download style="font-size:11px; color:var(--chat-primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
                   <i class="ph ph-download-simple"></i> Download
                 </a>
               </div>
@@ -535,7 +551,7 @@
       if (msg.reaction) {
         reactionsHtml = `
           <div class="chat-msg-reactions">
-            <button class="chat-msg-reaction">${msg.reaction} <span class="chat-reaction-count">1</span></button>
+            <button class="chat-msg-reaction">${window.chatSanitize(msg.reaction)} <span class="chat-reaction-count">1</span></button>
           </div>
         `;
       }
@@ -544,7 +560,7 @@
 
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
-        <div class="chat-msg-bubble" data-id="${msgId}" data-text="${window.chatSanitize(msg.text || '[Image]')}">
+        <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}">
           ${replyHtml}
           ${imageHtml}
           ${textHtml}
@@ -572,31 +588,34 @@
     }
 
     recordMessage();
-
-    await supabaseClient.from('messages').insert({
-      chat_id: chatId,
-      sender: 'client',
-      senderName: clientName,
-      text: text,
-      replyTo_id: replyToData ? replyToData.id : null,
-      replyTo_text: replyToData ? replyToData.text : null,
-      timestamp: new Date().toISOString(),
-      read: false,
-    });
-
+    const savedReply = replyToData;
     replyToData = null;
     document.querySelectorAll('.chat-reply-preview').forEach(el => el.remove());
-
-    // Update last message timestamp
-    supabaseClient.from('chats').update({
-      lastMessageAt: new Date().toISOString(),
-    }).eq('id', chatId).then();
-
     chatInput.value = '';
     sendBtn.disabled = true;
 
-    // Clear client typing status
-    clearClientTyping();
+    try {
+      await supabaseClient.from('messages').insert({
+        chat_id: chatId,
+        sender: 'client',
+        senderName: clientName,
+        text: text,
+        replyTo_id: savedReply ? savedReply.id : null,
+        replyTo_text: savedReply ? savedReply.text : null,
+        timestamp: new Date().toISOString(),
+        read: false,
+      });
+
+      supabaseClient.from('chats').update({
+        lastMessageAt: new Date().toISOString(),
+      }).eq('id', chatId).then();
+
+      clearClientTyping();
+    } catch (err) {
+      chatInput.value = text;
+      sendBtn.disabled = false;
+      if (window.showToast) window.showToast('Gagal mengirim pesan. Coba lagi.', 'error');
+    }
   }
 
   // ── Client Typing Indicator ───────────────────────────────────
