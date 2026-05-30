@@ -11,7 +11,6 @@ self.addEventListener('push', function(event) {
     const options = {
       body: data.body || 'Anda memiliki pesan baru.',
       icon: '/assets/logo/logo-dark.png', 
-      badge: '/assets/logo/logo-dark.png',
       vibrate: [200, 100, 200],
       data: {
         url: data.url || '/'

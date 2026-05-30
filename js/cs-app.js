@@ -2156,9 +2156,18 @@
           p256dh: subData.keys.p256dh,
           last_updated: new Date().toISOString()
         }, { onConflict: 'endpoint' });
+
+        if (window.showToast) {
+          window.showToast('Push Notifikasi aktif untuk perangkat ini.', 'success');
+        }
       } catch (e) {
         console.error('Push registration failed', e);
+        if (window.showToast) {
+          window.showToast('Gagal mengaktifkan notifikasi: ' + e.message, 'error');
+        }
       }
+    } else {
+      console.warn('Push messaging is not supported');
     }
   }
 
