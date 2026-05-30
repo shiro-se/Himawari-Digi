@@ -274,7 +274,8 @@
     topbarName.textContent = csName;
     topbarAvatar.textContent = csName.substring(0, 2).toUpperCase();
     initDashboard();
-    subscribeToPush();
+    // Tunda 3 detik agar SW benar-benar aktif sebelum subscribe push
+    setTimeout(() => subscribeToPush(), 3000);
   }
 
   function clearSession() {
