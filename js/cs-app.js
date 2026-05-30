@@ -466,7 +466,11 @@
 
   // ── Listen for Active Chats ───────────────────────────────────
   async function listenForChats() {
-    const { data: chats } = await supabase.from('chats').select('*').eq('status', 'active');
+    const { data: chats, error } = await supabase.from('chats').select('*').eq('status', 'active');
+    if (error) {
+      console.error('Error fetching active chats:', error);
+      if (window.showToast) window.showToast('Error memuat chat aktif: ' + error.message, 'error');
+    }
     const newChatsData = {};
     if (chats) {
       chats.forEach((c) => {
