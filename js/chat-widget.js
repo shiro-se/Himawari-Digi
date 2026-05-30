@@ -737,6 +737,16 @@
         supabaseClient.from('chats').update({
           lastMessageAt: new Date().toISOString(),
         }).eq('id', chatId).then();
+
+        // Kirim push notification ke semua perangkat CS
+        if (window.triggerPushNotification) {
+          window.triggerPushNotification({
+            sender: 'client',
+            senderName: clientName,
+            text: text,
+            chat_id: chatId,
+          });
+        }
       }
 
       clearClientTyping();

@@ -1192,6 +1192,16 @@
             assignedCS: csName,
           })
           .eq('id', selectedChatId);
+
+        // Kirim push notification ke perangkat client
+        if (window.triggerPushNotification) {
+          window.triggerPushNotification({
+            sender: 'cs',
+            senderName: csName,
+            text: text,
+            chat_id: selectedChatId,
+          });
+        }
       }
 
       clearCSTyping();
