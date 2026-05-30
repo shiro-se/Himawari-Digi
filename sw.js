@@ -16,8 +16,14 @@ self.addEventListener('push', function(event) {
         url: data.url || '/'
       }
     };
+    const showPromise = self.registration.showNotification(title, options).catch((err) => {
+      console.error('Failed to show notification with icon', err);
+      // Fallback tanpa icon jika path icon error
+      delete options.icon;
+      return self.registration.showNotification(title, options);
+    });
 
-    event.waitUntil(self.registration.showNotification(title, options));
+    event.waitUntil(showPromise);
   }
 });
 
