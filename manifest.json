@@ -8,9 +8,9 @@
   "theme_color": "#0d9488",
   "icons": [
     {
-      "src": "/assets/logo/logo-dark.png",
+      "src": "/assets/logo/himawari-logo.jpg",
       "sizes": "192x192 512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ],
   "gcm_sender_id": "103953800507"

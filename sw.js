@@ -10,7 +10,7 @@ self.addEventListener('push', function(event) {
     const title = data.title || 'HimawariDigi Chat';
     const options = {
       body: data.body || 'Anda memiliki pesan baru.',
-      icon: '/assets/logo/logo-dark.png', 
+      icon: '/assets/logo/himawari-logo.jpg', 
       vibrate: [200, 100, 200],
       data: {
         url: data.url || '/'
