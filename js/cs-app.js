@@ -462,6 +462,91 @@
     listenForChats();
     listenForArchive();
     bindDashboardEvents();
+
+    // ── Test Push Button ──────────────────────────────────────
+    const testPushBtn = document.getElementById('cs-test-push-btn');
+    if (testPushBtn) {
+      testPushBtn.addEventListener('click', async () => {
+        const results = [];
+
+        // Step 1: Cek Notification permission
+        results.push('1. Notification permission: ' + (('Notification' in window) ? Notification.permission : 'NOT SUPPORTED'));
+
+        // Step 2: Cek Service Worker
+        let swReg = null;
+        if ('serviceWorker' in navigator) {
+          try {
+            swReg = await navigator.serviceWorker.getRegistration('/sw.js');
+            results.push('2. Service Worker: ' + (swReg ? 'ACTIVE ✅' : 'TIDAK TERDAFTAR ❌'));
+          } catch (e) {
+            results.push('2. Service Worker ERROR: ' + e.message);
+          }
+        } else {
+          results.push('2. Service Worker: NOT SUPPORTED ❌');
+        }
+
+        // Step 3: Cek Push Subscription
+        let pushSub = null;
+        if (swReg) {
+          try {
+            pushSub = await swReg.pushManager.getSubscription();
+            results.push('3. Push Subscription: ' + (pushSub ? 'AKTIF ✅' : 'TIDAK ADA ❌'));
+            if (pushSub) {
+              results.push('   Endpoint: ...' + pushSub.endpoint.slice(-40));
+            }
+          } catch (e) {
+            results.push('3. Push Subscription ERROR: ' + e.message);
+          }
+        }
+
+        // Step 4: Cek database push_subscriptions
+        try {
+          const { data, error } = await supabase.from('push_subscriptions').select('*').eq('role', 'cs');
+          if (error) {
+            results.push('4. DB Subscriptions ERROR: ' + error.message);
+          } else {
+            results.push('4. DB CS Subscriptions: ' + (data ? data.length : 0) + ' perangkat');
+            if (data) {
+              data.forEach((s, i) => {
+                results.push('   [' + i + '] endpoint: ...' + s.endpoint.slice(-40));
+              });
+            }
+          }
+        } catch (e) {
+          results.push('4. DB Query ERROR: ' + e.message);
+        }
+
+        // Step 5: Panggil Edge Function
+        try {
+          results.push('5. Memanggil Edge Function send-push...');
+          const resp = await fetch('https://chirpzqbybrrribwlwtm.supabase.co/functions/v1/send-push', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaXJwenFieWJycnJpYndsd3RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzQzODksImV4cCI6MjA5NTIxMDM4OX0.NttsgpJ7jF_TIZ1pJ1YVHDQIsQVluAKRLCC2N_8qfIY',
+            },
+            body: JSON.stringify({
+              record: {
+                sender: 'client',
+                senderName: 'TEST PUSH',
+                text: '🔔 Test notifikasi push dari CS Dashboard',
+                chat_id: 'test-push-' + Date.now(),
+              }
+            }),
+          });
+          const respText = await resp.text();
+          results.push('   Status: ' + resp.status);
+          results.push('   Response: ' + respText);
+        } catch (e) {
+          results.push('5. Edge Function ERROR: ' + e.message);
+        }
+
+        // Tampilkan semua hasil
+        const msg = results.join('\n');
+        console.log('=== PUSH DEBUG ===\n' + msg);
+        alert('PUSH NOTIFICATION DEBUG:\n\n' + msg);
+      });
+    }
   }
 
   // ── Listen for Active Chats ───────────────────────────────────
