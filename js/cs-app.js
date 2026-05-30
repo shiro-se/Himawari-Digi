@@ -470,81 +470,115 @@
         const results = [];
 
         // Step 1: Cek Notification permission
-        results.push('1. Notification permission: ' + (('Notification' in window) ? Notification.permission : 'NOT SUPPORTED'));
+        results.push('1. Permission: ' + (('Notification' in window) ? Notification.permission : 'NOT SUPPORTED'));
 
-        // Step 2: Cek Service Worker
+        // Step 2: Cek Service Worker & tunggu ready
         let swReg = null;
-        if ('serviceWorker' in navigator) {
-          try {
-            swReg = await navigator.serviceWorker.getRegistration('/sw.js');
-            results.push('2. Service Worker: ' + (swReg ? 'ACTIVE ✅' : 'TIDAK TERDAFTAR ❌'));
-          } catch (e) {
-            results.push('2. Service Worker ERROR: ' + e.message);
-          }
-        } else {
-          results.push('2. Service Worker: NOT SUPPORTED ❌');
+        try {
+          await navigator.serviceWorker.register('/sw.js');
+          swReg = await navigator.serviceWorker.ready;
+          results.push('2. SW: READY ✅ scope=' + swReg.scope);
+        } catch (e) {
+          results.push('2. SW ERROR: ' + e.message);
+        }
+
+        if (!swReg) {
+          alert('PUSH DEBUG:\n\n' + results.join('\n'));
+          return;
         }
 
         // Step 3: Cek Push Subscription
         let pushSub = null;
-        if (swReg) {
+        try {
+          pushSub = await swReg.pushManager.getSubscription();
+          results.push('3. Subscription: ' + (pushSub ? 'AKTIF ✅' : 'TIDAK ADA'));
+        } catch (e) {
+          results.push('3. Sub ERROR: ' + e.message);
+        }
+
+        // Step 3b: Jika tidak ada, coba subscribe SEKARANG
+        if (!pushSub) {
+          results.push('3b. Mencoba subscribe ulang...');
           try {
-            pushSub = await swReg.pushManager.getSubscription();
-            results.push('3. Push Subscription: ' + (pushSub ? 'AKTIF ✅' : 'TIDAK ADA ❌'));
-            if (pushSub) {
-              results.push('   Endpoint: ...' + pushSub.endpoint.slice(-40));
+            // Hapus subscription lama jika ada
+            const old = await swReg.pushManager.getSubscription();
+            if (old) await old.unsubscribe();
+
+            pushSub = await swReg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
+            });
+            results.push('3b. Subscribe BERHASIL ✅');
+            results.push('   Endpoint: ...' + pushSub.endpoint.slice(-30));
+
+            // Simpan ke DB
+            const subData = JSON.parse(JSON.stringify(pushSub));
+            await supabase.from('push_subscriptions').delete().eq('role', 'cs');
+            const { error: dbErr } = await supabase.from('push_subscriptions').insert({
+              role: 'cs',
+              chat_id: null,
+              endpoint: subData.endpoint,
+              auth: subData.keys.auth,
+              p256dh: subData.keys.p256dh,
+              last_updated: new Date().toISOString()
+            });
+            if (dbErr) {
+              results.push('3b. DB save ERROR: ' + dbErr.message);
+            } else {
+              results.push('3b. Disimpan ke DB ✅');
             }
+          } catch (subErr) {
+            results.push('3b. Subscribe GAGAL ❌: ' + subErr.name + ': ' + subErr.message);
+            // Tampilkan manifest info untuk debug
+            try {
+              const mResp = await fetch('/manifest.json');
+              const mJson = await mResp.json();
+              results.push('   manifest.gcm_sender_id: ' + (mJson.gcm_sender_id || 'TIDAK ADA (bagus!)'));
+              results.push('   manifest.name: ' + mJson.name);
+            } catch(me) {
+              results.push('   manifest fetch error: ' + me.message);
+            }
+          }
+        }
+
+        // Step 4: Cek DB
+        try {
+          const { data } = await supabase.from('push_subscriptions').select('*').eq('role', 'cs');
+          results.push('4. DB CS Subs: ' + (data ? data.length : 0));
+        } catch (e) {
+          results.push('4. DB ERROR: ' + e.message);
+        }
+
+        // Step 5: Kirim test push
+        if (pushSub) {
+          try {
+            const resp = await fetch('https://chirpzqbybrrribwlwtm.supabase.co/functions/v1/send-push', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaXJwenFieWJycnJpYndsd3RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzQzODksImV4cCI6MjA5NTIxMDM4OX0.NttsgpJ7jF_TIZ1pJ1YVHDQIsQVluAKRLCC2N_8qfIY',
+              },
+              body: JSON.stringify({
+                record: {
+                  sender: 'client',
+                  senderName: 'TEST PUSH',
+                  text: '🔔 Test notifikasi push!',
+                  chat_id: 'test-' + Date.now(),
+                }
+              }),
+            });
+            const respText = await resp.text();
+            results.push('5. Push: ' + resp.status + ' ' + respText);
           } catch (e) {
-            results.push('3. Push Subscription ERROR: ' + e.message);
+            results.push('5. Push ERROR: ' + e.message);
           }
+        } else {
+          results.push('5. SKIP - tidak ada subscription');
         }
 
-        // Step 4: Cek database push_subscriptions
-        try {
-          const { data, error } = await supabase.from('push_subscriptions').select('*').eq('role', 'cs');
-          if (error) {
-            results.push('4. DB Subscriptions ERROR: ' + error.message);
-          } else {
-            results.push('4. DB CS Subscriptions: ' + (data ? data.length : 0) + ' perangkat');
-            if (data) {
-              data.forEach((s, i) => {
-                results.push('   [' + i + '] endpoint: ...' + s.endpoint.slice(-40));
-              });
-            }
-          }
-        } catch (e) {
-          results.push('4. DB Query ERROR: ' + e.message);
-        }
-
-        // Step 5: Panggil Edge Function
-        try {
-          results.push('5. Memanggil Edge Function send-push...');
-          const resp = await fetch('https://chirpzqbybrrribwlwtm.supabase.co/functions/v1/send-push', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaXJwenFieWJycnJpYndsd3RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzQzODksImV4cCI6MjA5NTIxMDM4OX0.NttsgpJ7jF_TIZ1pJ1YVHDQIsQVluAKRLCC2N_8qfIY',
-            },
-            body: JSON.stringify({
-              record: {
-                sender: 'client',
-                senderName: 'TEST PUSH',
-                text: '🔔 Test notifikasi push dari CS Dashboard',
-                chat_id: 'test-push-' + Date.now(),
-              }
-            }),
-          });
-          const respText = await resp.text();
-          results.push('   Status: ' + resp.status);
-          results.push('   Response: ' + respText);
-        } catch (e) {
-          results.push('5. Edge Function ERROR: ' + e.message);
-        }
-
-        // Tampilkan semua hasil
         const msg = results.join('\n');
         console.log('=== PUSH DEBUG ===\n' + msg);
-        alert('PUSH NOTIFICATION DEBUG:\n\n' + msg);
+        alert('PUSH DEBUG:\n\n' + msg);
       });
     }
   }
