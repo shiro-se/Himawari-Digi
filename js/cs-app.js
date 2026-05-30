@@ -247,16 +247,18 @@
     if (session && csName) {
       showDashboard();
     } else {
-      clearSession();
       showLogin();
     }
   }
 
+  let isExplicitLogout = false;
+
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') {
+    if (event === 'SIGNED_OUT' && isExplicitLogout) {
       clearSession();
       showLogin();
-    } else if (event === 'SIGNED_IN' && csName) {
+      isExplicitLogout = false;
+    } else if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && csName) {
       showDashboard();
     }
   });
@@ -1381,6 +1383,7 @@
           resendInterval = null;
         }
 
+        isExplicitLogout = true;
         await supabase.auth.signOut();
         clearSession();
         selectedChatId = null;
