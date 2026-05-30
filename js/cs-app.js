@@ -2230,39 +2230,69 @@
   const PUBLIC_VAPID_KEY = 'BJgkti3bRXGoIaPq5bt3S346p0yhbw4GC8zAw7e8c7ulFpoa3huVb5PghF3jGWULnq0RpS2Hgs-jPTMXYJMyRus';
 
   async function subscribeToPush() {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      try {
-        const register = await navigator.serviceWorker.register('/sw.js');
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') return;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      console.warn('Push messaging is not supported on this device');
+      if (window.showToast) window.showToast('Push tidak didukung di perangkat ini.', 'warning');
+      return;
+    }
 
-        const subscription = await register.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
-        });
+    try {
+      // Step 1: Register SW dan tunggu sampai BENAR-BENAR aktif
+      await navigator.serviceWorker.register('/sw.js');
+      const swReg = await navigator.serviceWorker.ready;
+      console.log('[Push] SW ready, scope:', swReg.scope);
 
-        const subData = JSON.parse(JSON.stringify(subscription));
-        
-        await supabase.from('push_subscriptions').upsert({
-          role: 'cs',
-          chat_id: null,
-          endpoint: subData.endpoint,
-          auth: subData.keys.auth,
-          p256dh: subData.keys.p256dh,
-          last_updated: new Date().toISOString()
-        }, { onConflict: 'endpoint' });
-
-        if (window.showToast) {
-          window.showToast('Push Notifikasi aktif untuk perangkat ini.', 'success');
-        }
-      } catch (e) {
-        console.error('Push registration failed', e);
-        if (window.showToast) {
-          window.showToast('Gagal mengaktifkan notifikasi: ' + e.message, 'error');
-        }
+      // Step 2: Minta izin notifikasi
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        if (window.showToast) window.showToast('Izin notifikasi ditolak.', 'warning');
+        return;
       }
-    } else {
-      console.warn('Push messaging is not supported');
+
+      // Step 3: Hapus subscription lama (jika ada) agar buat baru yang fresh
+      const oldSub = await swReg.pushManager.getSubscription();
+      if (oldSub) {
+        console.log('[Push] Unsubscribing old subscription...');
+        await oldSub.unsubscribe();
+      }
+
+      // Step 4: Buat subscription BARU
+      const subscription = await swReg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
+      });
+
+      const subData = JSON.parse(JSON.stringify(subscription));
+      console.log('[Push] New subscription endpoint:', subData.endpoint.slice(-30));
+
+      // Step 5: Hapus SEMUA subscription CS lama di DB, lalu simpan yang baru
+      // (ini membersihkan sisa-sisa dari install/uninstall sebelumnya)
+      await supabase.from('push_subscriptions').delete().eq('role', 'cs');
+
+      const { error: upsertError } = await supabase.from('push_subscriptions').insert({
+        role: 'cs',
+        chat_id: null,
+        endpoint: subData.endpoint,
+        auth: subData.keys.auth,
+        p256dh: subData.keys.p256dh,
+        last_updated: new Date().toISOString()
+      });
+
+      if (upsertError) {
+        console.error('[Push] DB save error:', upsertError);
+        if (window.showToast) window.showToast('Gagal menyimpan subscription: ' + upsertError.message, 'error');
+        return;
+      }
+
+      console.log('[Push] Subscription saved to DB successfully!');
+      if (window.showToast) {
+        window.showToast('Push Notifikasi aktif untuk perangkat ini.', 'success');
+      }
+    } catch (e) {
+      console.error('[Push] Registration failed:', e);
+      if (window.showToast) {
+        window.showToast('Gagal mengaktifkan notifikasi: ' + e.message, 'error');
+      }
     }
   }
 
