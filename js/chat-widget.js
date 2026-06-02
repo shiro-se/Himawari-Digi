@@ -740,12 +740,15 @@
 
         // Kirim push notification ke semua perangkat CS
         if (window.triggerPushNotification) {
+          console.log('[DEBUG] Calling triggerPushNotification...');
           window.triggerPushNotification({
             sender: 'client',
             senderName: clientName,
             text: text,
             chat_id: chatId,
           });
+        } else {
+          alert('DEBUG: window.triggerPushNotification is UNDEFINED!');
         }
       }
 
