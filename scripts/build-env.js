@@ -173,6 +173,25 @@ const configTemplate = `// ═════════════════�
     });
   };
 
+  // ── Push Notification Trigger ─────────────────────────────
+  // Memanggil Supabase Edge Function "send-push" setelah pesan dikirim.
+  window.triggerPushNotification = async function (messageData) {
+    try {
+      const resp = await fetch(SUPABASE_URL + '/functions/v1/send-push', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ record: messageData }),
+      });
+      const respText = await resp.text();
+      console.log('[Push] Response:', resp.status, respText);
+    } catch (e) {
+      console.error('[Push] Error:', e);
+    }
+  };
+
   console.log('🔥 HimawariDigi Chat — Supabase initialized');
 })();
 `;
