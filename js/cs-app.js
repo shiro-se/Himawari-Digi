@@ -40,7 +40,7 @@
   let csLongPressTimer = null;
   let csArchiveContextMenuId = null;
 
-  window.csClearReply = function() {
+  window.csClearReply = function () {
     csReplyToData = null;
   };
 
@@ -274,8 +274,22 @@
     topbarName.textContent = csName;
     topbarAvatar.textContent = csName.substring(0, 2).toUpperCase();
     initDashboard();
-    // Tunda 3 detik agar SW benar-benar aktif sebelum subscribe push
-    setTimeout(() => subscribeToPush(), 3000);
+
+    // iOS memerlukan user gesture untuk minta izin notifikasi
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isIOSDevice) {
+      // Di iOS, tampilkan banner agar user klik untuk aktifkan notifikasi
+      if ('Notification' in window && Notification.permission !== 'granted' && !localStorage.getItem('hd_ios_push_dismissed')) {
+        setTimeout(() => showIOSPushBanner(), 2000);
+      } else if ('Notification' in window && Notification.permission === 'granted') {
+        // Sudah punya permission, langsung subscribe
+        setTimeout(() => subscribeToPush(), 2000);
+      }
+    } else {
+      // Android/Desktop — bisa auto-subscribe
+      setTimeout(() => subscribeToPush(), 3000);
+    }
   }
 
   function clearSession() {
@@ -477,7 +491,8 @@
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const isAndroid = /Android/.test(navigator.userAgent);
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
     // Capture beforeinstallprompt (Chrome/Edge Android & Desktop)
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -494,7 +509,8 @@
       if (isStandalone) {
         // Sudah terinstall
         installDesc.textContent = 'Aplikasi sudah terinstall di perangkat Anda! 🎉';
-        installContent.innerHTML = '<div style="padding:16px 0;"><i class="ph-fill ph-check-circle" style="font-size:48px; color:#10b981;"></i><p style="margin:12px 0 0; color:var(--cs-text-secondary, #94a3b8); font-size:13px;">Anda sudah menggunakan Himawari CS sebagai aplikasi.</p></div>';
+        installContent.innerHTML =
+          '<div style="padding:16px 0;"><i class="ph-fill ph-check-circle" style="font-size:48px; color:#10b981;"></i><p style="margin:12px 0 0; color:var(--cs-text-secondary, #94a3b8); font-size:13px;">Anda sudah menggunakan Himawari CS sebagai aplikasi.</p></div>';
       } else if (deferredInstallPrompt) {
         // Chrome/Edge — native install
         installDesc.textContent = 'Install aplikasi untuk akses cepat & notifikasi push.';
@@ -1031,7 +1047,10 @@
                 }
                 const timeContainer = bubble.querySelector('.cs-msg-time-container');
                 if (timeContainer && !timeContainer.querySelector('.cs-msg-edited-text')) {
-                  timeContainer.insertAdjacentHTML('afterbegin', '<span class="cs-msg-edited-text">(diedit)</span>');
+                  timeContainer.insertAdjacentHTML(
+                    'afterbegin',
+                    '<span class="cs-msg-edited-text">(diedit)</span>'
+                  );
                 }
               }
 
@@ -1056,14 +1075,14 @@
 
             // Update pinned header
             if (msg.is_pinned !== undefined) {
-               if (bubble) bubble.dataset.pinned = Boolean(msg.is_pinned);
-               if (msg.is_pinned) updateCSPinnedHeader(msg.text, msg.id);
-               else {
-                 const csPinnedHeader = document.getElementById('cs-pinned-header');
-                 if (csPinnedHeader && csPinnedHeader.dataset.id === msg.id) {
-                   updateCSPinnedHeader(null);
-                 }
-               }
+              if (bubble) bubble.dataset.pinned = Boolean(msg.is_pinned);
+              if (msg.is_pinned) updateCSPinnedHeader(msg.text, msg.id);
+              else {
+                const csPinnedHeader = document.getElementById('cs-pinned-header');
+                if (csPinnedHeader && csPinnedHeader.dataset.id === msg.id) {
+                  updateCSPinnedHeader(null);
+                }
+              }
             }
           }
         }
@@ -1218,7 +1237,7 @@
           </div>
         </div>
       `;
-      
+
       // Update sticky header if message is pinned
       if (msg.is_pinned) {
         updateCSPinnedHeader(msg.text);
@@ -1284,10 +1303,13 @@
 
     try {
       if (savedEditId) {
-        await supabase.from('messages').update({
-          text: text,
-          is_edited: true
-        }).eq('id', savedEditId);
+        await supabase
+          .from('messages')
+          .update({
+            text: text,
+            is_edited: true,
+          })
+          .eq('id', savedEditId);
       } else {
         await supabase.from('messages').insert({
           chat_id: selectedChatId,
@@ -1979,18 +2001,30 @@
       csCtxMenu.style.top = y + 'px';
     }
 
-    window.showCSContextMenuFromBtn = function(e, btn) {
+    window.showCSContextMenuFromBtn = function (e, btn) {
       e.stopPropagation();
       const bubble = btn.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
-        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.pinned);
+        showCSContextMenu(
+          e,
+          bubble.dataset.id,
+          bubble.dataset.text,
+          bubble.dataset.sender,
+          bubble.dataset.pinned
+        );
       }
     };
 
     messagesEl.addEventListener('contextmenu', (e) => {
       const bubble = e.target.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
-        showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.pinned);
+        showCSContextMenu(
+          e,
+          bubble.dataset.id,
+          bubble.dataset.text,
+          bubble.dataset.sender,
+          bubble.dataset.pinned
+        );
       }
     });
 
@@ -1998,7 +2032,13 @@
       const bubble = e.target.closest('.cs-msg-bubble');
       if (bubble && bubble.dataset.id) {
         csLongPressTimer = setTimeout(() => {
-          showCSContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.pinned);
+          showCSContextMenu(
+            e,
+            bubble.dataset.id,
+            bubble.dataset.text,
+            bubble.dataset.sender,
+            bubble.dataset.pinned
+          );
         }, 500);
       }
     });
@@ -2031,7 +2071,7 @@
           if (window.showToast) window.showToast('Pesan dihapus dari favorit', 'info');
         }
         localStorage.setItem('hd_cs_fav_msgs', JSON.stringify(favs));
-        
+
         // Update DOM visually without reloading
         const bubble = document.querySelector(`.cs-msg-bubble[data-id="${csContextMsgId}"]`);
         if (bubble) {
@@ -2042,7 +2082,10 @@
               if (timeContainer) {
                 const timeSpan = timeContainer.querySelector('.cs-msg-time');
                 if (timeSpan) {
-                  timeSpan.insertAdjacentHTML('afterend', '<i class="ph-fill ph-star cs-msg-fav-icon"></i>');
+                  timeSpan.insertAdjacentHTML(
+                    'afterend',
+                    '<i class="ph-fill ph-star cs-msg-fav-icon"></i>'
+                  );
                 }
               }
             }
@@ -2066,25 +2109,43 @@
       const btnPin = document.getElementById('cs-ctx-pin');
       if (btnPin) {
         btnPin.addEventListener('click', () => {
-          supabase.from('messages').select('is_pinned').eq('id', csContextMsgId).single().then(({data}) => {
-            if (data) {
-              const newStatus = !data.is_pinned;
-              
-              if (newStatus) {
-                supabase.from('messages').update({ is_pinned: false }).eq('chat_id', selectedChatId).eq('is_pinned', true).then(() => {
-                  supabase.from('messages').update({ is_pinned: true }).eq('id', csContextMsgId).then(() => {
-                    if (window.showToast) window.showToast('Pesan disematkan', 'success');
-                    updateCSPinnedHeader(csContextMsgText);
-                  });
-                });
-              } else {
-                supabase.from('messages').update({ is_pinned: false }).eq('id', csContextMsgId).then(() => {
-                  if (window.showToast) window.showToast('Sematan dilepas', 'success');
-                  updateCSPinnedHeader(null);
-                });
+          supabase
+            .from('messages')
+            .select('is_pinned')
+            .eq('id', csContextMsgId)
+            .single()
+            .then(({ data }) => {
+              if (data) {
+                const newStatus = !data.is_pinned;
+
+                if (newStatus) {
+                  supabase
+                    .from('messages')
+                    .update({ is_pinned: false })
+                    .eq('chat_id', selectedChatId)
+                    .eq('is_pinned', true)
+                    .then(() => {
+                      supabase
+                        .from('messages')
+                        .update({ is_pinned: true })
+                        .eq('id', csContextMsgId)
+                        .then(() => {
+                          if (window.showToast) window.showToast('Pesan disematkan', 'success');
+                          updateCSPinnedHeader(csContextMsgText);
+                        });
+                    });
+                } else {
+                  supabase
+                    .from('messages')
+                    .update({ is_pinned: false })
+                    .eq('id', csContextMsgId)
+                    .then(() => {
+                      if (window.showToast) window.showToast('Sematan dilepas', 'success');
+                      updateCSPinnedHeader(null);
+                    });
+                }
               }
-            }
-          });
+            });
           csCtxMenu.style.display = 'none';
         });
       }
@@ -2095,7 +2156,7 @@
           csEditingMsgId = csContextMsgId;
           chatInput.value = csContextMsgText;
           chatInput.focus();
-          
+
           document.querySelectorAll('.cs-reply-preview').forEach((el) => el.remove());
           const preview = document.createElement('div');
           preview.className = 'cs-reply-preview';
@@ -2106,7 +2167,7 @@
             </div>`;
           const inputArea = document.getElementById('cs-input-area');
           inputArea.insertBefore(preview, inputArea.firstChild);
-          
+
           csCtxMenu.style.display = 'none';
         });
       }
@@ -2120,16 +2181,24 @@
             const myReactions = JSON.parse(localStorage.getItem('hd_cs_my_reactions') || '[]');
 
             if (currentReaction && currentReaction.textContent.includes(emoji)) {
-              supabase.from('messages').update({ reaction: null }).eq('id', csContextMsgId).then(() => {
-                const index = myReactions.indexOf(csContextMsgId);
-                if (index > -1) myReactions.splice(index, 1);
-                localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
-              });
+              supabase
+                .from('messages')
+                .update({ reaction: null })
+                .eq('id', csContextMsgId)
+                .then(() => {
+                  const index = myReactions.indexOf(csContextMsgId);
+                  if (index > -1) myReactions.splice(index, 1);
+                  localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+                });
             } else {
-              supabase.from('messages').update({ reaction: emoji }).eq('id', csContextMsgId).then(() => {
-                if (!myReactions.includes(csContextMsgId)) myReactions.push(csContextMsgId);
-                localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
-              });
+              supabase
+                .from('messages')
+                .update({ reaction: emoji })
+                .eq('id', csContextMsgId)
+                .then(() => {
+                  if (!myReactions.includes(csContextMsgId)) myReactions.push(csContextMsgId);
+                  localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+                });
             }
             csCtxMenu.style.display = 'none';
           }
@@ -2229,19 +2298,27 @@
           const msgId = bubble.dataset.id;
           const myReactions = JSON.parse(localStorage.getItem('hd_cs_my_reactions') || '[]');
           if (myReactions.includes(msgId)) {
-            supabase.from('messages').update({ reaction: null }).eq('id', msgId).then(() => {
-              myReactions.splice(myReactions.indexOf(msgId), 1);
-              localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
-            });
+            supabase
+              .from('messages')
+              .update({ reaction: null })
+              .eq('id', msgId)
+              .then(() => {
+                myReactions.splice(myReactions.indexOf(msgId), 1);
+                localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+              });
           } else {
             let emoji = reactionBtn.textContent.trim().split(' ')[0];
             if (reactionBtn.childNodes.length > 0) {
               emoji = reactionBtn.childNodes[0].nodeValue.trim();
             }
-            supabase.from('messages').update({ reaction: emoji }).eq('id', msgId).then(() => {
-              myReactions.push(msgId);
-              localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
-            });
+            supabase
+              .from('messages')
+              .update({ reaction: emoji })
+              .eq('id', msgId)
+              .then(() => {
+                myReactions.push(msgId);
+                localStorage.setItem('hd_cs_my_reactions', JSON.stringify(myReactions));
+              });
           }
         }
       }
@@ -2249,7 +2326,7 @@
   }
 
   function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
@@ -2257,7 +2334,50 @@
     return outputArray;
   }
 
-  const PUBLIC_VAPID_KEY = 'BJgkti3bRXGoIaPq5bt3S346p0yhbw4GC8zAw7e8c7ulFpoa3huVb5PghF3jGWULnq0RpS2Hgs-jPTMXYJMyRus';
+  const PUBLIC_VAPID_KEY =
+    'BJgkti3bRXGoIaPq5bt3S346p0yhbw4GC8zAw7e8c7ulFpoa3huVb5PghF3jGWULnq0RpS2Hgs-jPTMXYJMyRus';
+
+  // ── iOS Push Banner ─────────────────────────────────────────
+  function showIOSPushBanner() {
+    // Hapus banner lama jika ada
+    const oldBanner = document.getElementById('ios-push-banner');
+    if (oldBanner) oldBanner.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'ios-push-banner';
+    banner.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9998; background:linear-gradient(135deg, #10b981, #059669); color:white; padding:14px 20px; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; align-items:center; gap:12px; max-width:360px; width:90%; animation:slideUp 0.4s ease;';
+    banner.innerHTML = `
+      <i class="ph-bold ph-bell-ringing" style="font-size:24px; flex-shrink:0;"></i>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:14px;">Aktifkan Notifikasi</div>
+        <div style="font-size:12px; opacity:0.85; margin-top:2px;">Agar tidak melewatkan pesan dari client</div>
+      </div>
+      <button id="ios-push-enable" style="background:white; color:#059669; border:none; padding:8px 14px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; white-space:nowrap;">Aktifkan</button>
+      <button id="ios-push-dismiss" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; font-size:18px; padding:2px;"><i class="ph ph-x"></i></button>
+    `;
+
+    // Tambahkan animasi slideUp
+    if (!document.getElementById('ios-push-style')) {
+      const style = document.createElement('style');
+      style.id = 'ios-push-style';
+      style.textContent = '@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }';
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(banner);
+
+    // Klik Aktifkan → panggil subscribeToPush (ini user gesture, iOS akan izinkan)
+    document.getElementById('ios-push-enable').addEventListener('click', async () => {
+      banner.remove();
+      await subscribeToPush();
+    });
+
+    // Klik dismiss
+    document.getElementById('ios-push-dismiss').addEventListener('click', () => {
+      banner.remove();
+      localStorage.setItem('hd_ios_push_dismissed', '1');
+    });
+  }
 
   async function subscribeToPush() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -2272,10 +2392,11 @@
       const swReg = await navigator.serviceWorker.ready;
       console.log('[Push] SW ready, scope:', swReg.scope);
 
-      // Step 2: Minta izin notifikasi
+      // Step 2: Minta izin notifikasi (pada iOS, ini harus dari user gesture)
       const permission = await Notification.requestPermission();
+      console.log('[Push] Permission result:', permission);
       if (permission !== 'granted') {
-        if (window.showToast) window.showToast('Izin notifikasi ditolak.', 'warning');
+        if (window.showToast) window.showToast('Izin notifikasi ditolak. Buka Pengaturan > Notifikasi untuk mengizinkan.', 'warning');
         return;
       }
 
@@ -2289,28 +2410,26 @@
       // Step 4: Buat subscription BARU
       const subscription = await swReg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
+        applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
       });
 
       const subData = JSON.parse(JSON.stringify(subscription));
       console.log('[Push] New subscription endpoint:', subData.endpoint.slice(-30));
 
-      // Step 5: Hapus SEMUA subscription CS lama di DB, lalu simpan yang baru
-      // (ini membersihkan sisa-sisa dari install/uninstall sebelumnya)
-      await supabase.from('push_subscriptions').delete().eq('role', 'cs');
-
-      const { error: upsertError } = await supabase.from('push_subscriptions').insert({
+      // Step 5: Simpan ke DB (upsert berdasarkan endpoint agar multi-device OK)
+      const { error: upsertError } = await supabase.from('push_subscriptions').upsert({
         role: 'cs',
         chat_id: null,
         endpoint: subData.endpoint,
         auth: subData.keys.auth,
         p256dh: subData.keys.p256dh,
-        last_updated: new Date().toISOString()
-      });
+        last_updated: new Date().toISOString(),
+      }, { onConflict: 'endpoint' });
 
       if (upsertError) {
         console.error('[Push] DB save error:', upsertError);
-        if (window.showToast) window.showToast('Gagal menyimpan subscription: ' + upsertError.message, 'error');
+        if (window.showToast)
+          window.showToast('Gagal menyimpan subscription: ' + upsertError.message, 'error');
         return;
       }
 
