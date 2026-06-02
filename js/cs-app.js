@@ -464,123 +464,118 @@
     listenForArchive();
     bindDashboardEvents();
 
-    // ── Test Push Button ──────────────────────────────────────
-    const testPushBtn = document.getElementById('cs-test-push-btn');
-    if (testPushBtn) {
-      testPushBtn.addEventListener('click', async () => {
-        const results = [];
+    // ── Install PWA ──────────────────────────────────────────
+    const installBtn = document.getElementById('cs-install-btn');
+    const installModal = document.getElementById('cs-install-modal');
+    const installClose = document.getElementById('cs-install-close');
+    const installContent = document.getElementById('cs-install-content');
+    const installAction = document.getElementById('cs-install-action');
+    const installDesc = document.getElementById('cs-install-desc');
+    let deferredInstallPrompt = null;
 
-        // Step 1: Cek Notification permission
-        results.push('1. Permission: ' + (('Notification' in window) ? Notification.permission : 'NOT SUPPORTED'));
+    // Detect platform
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-        // Step 2: Cek Service Worker & tunggu ready
-        let swReg = null;
-        try {
-          await navigator.serviceWorker.register('/sw.js');
-          swReg = await navigator.serviceWorker.ready;
-          results.push('2. SW: READY ✅ scope=' + swReg.scope);
-        } catch (e) {
-          results.push('2. SW ERROR: ' + e.message);
-        }
+    // Capture beforeinstallprompt (Chrome/Edge Android & Desktop)
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      console.log('[Install] beforeinstallprompt captured');
+    });
 
-        if (!swReg) {
-          alert('PUSH DEBUG:\n\n' + results.join('\n'));
-          return;
-        }
+    function showInstallModal() {
+      if (!installModal) return;
+      installContent.innerHTML = '';
+      installAction.style.display = 'none';
 
-        // Step 3: Cek Push Subscription
-        let pushSub = null;
-        try {
-          pushSub = await swReg.pushManager.getSubscription();
-          results.push('3. Subscription: ' + (pushSub ? 'AKTIF ✅' : 'TIDAK ADA'));
-        } catch (e) {
-          results.push('3. Sub ERROR: ' + e.message);
-        }
-
-        // Step 3b: Jika tidak ada, coba subscribe SEKARANG
-        if (!pushSub) {
-          results.push('3b. Mencoba subscribe ulang...');
-          try {
-            // Hapus subscription lama jika ada
-            const old = await swReg.pushManager.getSubscription();
-            if (old) await old.unsubscribe();
-
-            pushSub = await swReg.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
-            });
-            results.push('3b. Subscribe BERHASIL ✅');
-            results.push('   Endpoint: ...' + pushSub.endpoint.slice(-30));
-
-            // Simpan ke DB
-            const subData = JSON.parse(JSON.stringify(pushSub));
-            await supabase.from('push_subscriptions').delete().eq('role', 'cs');
-            const { error: dbErr } = await supabase.from('push_subscriptions').insert({
-              role: 'cs',
-              chat_id: null,
-              endpoint: subData.endpoint,
-              auth: subData.keys.auth,
-              p256dh: subData.keys.p256dh,
-              last_updated: new Date().toISOString()
-            });
-            if (dbErr) {
-              results.push('3b. DB save ERROR: ' + dbErr.message);
-            } else {
-              results.push('3b. Disimpan ke DB ✅');
-            }
-          } catch (subErr) {
-            results.push('3b. Subscribe GAGAL ❌: ' + subErr.name + ': ' + subErr.message);
-            // Tampilkan manifest info untuk debug
-            try {
-              const mResp = await fetch('/manifest.json');
-              const mJson = await mResp.json();
-              results.push('   manifest.gcm_sender_id: ' + (mJson.gcm_sender_id || 'TIDAK ADA (bagus!)'));
-              results.push('   manifest.name: ' + mJson.name);
-            } catch(me) {
-              results.push('   manifest fetch error: ' + me.message);
-            }
-          }
-        }
-
-        // Step 4: Cek DB
-        try {
-          const { data } = await supabase.from('push_subscriptions').select('*').eq('role', 'cs');
-          results.push('4. DB CS Subs: ' + (data ? data.length : 0));
-        } catch (e) {
-          results.push('4. DB ERROR: ' + e.message);
-        }
-
-        // Step 5: Kirim test push
-        if (pushSub) {
-          try {
-            const resp = await fetch('https://chirpzqbybrrribwlwtm.supabase.co/functions/v1/send-push', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaXJwenFieWJycnJpYndsd3RtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MzQzODksImV4cCI6MjA5NTIxMDM4OX0.NttsgpJ7jF_TIZ1pJ1YVHDQIsQVluAKRLCC2N_8qfIY',
-              },
-              body: JSON.stringify({
-                record: {
-                  sender: 'client',
-                  senderName: 'TEST PUSH',
-                  text: '🔔 Test notifikasi push!',
-                  chat_id: 'test-' + Date.now(),
-                }
-              }),
-            });
-            const respText = await resp.text();
-            results.push('5. Push: ' + resp.status + ' ' + respText);
-          } catch (e) {
-            results.push('5. Push ERROR: ' + e.message);
-          }
+      if (isStandalone) {
+        // Sudah terinstall
+        installDesc.textContent = 'Aplikasi sudah terinstall di perangkat Anda! 🎉';
+        installContent.innerHTML = '<div style="padding:16px 0;"><i class="ph-fill ph-check-circle" style="font-size:48px; color:#10b981;"></i><p style="margin:12px 0 0; color:var(--cs-text-secondary, #94a3b8); font-size:13px;">Anda sudah menggunakan Himawari CS sebagai aplikasi.</p></div>';
+      } else if (deferredInstallPrompt) {
+        // Chrome/Edge — native install
+        installDesc.textContent = 'Install aplikasi untuk akses cepat & notifikasi push.';
+        installAction.style.display = 'block';
+      } else if (isIOS) {
+        // iOS — manual instructions
+        installDesc.textContent = 'Ikuti langkah berikut untuk install di iPhone/iPad:';
+        const isBrowserSafari = isSafari;
+        if (isBrowserSafari) {
+          installContent.innerHTML = `
+            <div style="margin-bottom:16px;">
+              <div class="install-step"><div class="install-step-num">1</div><div class="install-step-text">Ketuk ikon <strong>Share</strong> <i class="ph ph-share-network"></i> di bagian bawah layar</div></div>
+              <div class="install-step"><div class="install-step-num">2</div><div class="install-step-text">Scroll ke bawah dan pilih <strong>"Add to Home Screen"</strong> <i class="ph ph-plus-square"></i></div></div>
+              <div class="install-step"><div class="install-step-num">3</div><div class="install-step-text">Ketuk <strong>"Add"</strong> di pojok kanan atas</div></div>
+            </div>`;
         } else {
-          results.push('5. SKIP - tidak ada subscription');
+          installContent.innerHTML = `
+            <div style="padding:12px; background:rgba(245,158,11,0.1); border-radius:10px; margin-bottom:16px; text-align:left;">
+              <p style="margin:0; font-size:13px; color:#f59e0b; font-weight:600;"><i class="ph ph-warning"></i> Buka di Safari</p>
+              <p style="margin:6px 0 0; font-size:12px; color:var(--cs-text-secondary, #94a3b8);">Di iPhone/iPad, instal PWA hanya bisa dilakukan melalui <strong>Safari</strong>. Salin URL ini dan buka di Safari:</p>
+              <div style="margin-top:8px; padding:8px 12px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:11px; color:#10b981; word-break:break-all; font-family:monospace;">${window.location.href}</div>
+            </div>
+            <div class="install-step"><div class="install-step-num">1</div><div class="install-step-text">Buka URL di atas di <strong>Safari</strong></div></div>
+            <div class="install-step"><div class="install-step-num">2</div><div class="install-step-text">Ketuk ikon <strong>Share</strong> <i class="ph ph-share-network"></i></div></div>
+            <div class="install-step"><div class="install-step-num">3</div><div class="install-step-text">Pilih <strong>"Add to Home Screen"</strong></div></div>`;
         }
+      } else {
+        // Firefox, Samsung Internet, etc — generic instructions
+        installDesc.textContent = 'Install untuk akses cepat:';
+        installContent.innerHTML = `
+          <div style="margin-bottom:16px;">
+            <div class="install-step"><div class="install-step-num">1</div><div class="install-step-text">Ketuk tombol <strong>Menu</strong> ( <i class="ph ph-dots-three-vertical"></i> ) di browser Anda</div></div>
+            <div class="install-step"><div class="install-step-num">2</div><div class="install-step-text">Pilih <strong>"Install app"</strong> atau <strong>"Add to Home Screen"</strong></div></div>
+            <div class="install-step"><div class="install-step-num">3</div><div class="install-step-text">Konfirmasi dan <strong>Install</strong></div></div>
+          </div>`;
+      }
 
-        const msg = results.join('\n');
-        console.log('=== PUSH DEBUG ===\n' + msg);
-        alert('PUSH DEBUG:\n\n' + msg);
+      installModal.style.display = 'flex';
+    }
+
+    // Install action button click (for Chrome/Edge native prompt)
+    if (installAction) {
+      installAction.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          const { outcome } = await deferredInstallPrompt.userChoice;
+          console.log('[Install] User choice:', outcome);
+          deferredInstallPrompt = null;
+          if (outcome === 'accepted') {
+            installModal.style.display = 'none';
+            if (window.showToast) window.showToast('Aplikasi berhasil diinstall! 🎉', 'success');
+            localStorage.setItem('hd_install_prompted', 'installed');
+          }
+        }
       });
+    }
+
+    // Close modal
+    if (installClose) {
+      installClose.addEventListener('click', () => {
+        installModal.style.display = 'none';
+        localStorage.setItem('hd_install_prompted', 'dismissed');
+      });
+    }
+    if (installModal) {
+      installModal.addEventListener('click', (e) => {
+        if (e.target === installModal) {
+          installModal.style.display = 'none';
+          localStorage.setItem('hd_install_prompted', 'dismissed');
+        }
+      });
+    }
+
+    // Install button in topbar
+    if (installBtn) {
+      installBtn.addEventListener('click', showInstallModal);
+    }
+
+    // Auto-show on first visit (setelah 2 detik)
+    if (!isStandalone && !localStorage.getItem('hd_install_prompted')) {
+      setTimeout(() => showInstallModal(), 2000);
     }
   }
 

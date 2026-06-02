@@ -1587,8 +1587,8 @@
             <i class="ph ph-moon" id="cs-theme-moon"></i>
             <i class="ph ph-sun" id="cs-theme-sun" style="display: none"></i>
           </button>
-          <button class="cs-topbar-btn" id="cs-test-push-btn" title="Test Push Notifikasi" style="color: #f59e0b">
-            <i class="ph-bold ph-bell-ringing"></i>
+          <button class="cs-topbar-btn" id="cs-install-btn" title="Install Aplikasi" style="color: #10b981">
+            <i class="ph-bold ph-download-simple"></i>
           </button>
           <button class="cs-topbar-btn" id="cs-logout-btn" title="Logout" style="color: #ef4444">
             <i class="ph-bold ph-sign-out"></i>
@@ -1790,5 +1790,32 @@
         <img id="cs-lightbox-img" class="cs-lightbox-img" src="" alt="Zoom" style="max-width:90%; max-height:90%; object-fit:contain; transition: transform 0.1s ease-out; cursor: grab;" draggable="false" />
       </div>
     </div>
+
+    <!-- Install PWA Modal -->
+    <div id="cs-install-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+      <div style="background:var(--cs-bg-card, #1e293b); border-radius:16px; padding:28px 24px; max-width:380px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.4); text-align:center; position:relative; animation: modalIn 0.3s ease;">
+        <button id="cs-install-close" style="position:absolute; top:12px; right:12px; background:none; border:none; color:var(--cs-text-secondary, #94a3b8); cursor:pointer; font-size:20px; padding:4px;">
+          <i class="ph ph-x"></i>
+        </button>
+        <div style="width:64px; height:64px; margin:0 auto 16px; border-radius:16px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+          <img src="/assets/logo/icon-192x192.png" alt="Himawari" style="width:100%; height:100%; object-fit:cover;" />
+        </div>
+        <h3 style="margin:0 0 8px; font-size:18px; font-weight:700; color:var(--cs-text-primary, #f1f5f9);">Install Himawari CS</h3>
+        <p style="margin:0 0 20px; font-size:13px; color:var(--cs-text-secondary, #94a3b8); line-height:1.5;" id="cs-install-desc">Dapatkan akses cepat & notifikasi push langsung di perangkat Anda.</p>
+        <div id="cs-install-content"></div>
+        <button id="cs-install-action" style="display:none; width:100%; padding:12px; border:none; border-radius:10px; background:linear-gradient(135deg, #10b981, #059669); color:white; font-size:15px; font-weight:600; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; box-shadow:0 4px 12px rgba(16,185,129,0.3);" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <i class="ph-bold ph-download-simple"></i> Install Sekarang
+        </button>
+        <p style="margin:12px 0 0; font-size:11px; color:var(--cs-text-secondary, #64748b);">Gratis • Ringan • Tanpa App Store</p>
+      </div>
+    </div>
+    <style>
+      @keyframes modalIn { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+      .install-step { display:flex; align-items:flex-start; gap:12px; text-align:left; margin-bottom:14px; }
+      .install-step-num { min-width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, #10b981, #059669); color:white; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
+      .install-step-text { font-size:13px; color:var(--cs-text-secondary, #cbd5e1); line-height:1.5; }
+      .install-step-text strong { color:var(--cs-text-primary, #f1f5f9); }
+    </style>
   </body>
 </html>
+
