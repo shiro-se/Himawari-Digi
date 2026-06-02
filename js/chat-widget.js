@@ -938,6 +938,16 @@
           lastMessageAt: new Date().toISOString()
         }).eq('id', chatId).then();
 
+        // Kirim push notification ke semua perangkat CS
+        if (window.triggerPushNotification) {
+          window.triggerPushNotification({
+            sender: 'client',
+            senderName: clientName,
+            text: '[Gambar]',
+            chat_id: chatId,
+          });
+        }
+
         if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
         sendClientTyping();
       } catch (err) {
