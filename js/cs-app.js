@@ -1024,7 +1024,7 @@
             }
 
             const bubble = document.querySelector(`.cs-msg-bubble[data-id="${m.id}"]`);
-            
+
             // Handle deleted_at toggle
             if (bubble) {
               const isCurrentlyDeleted = bubble.classList.contains('cs-msg-deleted');
@@ -1994,10 +1994,10 @@
             })
             .eq('id', selectedChatId);
 
-          if (window.showToast) window.showToast('Gambar berhasil dikirim', 'success');
+          if (window.showToast) window.showToast('File berhasil dikirim', 'success');
         } catch (err) {
           console.error(err);
-          if (window.showToast) window.showToast('Gagal upload gambar', 'error');
+          if (window.showToast) window.showToast('Gagal upload file', 'error');
         }
 
         sendBtn.disabled = !chatInput.value.trim();
