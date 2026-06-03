@@ -589,9 +589,10 @@
 
         if (isImg) {
           imageHtml = `
-            <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${escapeAttr(safeUrl(msg.imageUrl))}')">
-              <img class="chat-msg-image" src="${escapeAttr(safeUrl(msg.imageUrl))}" alt="Image" loading="lazy" />
-              ${msg.text ? `<div class="chat-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
+            <div class="chat-msg-img-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:300px; cursor:pointer; position:relative; background:var(--card); display:flex; flex-direction:column;" onclick="window.openChatLightbox('${escapeAttr(safeUrl(msg.imageUrl))}')">
+              <img src="${escapeAttr(safeUrl(msg.imageUrl))}" alt="Attached Image" style="width:100%; max-height:350px; object-fit:cover; display:block; transition:0.2s;" loading="lazy">
+              ${msg.text ? `<div style="padding:8px 12px; font-size:12px; color:var(--foreground); border-top:1px solid var(--border);">${window.chatSanitize(msg.text)}</div>` : ''}
+              <div style="position:absolute; inset:0; background:rgba(0,0,0,0.1); opacity:0; transition:0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'"></div>
             </div>
           `;
         } else if (isAudio) {
@@ -613,8 +614,8 @@
           `;
         } else if (isVideo) {
           imageHtml = `
-            <div class="chat-msg-video-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:260px; background:var(--card); display:flex; flex-direction:column;">
-              <video controls playsinline webkit-playsinline style="width:100%; max-height:220px; display:block; background:#000;" preload="metadata">
+            <div class="chat-msg-video-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:300px; background:var(--card); display:flex; flex-direction:column;">
+              <video controls playsinline webkit-playsinline style="width:100%; max-height:350px; display:block; background:#000;" preload="metadata">
                 <source src="${escapeAttr(safeUrl(msg.imageUrl))}">
                 Browser Anda tidak mendukung elemen video.
               </video>

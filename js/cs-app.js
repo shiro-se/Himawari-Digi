@@ -1188,8 +1188,8 @@
           `;
         } else if (isVideo) {
           imageHtml = `
-            <div class="cs-msg-video-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:280px; background:var(--card); display:flex; flex-direction:column;">
-              <video controls playsinline webkit-playsinline style="width:100%; max-height:220px; display:block; background:#000;" preload="metadata">
+            <div class="cs-msg-video-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:360px; background:var(--card); display:flex; flex-direction:column;">
+              <video controls playsinline webkit-playsinline style="width:100%; max-height:450px; display:block; background:#000;" preload="metadata">
                 <source src="${escapeAttr(safeUrl(msg.imageUrl))}">
                 Browser Anda tidak mendukung elemen video.
               </video>
