@@ -998,6 +998,23 @@
   }
 
 
+  window.chatForceDownload = async (url, filename) => {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename || 'download';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch(e) {
+      window.open(url, '_blank');
+    }
+  };
+
   // ── Lightbox ───────────────────────────────────────────────────
   window.openChatLightbox = function (url) {
     const lb = document.getElementById('chat-lightbox');
@@ -1006,8 +1023,18 @@
     if (lb && img) {
       img.src = url;
       if (dl) {
-        dl.href = url;
-        dl.download = 'image_' + Date.now() + '.jpg';
+        dl.onclick = (e) => {
+          e.preventDefault();
+          if (window.chatForceDownload) {
+            window.chatForceDownload(url, 'image_' + Date.now() + '.jpg');
+          } else {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'image_' + Date.now() + '.jpg';
+            a.target = '_blank';
+            a.click();
+          }
+        };
       }
       lb.style.display = 'flex';
       resetLightbox();

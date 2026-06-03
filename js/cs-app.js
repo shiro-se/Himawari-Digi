@@ -1728,18 +1728,90 @@
   }
 
   // ── Lightbox ────────────────────────────────────────────────
+  window.hdForceDownload = async (url, filename) => {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename || 'download';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch(e) {
+      window.open(url, '_blank');
+    }
+  };
+
+  // ── Lightbox Zoom & Pan ────────────────────────────────────────────────
+  const csLightbox = document.getElementById('cs-lightbox');
+  const csLightboxClose = document.getElementById('cs-lightbox-close');
+  const csLightboxOverlay = document.querySelector('.cs-lightbox-overlay');
+  const csLightboxImg = document.getElementById('cs-lightbox-img');
+  const csZoomInBtn = document.getElementById('cs-lightbox-zoom-in');
+  const csZoomOutBtn = document.getElementById('cs-lightbox-zoom-out');
+  const csResetBtn = document.getElementById('cs-lightbox-reset');
+  const csDownloadBtn = document.getElementById('cs-lightbox-download');
+
+  let csScale = 1, csPanning = false, csPointX = 0, csPointY = 0, csStartX = 0, csStartY = 0;
+
+  const setCSLightboxTransform = () => {
+    if (csLightboxImg) csLightboxImg.style.transform = `translate(${csPointX}px, ${csPointY}px) scale(${csScale})`;
+  };
+
+  const resetCSLightbox = () => {
+    csScale = 1; csPointX = 0; csPointY = 0;
+    setCSLightboxTransform();
+  };
+
+  if (csLightboxImg) {
+    csLightboxImg.onmousedown = (e) => {
+      e.preventDefault();
+      csStartX = e.clientX - csPointX;
+      csStartY = e.clientY - csPointY;
+      csPanning = true;
+    };
+    document.addEventListener('mouseup', () => { csPanning = false; });
+    document.addEventListener('mousemove', (e) => {
+      if (!csPanning || csScale <= 1) return;
+      csPointX = e.clientX - csStartX;
+      csPointY = e.clientY - csStartY;
+      setCSLightboxTransform();
+    });
+    csLightboxImg.onwheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      csScale = Math.max(0.5, Math.min(csScale + delta, 5));
+      setCSLightboxTransform();
+    };
+  }
+
+  if (csZoomInBtn) csZoomInBtn.onclick = () => { csScale = Math.min(csScale + 0.2, 5); setCSLightboxTransform(); };
+  if (csZoomOutBtn) csZoomOutBtn.onclick = () => { csScale = Math.max(csScale - 0.2, 0.5); setCSLightboxTransform(); };
+  if (csResetBtn) csResetBtn.onclick = resetCSLightbox;
+
+  const closeCSLightbox = () => {
+    if (csLightbox) csLightbox.style.display = 'none';
+    resetCSLightbox();
+  };
+
+  if (csLightboxClose) csLightboxClose.addEventListener('click', closeCSLightbox);
+  if (csLightboxOverlay) csLightboxOverlay.addEventListener('click', closeCSLightbox);
+
   window.openCSLightbox = function (url) {
-    const lb = document.getElementById('cs-lightbox');
-    const img = document.getElementById('cs-lightbox-img');
-    const dl = document.getElementById('cs-lightbox-download');
-    if (lb && img) {
-      img.src = url;
-      img.classList.remove('zoomed');
-      if (dl) {
-        dl.href = url;
-        dl.download = 'image_' + Date.now() + '.jpg';
+    if (csLightbox && csLightboxImg) {
+      csLightboxImg.src = url;
+      csLightboxImg.classList.remove('zoomed');
+      if (csDownloadBtn) {
+        csDownloadBtn.onclick = (e) => {
+          e.preventDefault();
+          window.hdForceDownload(url, 'image_' + Date.now() + '.jpg');
+        };
       }
-      lb.style.display = 'flex';
+      csLightbox.style.display = 'flex';
+      resetCSLightbox();
     }
   };
 
@@ -1902,75 +1974,7 @@
       });
     }
 
-    // ── Lightbox Zoom & Pan ──
-    const lightbox = document.getElementById('cs-lightbox');
-    const lightboxClose = document.getElementById('cs-lightbox-close');
-    const lightboxOverlay = document.querySelector('.cs-lightbox-overlay');
-    const lightboxImg = document.getElementById('cs-lightbox-img');
-    const zoomInBtn = document.getElementById('cs-lightbox-zoom-in');
-    const zoomOutBtn = document.getElementById('cs-lightbox-zoom-out');
-    const resetBtn = document.getElementById('cs-lightbox-reset');
-
-    let scale = 1,
-      panning = false,
-      pointX = 0,
-      pointY = 0,
-      startX = 0,
-      startY = 0;
-    const setTransform = () => {
-      lightboxImg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
-    };
-
-    const resetLightbox = () => {
-      scale = 1;
-      pointX = 0;
-      pointY = 0;
-      setTransform();
-    };
-
-    if (lightboxImg) {
-      lightboxImg.onmousedown = (e) => {
-        e.preventDefault();
-        startX = e.clientX - pointX;
-        startY = e.clientY - pointY;
-        panning = true;
-      };
-      document.onmouseup = () => {
-        panning = false;
-      };
-      document.onmousemove = (e) => {
-        if (!panning || scale <= 1) return;
-        pointX = e.clientX - startX;
-        pointY = e.clientY - startY;
-        setTransform();
-      };
-      lightboxImg.onwheel = (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? -0.1 : 0.1;
-        scale = Math.max(0.5, Math.min(scale + delta, 5));
-        setTransform();
-      };
-    }
-
-    if (zoomInBtn)
-      zoomInBtn.onclick = () => {
-        scale = Math.min(scale + 0.2, 5);
-        setTransform();
-      };
-    if (zoomOutBtn)
-      zoomOutBtn.onclick = () => {
-        scale = Math.max(scale - 0.2, 0.5);
-        setTransform();
-      };
-    if (resetBtn) resetBtn.onclick = resetLightbox;
-
-    const closeLightbox = () => {
-      lightbox.style.display = 'none';
-      resetLightbox();
-    };
-
-    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
-    if (lightboxOverlay) lightboxOverlay.addEventListener('click', closeLightbox);
+    // Lightbox logic moved to global scope
 
     // ── Emoji Picker ──
     const csEmojiToggle = document.getElementById('cs-emoji-toggle');
