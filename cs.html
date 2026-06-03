@@ -467,9 +467,16 @@
         flex-shrink: 0;
       }
       @media (max-width: 767px) {
-        .cs-back-btn {
-          display: flex;
+        .cs-back-btn { display: flex; }
+        .hide-on-mobile { display: none !important; }
+        .cs-export-btn, .cs-close-chat-btn {
+          padding: 0.4rem;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
         }
+        .cs-detail-actions { gap: 0.3rem; }
+        .cs-detail-name { max-width: 150px; }
       }
 
       .cs-detail-name {
@@ -1564,7 +1571,6 @@
       <div class="cs-topbar">
         <div class="cs-topbar-left">
           <div class="cs-topbar-logo">HIMAWARI<span>DIGI</span></div>
-          <div class="cs-topbar-badge">CS Panel</div>
         </div>
         <div class="cs-topbar-right">
           <div class="cs-topbar-user" id="cs-topbar-user">
@@ -1656,7 +1662,7 @@
               <div class="cs-detail-actions">
                 <div class="cs-export-wrapper" style="position: relative">
                   <button class="cs-export-btn" id="cs-export-btn" title="Export chat">
-                    <i class="ph-bold ph-download-simple"></i> Export
+                    <i class="ph-bold ph-download-simple"></i> <span class="hide-on-mobile">Export</span>
                   </button>
                   <div class="cs-export-dropdown" id="cs-export-dropdown">
                     <button data-format="pdf"><i class="ph ph-file-pdf"></i> PDF</button>
@@ -1664,9 +1670,9 @@
                     <button data-format="csv"><i class="ph ph-file-csv"></i> CSV</button>
                   </div>
                 </div>
-                <button class="cs-close-chat-btn" id="cs-close-chat-btn">
+                <button class="cs-close-chat-btn" id="cs-close-chat-btn" title="Tutup Chat">
                   <i class="ph-bold ph-x"></i>
-                  Tutup Chat
+                  <span class="hide-on-mobile">Tutup Chat</span>
                 </button>
               </div>
             </div>

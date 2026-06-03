@@ -1813,7 +1813,7 @@
         const file = e.target.files[0];
         if (!file || !selectedChatId) return;
         if (file.size > 5 * 1024 * 1024) {
-          if (window.showToast) window.showToast('Ukuran gambar maksimal 5MB', 'error');
+          if (window.showToast) window.showToast('Ukuran file maksimal 5MB', 'error');
           csImageUpload.value = '';
           return;
         }
@@ -2349,7 +2349,8 @@
 
     const banner = document.createElement('div');
     banner.id = 'ios-push-banner';
-    banner.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9998; background:linear-gradient(135deg, #10b981, #059669); color:white; padding:14px 20px; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; align-items:center; gap:12px; max-width:360px; width:90%; animation:slideUp 0.4s ease;';
+    banner.style.cssText =
+      'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9998; background:linear-gradient(135deg, #10b981, #059669); color:white; padding:14px 20px; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.3); display:flex; align-items:center; gap:12px; max-width:360px; width:90%; animation:slideUp 0.4s ease;';
     banner.innerHTML = `
       <i class="ph-bold ph-bell-ringing" style="font-size:24px; flex-shrink:0;"></i>
       <div style="flex:1;">
@@ -2364,7 +2365,8 @@
     if (!document.getElementById('ios-push-style')) {
       const style = document.createElement('style');
       style.id = 'ios-push-style';
-      style.textContent = '@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }';
+      style.textContent =
+        '@keyframes slideUp { from { opacity:0; transform:translateX(-50%) translateY(20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }';
       document.head.appendChild(style);
     }
 
@@ -2400,7 +2402,11 @@
       const permission = await Notification.requestPermission();
       console.log('[Push] Permission result:', permission);
       if (permission !== 'granted') {
-        if (window.showToast) window.showToast('Izin notifikasi ditolak. Buka Pengaturan > Notifikasi untuk mengizinkan.', 'warning');
+        if (window.showToast)
+          window.showToast(
+            'Izin notifikasi ditolak. Buka Pengaturan > Notifikasi untuk mengizinkan.',
+            'warning'
+          );
         return;
       }
 
@@ -2421,14 +2427,17 @@
       console.log('[Push] New subscription endpoint:', subData.endpoint.slice(-30));
 
       // Step 5: Simpan ke DB (upsert berdasarkan endpoint agar multi-device OK)
-      const { error: upsertError } = await supabase.from('push_subscriptions').upsert({
-        role: 'cs',
-        chat_id: null,
-        endpoint: subData.endpoint,
-        auth: subData.keys.auth,
-        p256dh: subData.keys.p256dh,
-        last_updated: new Date().toISOString(),
-      }, { onConflict: 'endpoint' });
+      const { error: upsertError } = await supabase.from('push_subscriptions').upsert(
+        {
+          role: 'cs',
+          chat_id: null,
+          endpoint: subData.endpoint,
+          auth: subData.keys.auth,
+          p256dh: subData.keys.p256dh,
+          last_updated: new Date().toISOString(),
+        },
+        { onConflict: 'endpoint' }
+      );
 
       if (upsertError) {
         console.error('[Push] DB save error:', upsertError);
