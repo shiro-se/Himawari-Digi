@@ -507,6 +507,14 @@
         .cs-detail-name {
           max-width: 150px;
         }
+        .cs-notif-dropdown {
+          position: fixed;
+          top: 65px;
+          right: 15px;
+          left: 15px;
+          width: auto;
+          max-width: none;
+        }
       }
 
       .cs-detail-name {
@@ -1684,7 +1692,7 @@
           <!-- Chat View (hidden by default) -->
           <div
             id="cs-chat-view"
-            style="display: none; flex: 1; flex-direction: column; height: 100%"
+            style="display: none; flex: 1; flex-direction: column; height: 100%; position: relative"
           >
             <div class="cs-detail-header">
               <div class="cs-detail-header-left">
