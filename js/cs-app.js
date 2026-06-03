@@ -1171,7 +1171,7 @@
           `;
         } else if (isAudio) {
           imageHtml = `
-            <div class="cs-msg-audio-bubble" style="background:var(--card); padding:8px 12px; border-radius:10px; display:flex; flex-direction:column; gap:6px; border:1px solid var(--border); margin-bottom:4px; max-width:280px;">
+            <div class="cs-msg-audio-bubble" style="background:var(--card); padding:8px 12px; border-radius:10px; display:flex; flex-direction:column; gap:6px; border:1px solid var(--border); margin-bottom:4px; min-width:250px; max-width:280px;">
               <audio controls style="width:100%; height:36px; outline:none;" preload="metadata">
                 <source src="${escapeAttr(safeUrl(msg.imageUrl))}" type="audio/${ext === 'mp3' ? 'mpeg' : ext}">
                 Browser Anda tidak mendukung elemen audio.
