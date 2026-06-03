@@ -596,13 +596,20 @@
           `;
         } else if (isAudio) {
           imageHtml = `
-            <div class="chat-msg-audio-bubble" style="background:var(--card); padding:8px 12px; border-radius:10px; display:flex; flex-direction:column; gap:6px; border:1px solid var(--border); margin-bottom:4px; min-width:240px; max-width:260px;">
-              <audio controls style="width:100%; height:36px; outline:none;" preload="metadata">
-                <source src="${escapeAttr(safeUrl(msg.imageUrl))}" type="audio/${ext === 'mp3' ? 'mpeg' : ext}">
-                Browser Anda tidak mendukung elemen audio.
-              </audio>
-              ${msg.text ? `<div style="font-size:12px; color:var(--foreground); margin-top:2px;">${window.chatSanitize(msg.text)}</div>` : ''}
+            <div class="hd-audio-player" data-src="${escapeAttr(safeUrl(msg.imageUrl))}">
+              <audio class="hd-audio-element" src="${escapeAttr(safeUrl(msg.imageUrl))}" preload="metadata"></audio>
+              <button class="hd-audio-play-btn" onclick="window.hdToggleAudio(this)">
+                <i class="ph-fill ph-play"></i>
+              </button>
+              <div class="hd-audio-timeline">
+                <div class="hd-audio-progress-bg">
+                  <div class="hd-audio-progress-fill" style="width: 0%"></div>
+                </div>
+                <input type="range" class="hd-audio-progress-slider" min="0" max="100" value="0" step="0.1" oninput="window.hdSeekAudio(this)" onchange="window.hdSeekAudio(this)">
+              </div>
+              <div class="hd-audio-time">0:00</div>
             </div>
+            ${msg.text ? `<div style="font-size:12px; color:var(--foreground); margin-top:2px; padding:0 6px;">${window.chatSanitize(msg.text)}</div>` : ''}
           `;
         } else if (isVideo) {
           imageHtml = `

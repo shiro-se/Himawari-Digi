@@ -191,6 +191,91 @@ const configTemplate = `// ═════════════════�
       console.error('[Push] Error:', e);
     }
   };
+  // ── Custom Audio Player Global Functions ────────────────
+  window.hdToggleAudio = function(btn) {
+    const player = btn.closest('.hd-audio-player');
+    const audio = player.querySelector('.hd-audio-element');
+    const icon = btn.querySelector('i');
+    
+    // Pause all other audio
+    document.querySelectorAll('.hd-audio-element').forEach(a => {
+      if (a !== audio && !a.paused) {
+        a.pause();
+        const otherBtn = a.closest('.hd-audio-player').querySelector('.hd-audio-play-btn i');
+        if(otherBtn) otherBtn.className = 'ph-fill ph-play';
+      }
+    });
+
+    if (audio.paused) {
+      audio.play();
+      icon.className = 'ph-fill ph-pause';
+    } else {
+      audio.pause();
+      icon.className = 'ph-fill ph-play';
+    }
+  };
+
+  window.hdSeekAudio = function(slider) {
+    const player = slider.closest('.hd-audio-player');
+    const audio = player.querySelector('.hd-audio-element');
+    if (audio.duration) {
+      audio.currentTime = (slider.value / 100) * audio.duration;
+    }
+  };
+
+  window.hdFormatAudioTime = function(sec) {
+    if (isNaN(sec) || !isFinite(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return m + ':' + (s < 10 ? '0'+s : s);
+  };
+
+  window.bindAudioPlayers = function() {
+    document.querySelectorAll('.hd-audio-element:not(.bound)').forEach(audio => {
+      audio.classList.add('bound');
+      const player = audio.closest('.hd-audio-player');
+      if (!player) return;
+      const fill = player.querySelector('.hd-audio-progress-fill');
+      const slider = player.querySelector('.hd-audio-progress-slider');
+      const timeDisplay = player.querySelector('.hd-audio-time');
+
+      audio.addEventListener('loadedmetadata', () => {
+        timeDisplay.textContent = window.hdFormatAudioTime(audio.duration);
+      });
+      audio.addEventListener('timeupdate', () => {
+        const percent = (audio.currentTime / audio.duration) * 100 || 0;
+        fill.style.width = percent + '%';
+        slider.value = percent;
+        timeDisplay.textContent = window.hdFormatAudioTime(audio.currentTime);
+      });
+      audio.addEventListener('ended', () => {
+        const icon = player.querySelector('.hd-audio-play-btn i');
+        if(icon) icon.className = 'ph-fill ph-play';
+        fill.style.width = '0%';
+        slider.value = 0;
+        timeDisplay.textContent = window.hdFormatAudioTime(audio.duration);
+      });
+    });
+  };
+
+  // MutationObserver to auto-bind new audio players as they are injected
+  const hdAudioObserver = new MutationObserver((mutations) => {
+    let hasNewAudio = false;
+    for (const m of mutations) {
+      if (m.addedNodes.length > 0) {
+        hasNewAudio = true;
+        break;
+      }
+    }
+    if (hasNewAudio) {
+      window.bindAudioPlayers();
+    }
+  });
+  if (typeof document !== 'undefined') {
+    hdAudioObserver.observe(document.body, { childList: true, subtree: true });
+    // Bind initial
+    setTimeout(() => window.bindAudioPlayers(), 500);
+  }
 
   console.log('🔥 HimawariDigi Chat — Supabase initialized');
 })();
