@@ -1024,6 +1024,26 @@
             }
 
             const bubble = document.querySelector(`.cs-msg-bubble[data-id="${m.id}"]`);
+            
+            // Handle deleted_at toggle
+            if (bubble) {
+              const isCurrentlyDeleted = bubble.classList.contains('cs-msg-deleted');
+              const isNowDeleted = !!msg.deleted_at;
+              if (isCurrentlyDeleted !== isNowDeleted) {
+                const wrapperDiv = bubble.closest('.cs-msg');
+                if (wrapperDiv) {
+                  const tempContainer = document.createElement('div');
+                  const oldAppend = messagesEl.appendChild.bind(messagesEl);
+                  messagesEl.appendChild = (el) => tempContainer.appendChild(el);
+                  renderedIds.delete(msg.id);
+                  renderCSMessage(msg, msg.id);
+                  messagesEl.appendChild = oldAppend;
+                  wrapperDiv.replaceWith(tempContainer.firstChild);
+                }
+                return;
+              }
+            }
+
             if (bubble) {
               // Update Text and Edit status
               if (msg.is_edited && bubble.dataset.text !== msg.text) {
@@ -1244,25 +1264,36 @@
       const favs = JSON.parse(localStorage.getItem('hd_cs_fav_msgs') || '[]');
       const isFav = favs.includes(msgId) ? '<i class="ph-fill ph-star cs-msg-fav-icon"></i>' : '';
 
-      div.innerHTML = `
-        ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
-        <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-pinned="${Boolean(msg.is_pinned)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
-          <div class="cs-msg-options" onclick="window.showCSContextMenuFromBtn(event, this)">
-            <i class="ph-bold ph-dots-three-vertical"></i>
+      // Handle soft deleted message
+      if (msg.deleted_at) {
+        div.innerHTML = `
+          ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
+          <div class="cs-msg-bubble cs-msg-deleted" data-id="${escapeAttr(msgId)}" data-sender="${escapeAttr(msg.sender)}" style="background:var(--muted); color:var(--muted-foreground); border:1px solid var(--border); font-style:italic; display:flex; align-items:center; gap:8px;">
+            <i class="ph ph-prohibit"></i> Pesan ini telah dihapus.
+            ${!isClient ? `<button onclick="window.undoDeleteCSMessage('${escapeAttr(msgId)}')" style="margin-left:8px; padding:2px 6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:var(--background); color:var(--foreground); cursor:pointer;">Undo</button>` : ''}
           </div>
-          ${senderNameHtml}
-          ${replyHtml}
-          ${imageHtml}
-          ${textHtml}
-          ${reactionsHtml}
-          <div class="cs-msg-time-container">
-            ${isEdited}
-            <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
-            ${isFav}
-            ${statusHtml}
+        `;
+      } else {
+        div.innerHTML = `
+          ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
+          <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-pinned="${Boolean(msg.is_pinned)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
+            <div class="cs-msg-options" onclick="window.showCSContextMenuFromBtn(event, this)">
+              <i class="ph-bold ph-dots-three-vertical"></i>
+            </div>
+            ${senderNameHtml}
+            ${replyHtml}
+            ${imageHtml}
+            ${textHtml}
+            ${reactionsHtml}
+            <div class="cs-msg-time-container">
+              ${isEdited}
+              <span class="cs-msg-time">${msg.timestamp ? window.chatFormatTime(msg.timestamp) : ''}</span>
+              ${isFav}
+              ${statusHtml}
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
 
       // Update sticky header if message is pinned
       if (msg.is_pinned) {
@@ -2054,6 +2085,12 @@
         }
       }
 
+      // Toggle Delete button
+      const deleteBtn = document.getElementById('cs-ctx-delete');
+      if (deleteBtn) {
+        deleteBtn.style.display = csContextMsgSender === 'cs' ? 'flex' : 'none';
+      }
+
       let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
       let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
       csCtxMenu.style.display = 'block';
@@ -2075,6 +2112,34 @@
           bubble.dataset.pinned,
           bubble.dataset.url
         );
+      }
+    };
+
+    window.deleteCSMessage = async function (msgId) {
+      try {
+        const { error } = await supabase
+          .from('messages')
+          .update({ deleted_at: new Date().toISOString() })
+          .eq('id', msgId);
+        if (error) throw error;
+        if (window.showToast) window.showToast('Pesan berhasil dihapus', 'success');
+      } catch (err) {
+        console.error('Delete error:', err);
+        if (window.showToast) window.showToast('Gagal menghapus pesan', 'error');
+      }
+    };
+
+    window.undoDeleteCSMessage = async function (msgId) {
+      try {
+        const { error } = await supabase
+          .from('messages')
+          .update({ deleted_at: null })
+          .eq('id', msgId);
+        if (error) throw error;
+        if (window.showToast) window.showToast('Penghapusan dibatalkan', 'success');
+      } catch (err) {
+        console.error('Undo error:', err);
+        if (window.showToast) window.showToast('Gagal membatalkan penghapusan', 'error');
       }
     };
 
@@ -2233,6 +2298,14 @@
           const inputArea = document.getElementById('cs-input-area');
           inputArea.insertBefore(preview, inputArea.firstChild);
 
+          csCtxMenu.style.display = 'none';
+        });
+      }
+
+      const btnDelete = document.getElementById('cs-ctx-delete');
+      if (btnDelete) {
+        btnDelete.addEventListener('click', () => {
+          if (csContextMsgId) window.deleteCSMessage(csContextMsgId);
           csCtxMenu.style.display = 'none';
         });
       }

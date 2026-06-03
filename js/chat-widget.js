@@ -476,6 +476,26 @@
           }
           
           const bubble = document.querySelector(`.chat-msg-bubble[data-id="${msg.id}"]`);
+          
+          // Handle deleted_at toggle
+          if (bubble) {
+            const isCurrentlyDeleted = bubble.classList.contains('chat-msg-deleted');
+            const isNowDeleted = !!msg.deleted_at;
+            if (isCurrentlyDeleted !== isNowDeleted) {
+              const wrapperDiv = bubble.closest('.chat-msg');
+              if (wrapperDiv) {
+                const tempContainer = document.createElement('div');
+                const oldAppend = messagesEl.appendChild.bind(messagesEl);
+                messagesEl.appendChild = (el) => tempContainer.appendChild(el);
+                renderedMessageIds.delete(msg.id);
+                renderMessage(msg, msg.id);
+                messagesEl.appendChild = oldAppend;
+                wrapperDiv.replaceWith(tempContainer.firstChild);
+              }
+              return;
+            }
+          }
+
           if (bubble) {
             // Update Text and Edit status
             if (msg.is_edited && bubble.dataset.text !== msg.text) {
@@ -669,24 +689,34 @@
       const favs = JSON.parse(localStorage.getItem('hd_fav_msgs') || '[]');
       const isFav = favs.includes(msgId) ? '<i class="ph-fill ph-star chat-msg-fav-icon"></i>' : '';
 
-      div.innerHTML = `
-        ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
-        <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
-          <div class="chat-msg-options" onclick="window.showContextMenuFromBtn(event, this)">
-            <i class="ph-bold ph-dots-three-vertical"></i>
+      // Handle soft deleted message
+      if (msg.deleted_at) {
+        div.innerHTML = `
+          ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
+          <div class="chat-msg-bubble chat-msg-deleted" data-id="${escapeAttr(msgId)}" data-sender="${escapeAttr(msg.sender)}" style="background:var(--muted); color:var(--muted-foreground); border:1px solid var(--border); font-style:italic; display:flex; align-items:center; gap:8px;">
+            <i class="ph ph-prohibit"></i> Pesan ini telah dihapus.
           </div>
-          ${replyHtml}
-          ${imageHtml}
-          ${textHtml}
-          ${reactionsHtml}
-          <div class="chat-msg-time-container">
-            ${isEdited}
-            <span class="chat-msg-time">${timeFormatted}</span>
-            ${isFav}
-            ${statusHtml}
+        `;
+      } else {
+        div.innerHTML = `
+          ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
+          <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
+            <div class="chat-msg-options" onclick="window.showContextMenuFromBtn(event, this)">
+              <i class="ph-bold ph-dots-three-vertical"></i>
+            </div>
+            ${replyHtml}
+            ${imageHtml}
+            ${textHtml}
+            ${reactionsHtml}
+            <div class="chat-msg-time-container">
+              ${isEdited}
+              <span class="chat-msg-time">${timeFormatted}</span>
+              ${isFav}
+              ${statusHtml}
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
       
       // Update sticky header if message is pinned
       if (msg.is_pinned) {
