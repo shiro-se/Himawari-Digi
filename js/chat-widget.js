@@ -976,7 +976,8 @@
         if (chatAttachLabel) chatAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
         const finalFile = window.compressImageFile ? await window.compressImageFile(file) : file;
-        const filePath = `${chatId}/${Date.now()}_${finalFile.name}`;
+        const safeName = finalFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        const filePath = `${chatId}/${Date.now()}_${safeName}`;
         
         const { error: uploadError } = await supabaseClient.storage.from('chat-images').upload(filePath, finalFile);
         if (uploadError) throw uploadError;

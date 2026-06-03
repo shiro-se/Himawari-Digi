@@ -1961,7 +1961,8 @@
           if (csAttachLabel) csAttachLabel.innerHTML = '<i class="ph ph-spinner ph-spin"></i>';
 
           const finalFile = window.compressImageFile ? await window.compressImageFile(file) : file;
-          const filePath = selectedChatId + '/' + Date.now() + '_' + finalFile.name;
+          const safeName = finalFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+          const filePath = selectedChatId + '/' + Date.now() + '_' + safeName;
           const { error: uploadError } = await supabase.storage
             .from('chat-images')
             .upload(filePath, finalFile);
