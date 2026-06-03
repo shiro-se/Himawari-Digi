@@ -614,7 +614,7 @@
         } else if (isVideo) {
           imageHtml = `
             <div class="chat-msg-video-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:260px; background:var(--card); display:flex; flex-direction:column;">
-              <video controls style="width:100%; max-height:220px; display:block; background:#000;" preload="metadata">
+              <video controls playsinline webkit-playsinline style="width:100%; max-height:220px; display:block; background:#000;" preload="metadata">
                 <source src="${escapeAttr(safeUrl(msg.imageUrl))}" type="video/${ext === 'mp4' ? 'mp4' : ext}">
                 Browser Anda tidak mendukung elemen video.
               </video>
@@ -670,7 +670,7 @@
 
       div.innerHTML = `
         ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
-        <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}">
+        <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
           <div class="chat-msg-options" onclick="window.showContextMenuFromBtn(event, this)">
             <i class="ph-bold ph-dots-three-vertical"></i>
           </div>
@@ -1102,7 +1102,7 @@
   const ctxMenu = document.getElementById('chat-context-menu');
   let contextMsgSender = null;
   
-  function showContextMenu(e, msgId, msgText, sender) {
+  function showContextMenu(e, msgId, msgText, sender, bubbleUrl) {
     e.preventDefault();
     contextMsgId = msgId;
     contextMsgText = msgText;
@@ -1125,6 +1125,26 @@
       }
     }
 
+    // Toggle Download button
+    const downloadBtn = document.getElementById('chat-ctx-download');
+    if (downloadBtn) {
+      if (bubbleUrl) {
+        downloadBtn.style.display = 'flex';
+        downloadBtn.onclick = () => {
+          const a = document.createElement('a');
+          a.href = bubbleUrl;
+          a.download = bubbleUrl.split('/').pop() || 'download';
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          ctxMenu.style.display = 'none';
+        };
+      } else {
+        downloadBtn.style.display = 'none';
+      }
+    }
+
     // Position menu
     let x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
     let y = e.clientY || (e.touches && e.touches[0].clientY) || 0;
@@ -1142,14 +1162,14 @@
     e.stopPropagation();
     const bubble = btn.closest('.chat-msg-bubble');
     if (bubble && bubble.dataset.id) {
-      showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+      showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.url);
     }
   };
 
   messagesEl.addEventListener('contextmenu', (e) => {
     const bubble = e.target.closest('.chat-msg-bubble');
     if (bubble && bubble.dataset.id) {
-      showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender);
+      showContextMenu(e, bubble.dataset.id, bubble.dataset.text, bubble.dataset.sender, bubble.dataset.url);
     }
   });
 
