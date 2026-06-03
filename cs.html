@@ -1817,16 +1817,7 @@
     <!-- Audio Notification -->
     <audio id="cs-notif-sound" src="/assets/notification_alert.mp3" preload="auto"></audio>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <script src="./js/supabase-config.js"></script>
-    <script src="./js/cs-app.js"></script>
-
+    <!-- Scripts moved to end of body -->
     <!-- Lightbox -->
     <div
       class="cs-lightbox"
@@ -2137,5 +2128,14 @@
         color: var(--cs-text-primary, #f1f5f9);
       }
     </style>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="./js/supabase-config.js"></script>
+    <script src="./js/cs-app.js"></script>
   </body>
 </html>
