@@ -919,8 +919,8 @@
       const file = e.target.files[0];
       if (!file || !chatId) return;
 
-      if (file.size > 5 * 1024 * 1024) {
-        if (window.showToast) window.showToast('Ukuran gambar maksimal 5MB', 'error');
+      if (file.size > 50 * 1024 * 1024) {
+        if (window.showToast) window.showToast('Ukuran file maksimal 50MB', 'error');
         imageUploadInput.value = '';
         return;
       }

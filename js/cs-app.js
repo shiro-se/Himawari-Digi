@@ -1846,8 +1846,8 @@
       csImageUpload.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file || !selectedChatId) return;
-        if (file.size > 5 * 1024 * 1024) {
-          if (window.showToast) window.showToast('Ukuran file maksimal 5MB', 'error');
+        if (file.size > 50 * 1024 * 1024) {
+          if (window.showToast) window.showToast('Ukuran file maksimal 50MB', 'error');
           csImageUpload.value = '';
           return;
         }
