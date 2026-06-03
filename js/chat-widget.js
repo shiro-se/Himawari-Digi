@@ -589,16 +589,16 @@
           const fileName = msg.imageUrl.split('/').pop().split('?')[0];
           const ext = fileName.split('.').pop().toUpperCase();
           imageHtml = `
-            <div class="chat-msg-file-bubble" style="background:#f1f5f9; padding:8px; border-radius:6px; display:flex; align-items:center; gap:10px; border:1px solid #e2e8f0; margin-bottom:4px; max-width:240px;">
-              <div style="width:36px; height:36px; background:var(--chat-primary); color:white; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:11px;">
+            <div class="chat-msg-file-bubble" style="background:var(--card); padding:10px 12px; border-radius:10px; display:flex; align-items:center; gap:10px; border:1px solid var(--border); margin-bottom:4px; max-width:240px;">
+              <div style="width:40px; height:40px; background:var(--primary); color:var(--primary-foreground); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; flex-shrink:0;">
                 ${ext}
               </div>
               <div style="flex:1; overflow:hidden;">
-                <div style="font-size:12px; font-weight:500; color:#1e293b; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
+                <div style="font-size:12px; font-weight:600; color:var(--foreground); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
                   ${escapeAttr(fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName)}
                 </div>
-                <a href="${escapeAttr(safeUrl(msg.imageUrl))}" target="_blank" download style="font-size:11px; color:var(--chat-primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
-                  <i class="ph ph-download-simple"></i> Download
+                <a href="${escapeAttr(safeUrl(msg.imageUrl))}" target="_blank" download style="font-size:11px; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
+                  <i class="ph ph-download-simple"></i> Download File
                 </a>
               </div>
             </div>

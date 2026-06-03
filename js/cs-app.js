@@ -275,21 +275,8 @@
     topbarAvatar.textContent = csName.substring(0, 2).toUpperCase();
     initDashboard();
 
-    // iOS memerlukan user gesture untuk minta izin notifikasi
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    
-    if (isIOSDevice) {
-      // Di iOS, tampilkan banner agar user klik untuk aktifkan notifikasi
-      if ('Notification' in window && Notification.permission !== 'granted' && !localStorage.getItem('hd_ios_push_dismissed')) {
-        setTimeout(() => showIOSPushBanner(), 2000);
-      } else if ('Notification' in window && Notification.permission === 'granted') {
-        // Sudah punya permission, langsung subscribe
-        setTimeout(() => subscribeToPush(), 2000);
-      }
-    } else {
-      // Android/Desktop — bisa auto-subscribe
-      setTimeout(() => subscribeToPush(), 3000);
-    }
+    // Push notification ditunda — akan diaktifkan kembali nanti
+    // subscribeToPush();
   }
 
   function clearSession() {
@@ -1126,6 +1113,11 @@
     detail.classList.add('show-mobile');
     sidebar.classList.add('hidden-mobile');
 
+    // Push history state so hardware back button returns to chat list
+    if (window.innerWidth < 768) {
+      history.pushState({ view: 'chat', chatId: chatId }, '');
+    }
+
     // Re-render list to update active state
     renderChatList();
   }
@@ -1172,12 +1164,12 @@
           const fileName = msg.imageUrl.split('/').pop().split('?')[0];
           const ext = fileName.split('.').pop().toUpperCase();
           imageHtml = `
-            <div class="cs-msg-file-bubble" style="background:var(--bg-tertiary); padding:10px; border-radius:8px; display:flex; align-items:center; gap:12px; border:1px solid var(--border-color); margin-bottom: 5px;">
-              <div style="width:40px; height:40px; background:var(--primary); color:white; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">
+            <div class="cs-msg-file-bubble" style="background:var(--card); padding:10px 12px; border-radius:10px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); margin-bottom:5px;">
+              <div style="width:40px; height:40px; background:var(--primary); color:var(--primary-foreground); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0;">
                 ${ext}
               </div>
               <div style="flex:1; overflow:hidden;">
-                <div style="font-size:13px; font-weight:500; color:var(--text-primary); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
+                <div style="font-size:13px; font-weight:600; color:var(--foreground); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
                   ${escapeAttr(fileName.length > 20 ? fileName.substring(0, 15) + '...' + fileName.slice(-5) : fileName)}
                 </div>
                 <a href="${escapeAttr(safeUrl(msg.imageUrl))}" target="_blank" download style="font-size:12px; color:var(--primary); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-top:4px;">
@@ -1756,6 +1748,18 @@
     backBtn.addEventListener('click', () => {
       detail.classList.remove('show-mobile');
       sidebar.classList.remove('hidden-mobile');
+      // Go back in history if we pushed a state
+      if (history.state && history.state.view === 'chat') {
+        history.back();
+      }
+    });
+
+    // Handle hardware back button (Android) and swipe back (iOS)
+    window.addEventListener('popstate', (e) => {
+      if (detail.classList.contains('show-mobile')) {
+        detail.classList.remove('show-mobile');
+        sidebar.classList.remove('hidden-mobile');
+      }
     });
 
     // Logout
