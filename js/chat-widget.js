@@ -489,6 +489,7 @@
                 messagesEl.appendChild = (el) => tempContainer.appendChild(el);
                 renderedMessageIds.delete(msg.id);
                 renderMessage(msg, msg.id);
+                renderedMessageIds.add(msg.id);
                 messagesEl.appendChild = oldAppend;
                 wrapperDiv.replaceWith(tempContainer.firstChild);
               }

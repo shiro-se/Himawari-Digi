@@ -1037,6 +1037,7 @@
                   messagesEl.appendChild = (el) => tempContainer.appendChild(el);
                   renderedIds.delete(msg.id);
                   renderCSMessage(msg, msg.id);
+                  renderedIds.add(msg.id);
                   messagesEl.appendChild = oldAppend;
                   wrapperDiv.replaceWith(tempContainer.firstChild);
                 }
