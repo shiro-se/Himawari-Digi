@@ -576,8 +576,17 @@
       let textHtml = '';
 
       if (msg.imageUrl) {
-        const urlLower = msg.imageUrl.toLowerCase();
-        const isImg = urlLower.match(/\.(jpeg|jpg|gif|png|webp|svg)$/) || !urlLower.includes('.');
+        const cleanUrl = msg.imageUrl.split('?')[0];
+        const urlLower = cleanUrl.toLowerCase();
+        const fileName = cleanUrl.split('/').pop();
+        const extMatch = fileName.match(/\.([a-z0-9]+)$/);
+        const ext = extMatch ? extMatch[1] : '';
+        const extUpper = ext.toUpperCase() || 'FILE';
+
+        const isImg = ['jpeg', 'jpg', 'gif', 'png', 'webp', 'svg'].includes(ext) || !urlLower.includes('.');
+        const isAudio = ['mp3', 'wav', 'ogg', 'm4a'].includes(ext);
+        const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
+
         if (isImg) {
           imageHtml = `
             <div class="chat-msg-image-bubble" onclick="window.openChatLightbox('${escapeAttr(safeUrl(msg.imageUrl))}')">
@@ -585,13 +594,31 @@
               ${msg.text ? `<div class="chat-msg-image-caption">${window.chatSanitize(msg.text)}</div>` : ''}
             </div>
           `;
+        } else if (isAudio) {
+          imageHtml = `
+            <div class="chat-msg-audio-bubble" style="background:var(--card); padding:8px 12px; border-radius:10px; display:flex; flex-direction:column; gap:6px; border:1px solid var(--border); margin-bottom:4px; max-width:260px;">
+              <audio controls style="width:100%; height:36px; outline:none;" preload="metadata">
+                <source src="${escapeAttr(safeUrl(msg.imageUrl))}" type="audio/${ext === 'mp3' ? 'mpeg' : ext}">
+                Browser Anda tidak mendukung elemen audio.
+              </audio>
+              ${msg.text ? `<div style="font-size:12px; color:var(--foreground); margin-top:2px;">${window.chatSanitize(msg.text)}</div>` : ''}
+            </div>
+          `;
+        } else if (isVideo) {
+          imageHtml = `
+            <div class="chat-msg-video-bubble" style="border-radius:12px; overflow:hidden; border:1px solid var(--border); margin-bottom:4px; max-width:260px; background:var(--card); display:flex; flex-direction:column;">
+              <video controls style="width:100%; max-height:220px; display:block; background:#000;" preload="metadata">
+                <source src="${escapeAttr(safeUrl(msg.imageUrl))}" type="video/${ext === 'mp4' ? 'mp4' : ext}">
+                Browser Anda tidak mendukung elemen video.
+              </video>
+              ${msg.text ? `<div style="padding:8px 12px; font-size:12px; color:var(--foreground); border-top:1px solid var(--border);">${window.chatSanitize(msg.text)}</div>` : ''}
+            </div>
+          `;
         } else {
-          const fileName = msg.imageUrl.split('/').pop().split('?')[0];
-          const ext = fileName.split('.').pop().toUpperCase();
           imageHtml = `
             <div class="chat-msg-file-bubble" style="background:var(--card); padding:10px 12px; border-radius:10px; display:flex; align-items:center; gap:10px; border:1px solid var(--border); margin-bottom:4px; max-width:240px;">
               <div style="width:40px; height:40px; background:var(--primary); color:var(--primary-foreground); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; flex-shrink:0;">
-                ${ext}
+                ${extUpper}
               </div>
               <div style="flex:1; overflow:hidden;">
                 <div style="font-size:12px; font-weight:600; color:var(--foreground); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;" title="${escapeAttr(fileName)}">
