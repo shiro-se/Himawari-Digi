@@ -50,6 +50,12 @@
   let longPressTimer = null;
   let isCreatingChat = false;
 
+  let oldestMessageTimestamp = null;
+  let isLoadingMore = false;
+  let hasMoreMessages = true;
+  let currentLastDateSeparator = null;
+  let chatMessagesData = [];
+
   const supabaseClient = window.supabaseClient;
 
   // ── Sanitize Helpers ─────────────────────────────────────────
@@ -80,6 +86,30 @@
     if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) return '[Audio]';
     if (['mp4', 'webm', 'mov'].includes(ext)) return '[Video]';
     return '[Dokumen]';
+  };
+
+  window.formatDateSeparator = function(timestamp) {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const isSameDate = (d1, d2) => d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
+
+    if (isSameDate(date, today)) return 'Hari ini';
+    if (isSameDate(date, yesterday)) return 'Kemarin';
+
+    const diffTime = today.getTime() - date.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+
+    if (diffDays <= 7 && diffDays >= 0) {
+      const days = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      return days[date.getDay()];
+    }
+
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
   window.hdScrollToMsg = function(id) {
@@ -481,19 +511,29 @@
     detachListeners();
 
     // Fetch existing messages
-    const { data: messages } = await supabaseClient
+    isLoadingMore = false;
+    hasMoreMessages = true;
+    oldestMessageTimestamp = null;
+    
+    const { data: messagesData } = await supabaseClient
       .from('messages')
       .select('*')
       .eq('chat_id', chatId)
-      .order('timestamp', { ascending: true });
+      .order('timestamp', { ascending: false })
+      .limit(20);
 
-    if (messages) {
-      messages.forEach((msg) => {
-        if (!renderedMessageIds.has(msg.id)) {
-          renderedMessageIds.add(msg.id);
-          renderMessage(msg, msg.id);
-        }
-      });
+    if (messagesData) {
+      const messages = messagesData.reverse();
+      if (messages.length > 0) oldestMessageTimestamp = messages[0].timestamp;
+      if (messages.length < 20) hasMoreMessages = false;
+      
+      chatMessagesData = messages.map(m => ({
+        ...m,
+        timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+        replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+      }));
+      
+      renderMessagesList(chatMessagesData);
       scrollToBottom();
     }
 
@@ -512,6 +552,23 @@
           const msg = payload.new;
           if (payload.eventType === 'INSERT') {
             if (!renderedMessageIds.has(msg.id)) {
+              const formattedMsg = {
+                ...msg,
+                timestamp: msg.timestamp ? new Date(msg.timestamp).getTime() : 0,
+                replyTo: msg.replyTo_id ? { id: msg.replyTo_id, text: msg.replyTo_text } : null,
+              };
+              chatMessagesData.push(formattedMsg);
+              
+              const dateStr = window.formatDateSeparator(formattedMsg.timestamp);
+              if (dateStr && dateStr !== currentLastDateSeparator) {
+                const ds = document.createElement('div');
+                ds.className = 'chat-date-separator';
+                ds.style = 'text-align: center; margin: 1rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
+                ds.innerHTML = `<span style="background: var(--background); padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
+                messagesEl.appendChild(ds);
+                currentLastDateSeparator = dateStr;
+              }
+              
               renderedMessageIds.add(msg.id);
               renderMessage(msg, msg.id);
               scrollToBottom();
@@ -646,6 +703,56 @@
     updatePresence();
   }
 
+  async function loadMoreWidgetMessages() {
+    if (!chatId || isLoadingMore || !hasMoreMessages) return;
+    
+    isLoadingMore = true;
+    
+    const loadingEl = document.createElement('div');
+    loadingEl.style = 'text-align: center; padding: 10px; font-size: 0.8rem; color: var(--muted-foreground);';
+    loadingEl.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Memuat...';
+    messagesEl.prepend(loadingEl);
+    
+    const { data: msgsData } = await supabaseClient
+      .from('messages')
+      .select('*')
+      .eq('chat_id', chatId)
+      .lt('timestamp', new Date(oldestMessageTimestamp).toISOString())
+      .order('timestamp', { ascending: false })
+      .limit(20);
+      
+    if (msgsData && msgsData.length > 0) {
+      const messages = msgsData.reverse();
+      oldestMessageTimestamp = messages[0].timestamp;
+      
+      const formatted = messages.map(m => ({
+        ...m,
+        timestamp: m.timestamp ? new Date(m.timestamp).getTime() : 0,
+        replyTo: m.replyTo_id ? { id: m.replyTo_id, text: m.replyTo_text } : null,
+      }));
+      
+      chatMessagesData.push(...formatted);
+      if (messages.length < 20) hasMoreMessages = false;
+      
+      chatMessagesData.sort((a,b) => a.timestamp - b.timestamp);
+      
+      const oldScrollHeight = messagesEl.scrollHeight;
+      renderMessagesList(chatMessagesData);
+      messagesEl.scrollTop = messagesEl.scrollHeight - oldScrollHeight;
+    } else {
+      hasMoreMessages = false;
+      loadingEl.remove();
+    }
+    
+    isLoadingMore = false;
+  }
+
+  messagesEl.addEventListener('scroll', () => {
+    if (messagesEl.scrollTop <= 50) {
+      loadMoreWidgetMessages();
+    }
+  });
+
   function detachListeners() {
     if (typingTimeout) {
       clearTimeout(typingTimeout);
@@ -655,6 +762,26 @@
       supabaseClient.removeChannel(chatChannel);
       chatChannel = null;
     }
+  }
+
+  function renderMessagesList(messages) {
+    messagesEl.innerHTML = '';
+    currentLastDateSeparator = null;
+    renderedMessageIds.clear();
+
+    messages.forEach((msg) => {
+      const dateStr = window.formatDateSeparator(msg.timestamp);
+      if (dateStr && dateStr !== currentLastDateSeparator) {
+        const ds = document.createElement('div');
+        ds.className = 'chat-date-separator';
+        ds.style = 'text-align: center; margin: 1rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
+        ds.innerHTML = `<span style="background: var(--background); padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
+        messagesEl.appendChild(ds);
+        currentLastDateSeparator = dateStr;
+      }
+      renderedMessageIds.add(msg.id);
+      renderMessage(msg, msg.id, true);
+    });
   }
 
   // ── Render Message Bubble ─────────────────────────────────────
