@@ -1,13 +1,13 @@
 {
   "en": {
-    "about_title": "The Team Behind <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">HimawariDigi</span>",
+    "about_title": "The Philosophy Behind <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">HimawariDigi</span>",
     "about_subtitle": "We are a collective of passionate engineers, designers, and strategists dedicated to building exceptional digital experiences.",
     "about_mission": "Our Mission",
     "about_mission_desc": "To empower businesses with scalable, innovative, and user-centric digital solutions that drive real growth.",
     "about_vision": "Our Vision",
     "about_vision_desc": "To be the leading force in digital transformation, setting new standards for technological excellence.",
     "about_eyebrow": "About Us",
-    "about_hero_desc": "A passionate team of engineers, designers, and strategists based in Yogyakarta, Indonesia. We believe technology should empower businesses, not complicate them.",
+    "about_hero_desc": "Himawari means sunflower. And a sunflower never claims to be the most beautiful flower in the garden. It just keeps facing the right direction, growing every day, and giving as much as it can. We want to be that for your business — not the partner who makes the most promises, but the one who is most consistently present.",
     "about_mission_full": "To democratize access to world-class software development. We partner with businesses of all sizes — from ambitious startups to established enterprises — delivering solutions that are elegant, scalable, and built to last.",
     "about_vision_full": "To become Southeast Asia's most trusted software house — known for technical excellence, transparent collaboration, and products that genuinely move the needle for our clients' businesses.",
     "about_stat_1": "Projects Delivered",
@@ -34,14 +34,14 @@
     "about_cta_btn2": "Our Services"
   },
   "id": {
-    "about_title": "Orang-orang di Balik <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">HimawariDigi</span>",
+    "about_title": "Filosofi di Balik <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">HimawariDigi</span>",
     "about_subtitle": "Kami ini sekumpulan engineer, desainer, dan tukang atur strategi yang suka banget bikin pengalaman digital super keren buat Anda.",
     "about_mission": "Misi Kami",
     "about_mission_desc": "Bantu bisnis Anda makin maju dengan solusi digital inovatif yang fokus pada kemudahan pengguna.",
     "about_vision": "Visi Kami",
     "about_vision_desc": "Jadi garda terdepan buat transformasi digital, dan ciptain standar baru di dunia teknologi.",
     "about_eyebrow": "Tentang Kami",
-    "about_hero_desc": "Tim engineer, desainer, dan pemikir strategi yang berpusat di Yogyakarta. Kami percaya teknologi itu ada buat mempermudah urusan bisnis, bukan malah bikin ribet.",
+    "about_hero_desc": "Himawari artinya bunga matahari. Dan bunga matahari tidak pernah mengklaim dirinya bunga paling cantik di kebun. Ia hanya terus menghadap ke tempat yang benar, tumbuh setiap hari, dan memberi sebanyak yang ia bisa. Kami ingin menjadi itu untuk bisnis Anda — bukan mitra yang paling banyak janji, tapi yang paling konsisten hadir.",
     "about_mission_full": "Membuka akses pengembangan software kelas dunia buat siapa saja. Kami siap jadi partner buat bisnis segala ukuran — dari startup yang baru merintis sampai perusahaan raksasa — buat bikin solusi yang elegan, cepat, dan tahan banting.",
     "about_vision_full": "Jadi software house paling dipercaya di Asia Tenggara — terkenal gara-gara kualitas teknis yang mantap, kerja bareng yang transparan, dan produk yang beneran ngasih dampak buat bisnis klien.",
     "about_stat_1": "Proyek Selesai",
