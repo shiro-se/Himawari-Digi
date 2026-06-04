@@ -2517,11 +2517,9 @@ footer {
   }
 }
 .chat-msg--client {
-  justify-content: flex-end;
   flex-direction: row-reverse;
 }
 .chat-msg--cs {
-  justify-content: flex-start;
 }
 .chat-msg--system {
   justify-content: center;
