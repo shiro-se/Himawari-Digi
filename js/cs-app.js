@@ -940,6 +940,19 @@
 
   // ── Select Chat ───────────────────────────────────────────────
   async function selectChat(chatId) {
+    if (selectedChatId === chatId) {
+      // Mobile: show detail
+      const detail = document.getElementById('cs-detail');
+      const sidebar = document.getElementById('cs-sidebar');
+      if (detail && sidebar) {
+        detail.classList.add('show-mobile');
+        sidebar.classList.add('hidden-mobile');
+        if (window.innerWidth < 768) {
+          history.pushState({ view: 'chat', chatId: chatId }, '');
+        }
+      }
+      return;
+    }
     detachCurrentChatListeners();
     selectedChatId = chatId;
     const chatSource = currentTab === 'archive' ? archiveData : chatsData;
@@ -967,6 +980,15 @@
       .eq('chat_id', chatId)
       .order('timestamp', { ascending: true });
     if (msgs) {
+      let firstUnreadMsgId = null;
+      let unreadCount = 0;
+      msgs.forEach((m) => {
+        if (m.sender === 'client' && !m.read) {
+          if (!firstUnreadMsgId) firstUnreadMsgId = m.id;
+          unreadCount++;
+        }
+      });
+
       msgs.forEach((m) => {
         const msg = {
           ...m,
@@ -977,6 +999,16 @@
           chatSource[chatId].messages[m.id] = msg;
         }
         renderedIds.add(m.id);
+
+        if (m.id === firstUnreadMsgId) {
+          const sep = document.createElement('div');
+          sep.id = 'cs-unread-separator';
+          sep.className = 'cs-unread-separator';
+          sep.style = 'text-align: center; margin: 1.5rem 0; color: var(--primary); font-size: 0.8rem; font-weight: 600; position: relative;';
+          sep.innerHTML = `<span style="background: var(--background); padding: 0 10px; position: relative; z-index: 2;">${unreadCount} Pesan belum dibaca</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--primary) 30%, transparent); z-index: 1;"></div>`;
+          messagesEl.appendChild(sep);
+        }
+
         renderCSMessage(msg, m.id);
 
         if (msg.sender === 'client' && !msg.read) {
@@ -987,7 +1019,18 @@
         }
       });
       renderChatList();
-      scrollCSMessages();
+      
+      if (firstUnreadMsgId) {
+        setTimeout(() => {
+          const sepEl = document.getElementById('cs-unread-separator');
+          const container = document.getElementById('cs-messages');
+          if (sepEl && container) {
+            container.scrollTo({ top: sepEl.offsetTop - container.offsetTop - 20, behavior: 'smooth' });
+          }
+        }, 100);
+      } else {
+        scrollCSMessages();
+      }
     }
 
     // Listen for messages
