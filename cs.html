@@ -55,7 +55,7 @@
         justify-content: space-between;
         padding: 0 1.25rem;
         flex-shrink: 0;
-        z-index: 20;
+        z-index: 1000;
       }
       .cs-topbar-left {
         display: flex;
@@ -581,7 +581,7 @@
       .cs-msg {
         display: flex;
         gap: 0.5rem;
-        max-width: 75%;
+        width: 100%;
         animation: csMsgIn 0.3s ease;
       }
       @keyframes csMsgIn {
@@ -595,15 +595,15 @@
         }
       }
       .cs-msg--client {
-        align-self: flex-start;
+        justify-content: flex-start;
       }
       .cs-msg--cs {
-        align-self: flex-end;
+        justify-content: flex-end;
         flex-direction: row-reverse;
       }
       .cs-msg--system {
-        align-self: center;
-        max-width: 90%;
+        justify-content: center;
+        width: 100%;
       }
       .cs-msg--system .cs-msg-bubble {
         background: color-mix(in srgb, var(--muted) 60%, transparent);
@@ -634,6 +634,7 @@
         line-height: 1.5;
         word-break: break-word;
         position: relative;
+        max-width: 75%;
       }
       .cs-msg-options {
         position: absolute;
@@ -1124,8 +1125,8 @@
         gap: 6px;
         padding: 0.5rem 0.75rem;
         border: none;
-        background: transparent;
-        color: var(--muted);
+        background: var(--muted);
+        color: var(--foreground);
         font-size: 0.8rem;
         font-weight: 600;
         border-radius: 8px;
@@ -1134,8 +1135,7 @@
         font-family: inherit;
       }
       .cs-tab:hover {
-        background: var(--border);
-        color: var(--foreground);
+        background: color-mix(in srgb, var(--primary) 10%, var(--muted));
       }
       .cs-tab.active {
         background: var(--primary);
@@ -1145,10 +1145,12 @@
         font-size: 0.65rem;
         padding: 1px 6px;
         border-radius: 10px;
-        background: rgba(255, 255, 255, 0.2);
+        background: color-mix(in srgb, var(--primary) 15%, transparent);
+        color: var(--primary);
       }
       .cs-tab.active .cs-count-badge {
         background: rgba(255, 255, 255, 0.3);
+        color: white;
       }
 
       /* ── Export Chat ── */

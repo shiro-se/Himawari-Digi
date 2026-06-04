@@ -2501,7 +2501,7 @@ footer {
 .chat-msg {
   display: flex;
   gap: 0.4rem;
-  max-width: 85%;
+  width: 100%;
 }
 .chat-msg--anim {
   animation: chatBubbleIn 0.3s ease;
@@ -2517,15 +2517,15 @@ footer {
   }
 }
 .chat-msg--client {
-  align-self: flex-end;
+  justify-content: flex-end;
   flex-direction: row-reverse;
 }
 .chat-msg--cs {
-  align-self: flex-start;
+  justify-content: flex-start;
 }
 .chat-msg--system {
-  align-self: center;
-  max-width: 90%;
+  justify-content: center;
+  width: 100%;
   text-align: center;
 }
 .chat-msg--system p {
@@ -2562,6 +2562,7 @@ footer {
   line-height: 1.5;
   word-break: break-word;
   position: relative;
+  max-width: 85%;
 }
 
 .chat-msg-options {
