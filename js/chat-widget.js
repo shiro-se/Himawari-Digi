@@ -72,6 +72,32 @@
     }
   }
 
+  window.getFileFallbackText = function(url) {
+    if (!url) return '[File]';
+    const extMatch = url.split('?')[0].match(/\.([a-z0-9]+)$/i);
+    const ext = extMatch ? extMatch[1].toLowerCase() : '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext) || !ext) return '[Gambar]';
+    if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) return '[Audio]';
+    if (['mp4', 'webm', 'mov'].includes(ext)) return '[Video]';
+    return '[Dokumen]';
+  };
+
+  window.hdScrollToMsg = function(id) {
+    const msgBubble = document.querySelector(`.chat-msg-bubble[data-id="${id}"]`);
+    if (msgBubble) {
+      const row = msgBubble.closest('.chat-msg');
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.style.transition = 'background-color 0.5s';
+        const originalBg = row.style.backgroundColor;
+        row.style.backgroundColor = 'color-mix(in srgb, var(--primary) 15%, transparent)';
+        setTimeout(() => {
+          row.style.backgroundColor = originalBg;
+        }, 1500);
+      }
+    }
+  };
+
   // ── Authentication ──────────────────────────────────────────────
   async function ensureAuth() {
     if (!supabaseClient) return false;
@@ -571,11 +597,12 @@
 
             // Update pinned header
             if (msg.is_pinned !== undefined) {
-              if (msg.is_pinned) updatePinnedHeader(msg.text, msg.id);
+              const fallbackText = msg.text || window.getFileFallbackText(msg.imageUrl);
+              if (msg.is_pinned) updatePinnedHeader(fallbackText, msg.id);
               // Note: if unpinned we just leave it or hide it, let's hide if we unpinned the currently showing one
               else {
                 const pinnedTextEl = document.getElementById('chat-pinned-text');
-                if (pinnedTextEl && pinnedTextEl.textContent === msg.text) {
+                if (pinnedTextEl && pinnedTextEl.textContent === fallbackText) {
                   updatePinnedHeader(null);
                 }
               }
@@ -729,7 +756,7 @@
       }
 
       const replyHtml = msg.replyTo_text
-        ? `<div class="chat-msg-reply">
+        ? `<div class="chat-msg-reply" ${msg.replyTo_id ? `onclick="event.stopPropagation(); window.hdScrollToMsg('${escapeAttr(msg.replyTo_id)}', this)" style="cursor:pointer;"` : ''}>
              <div class="chat-msg-reply-inner">
                <div class="chat-msg-reply-author">Membalas pesan</div>
                <div class="chat-msg-reply-text">${window.chatSanitize(msg.replyTo_text)}</div>
@@ -764,7 +791,7 @@
       } else {
         div.innerHTML = `
           ${!isClient ? `<div class="chat-msg-avatar"><i class="ph-fill ph-headset"></i></div>` : ''}
-          <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
+          <div class="chat-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || window.getFileFallbackText(msg.imageUrl))}" data-sender="${escapeAttr(msg.sender)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
             <div class="chat-msg-options" onclick="window.showContextMenuFromBtn(event, this)">
               <i class="ph-bold ph-dots-three-vertical"></i>
             </div>
@@ -784,7 +811,7 @@
 
       // Update sticky header if message is pinned
       if (msg.is_pinned) {
-        updatePinnedHeader(msg.text, msg.id);
+        updatePinnedHeader(msg.text || window.getFileFallbackText(msg.imageUrl), msg.id);
       }
     }
 
@@ -812,17 +839,7 @@
   pinnedHeader.addEventListener('click', () => {
     const id = pinnedHeader.dataset.id;
     if (id) {
-      const msgEl = document.querySelector(`.chat-msg-bubble[data-id="${id}"]`);
-      if (msgEl) {
-        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Highlight effect
-        msgEl.style.transition = 'background-color 0.5s';
-        const originalBg = msgEl.style.backgroundColor;
-        msgEl.style.backgroundColor = 'var(--primary-light)';
-        setTimeout(() => {
-          msgEl.style.backgroundColor = originalBg;
-        }, 1500);
-      }
+      window.hdScrollToMsg(id);
     }
   });
 
@@ -1290,6 +1307,12 @@
       } else {
         favBtn.innerHTML = '<i class="ph ph-star"></i> Favorit';
       }
+    }
+
+    // Toggle Copy button
+    const copyBtn = document.getElementById('chat-ctx-copy');
+    if (copyBtn) {
+      copyBtn.style.display = bubbleUrl ? 'none' : 'flex';
     }
 
     // Toggle Download button

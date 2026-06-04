@@ -161,6 +161,16 @@
     }
   }
 
+  window.getFileFallbackText = function(url) {
+    if (!url) return '[File]';
+    const extMatch = url.split('?')[0].match(/\.([a-z0-9]+)$/i);
+    const ext = extMatch ? extMatch[1].toLowerCase() : '';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext) || !ext) return '[Gambar]';
+    if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) return '[Audio]';
+    if (['mp4', 'webm', 'mov'].includes(ext)) return '[Video]';
+    return '[Dokumen]';
+  };
+
   let isSendingCS = false;
 
   // ── DOM Refs ──────────────────────────────────────────────────
@@ -1084,7 +1094,8 @@
             // Update pinned header
             if (msg.is_pinned !== undefined) {
               if (bubble) bubble.dataset.pinned = Boolean(msg.is_pinned);
-              if (msg.is_pinned) updateCSPinnedHeader(msg.text, msg.id);
+              const fallbackText = msg.text || window.getFileFallbackText(msg.imageUrl);
+              if (msg.is_pinned) updateCSPinnedHeader(fallbackText, msg.id);
               else {
                 const csPinnedHeader = document.getElementById('cs-pinned-header');
                 if (csPinnedHeader && csPinnedHeader.dataset.id === msg.id) {
@@ -1244,7 +1255,7 @@
       let replyHtml = '';
       if (msg.replyTo && msg.replyTo.text) {
         replyHtml = `
-            <div class="cs-msg-reply" onclick="window.scrollToMessage('${escapeAttr(msg.replyTo.id)}')" style="cursor: pointer;" title="Klik untuk melompat ke pesan ini">
+            <div class="cs-msg-reply" onclick="event.stopPropagation(); window.scrollToMessage('${escapeAttr(msg.replyTo.id)}')" style="cursor: pointer;" title="Klik untuk melompat ke pesan ini">
               <div style="font-weight:600; font-size:0.75rem; color:var(--primary); margin-bottom:2px;">Replying to</div>
               <div>${window.chatSanitize(msg.replyTo.text)}</div>
             </div>
@@ -1277,7 +1288,7 @@
       } else {
         div.innerHTML = `
           ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
-          <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || '[Image]')}" data-sender="${escapeAttr(msg.sender)}" data-pinned="${Boolean(msg.is_pinned)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
+          <div class="cs-msg-bubble" data-id="${escapeAttr(msgId)}" data-text="${escapeAttr(msg.text || window.getFileFallbackText(msg.imageUrl))}" data-sender="${escapeAttr(msg.sender)}" data-pinned="${Boolean(msg.is_pinned)}" data-url="${msg.imageUrl ? escapeAttr(safeUrl(msg.imageUrl)) : ''}">
             <div class="cs-msg-options" onclick="window.showCSContextMenuFromBtn(event, this)">
               <i class="ph-bold ph-dots-three-vertical"></i>
             </div>
@@ -1298,7 +1309,7 @@
 
       // Update sticky header if message is pinned
       if (msg.is_pinned) {
-        updateCSPinnedHeader(msg.text);
+        updateCSPinnedHeader(msg.text || window.getFileFallbackText(msg.imageUrl), msg.id);
       }
     }
 
@@ -1325,17 +1336,7 @@
   csPinnedHeader.addEventListener('click', () => {
     const id = csPinnedHeader.dataset.id;
     if (id) {
-      const msgEl = document.querySelector(`.cs-msg-bubble[data-id="${id}"]`);
-      if (msgEl) {
-        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Highlight effect
-        msgEl.style.transition = 'background-color 0.5s';
-        const originalBg = msgEl.style.backgroundColor;
-        msgEl.style.backgroundColor = 'var(--primary-light)';
-        setTimeout(() => {
-          msgEl.style.backgroundColor = originalBg;
-        }, 1500);
-      }
+      window.scrollToMessage(id);
     }
   });
 
@@ -2067,6 +2068,12 @@
         }
       }
 
+      // Toggle Copy button
+      const copyBtn = document.getElementById('cs-ctx-copy');
+      if (copyBtn) {
+        copyBtn.style.display = bubbleUrl ? 'none' : 'flex';
+      }
+
       // Toggle Download button
       const downloadBtn = document.getElementById('cs-ctx-download');
       if (downloadBtn) {
@@ -2599,13 +2606,16 @@
     const el = document.querySelector(`.cs-msg-bubble[data-id="${id}"]`);
     if (el) {
       const container = document.getElementById('cs-messages');
-      container.scrollTo({ top: el.offsetTop - container.offsetTop - 20, behavior: 'smooth' });
-      const oldBg = el.style.backgroundColor;
-      el.style.transition = 'background-color 0.3s';
-      el.style.backgroundColor = 'rgba(0, 122, 255, 0.2)';
-      setTimeout(() => {
-        el.style.backgroundColor = oldBg || '';
-      }, 1500);
+      const row = el.closest('.cs-msg');
+      if (row) {
+        container.scrollTo({ top: row.offsetTop - container.offsetTop - 20, behavior: 'smooth' });
+        const oldBg = row.style.backgroundColor;
+        row.style.transition = 'background-color 0.5s';
+        row.style.backgroundColor = 'color-mix(in srgb, var(--primary) 15%, transparent)';
+        setTimeout(() => {
+          row.style.backgroundColor = oldBg || '';
+        }, 1500);
+      }
     }
   };
 
