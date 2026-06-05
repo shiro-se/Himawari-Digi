@@ -1003,17 +1003,31 @@
     messagesEl.innerHTML = '';
     currentRenderedIds.clear();
     currentLastDateSeparator = null;
+    updateCSPinnedHeader(null);
 
     hasMoreMessages = true;
     isLoadingMore = false;
     oldestMessageTimestamp = null;
     
-    const { data: msgsData } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('chat_id', chatId)
-      .order('timestamp', { ascending: false })
-      .limit(20);
+    const [ { data: msgsData }, { data: pinnedData } ] = await Promise.all([
+      supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .order('timestamp', { ascending: false })
+        .limit(20),
+      supabase
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .eq('is_pinned', true)
+        .limit(1)
+    ]);
+
+    if (pinnedData && pinnedData.length > 0) {
+      const pMsg = pinnedData[0];
+      updateCSPinnedHeader(pMsg.text || window.getFileFallbackText(pMsg.imageUrl), pMsg.id);
+    }
 
     if (msgsData) {
       const msgs = msgsData.reverse();
@@ -2219,7 +2233,7 @@
 
       const editBtn = document.getElementById('cs-ctx-edit');
       if (editBtn) {
-        editBtn.style.display = csContextMsgSender === 'cs' ? 'flex' : 'none';
+        editBtn.style.display = (csContextMsgSender === 'cs' && !bubbleUrl) ? 'flex' : 'none';
       }
 
       const pinBtn = document.getElementById('cs-ctx-pin');

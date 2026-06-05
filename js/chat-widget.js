@@ -514,13 +514,27 @@
     isLoadingMore = false;
     hasMoreMessages = true;
     oldestMessageTimestamp = null;
+    updatePinnedHeader(null);
     
-    const { data: messagesData } = await supabaseClient
-      .from('messages')
-      .select('*')
-      .eq('chat_id', chatId)
-      .order('timestamp', { ascending: false })
-      .limit(20);
+    const [ { data: messagesData }, { data: pinnedData } ] = await Promise.all([
+      supabaseClient
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .order('timestamp', { ascending: false })
+        .limit(20),
+      supabaseClient
+        .from('messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .eq('is_pinned', true)
+        .limit(1)
+    ]);
+
+    if (pinnedData && pinnedData.length > 0) {
+      const pMsg = pinnedData[0];
+      updatePinnedHeader(pMsg.text || window.getFileFallbackText(pMsg.imageUrl), pMsg.id);
+    }
 
     if (messagesData) {
       const messages = messagesData.reverse();
@@ -1427,10 +1441,10 @@
     contextMsgText = msgText;
     contextMsgSender = sender;
 
-    // Hide/Show Edit button based on sender
+    // Hide/Show Edit button based on sender and attachment
     const editBtn = document.getElementById('chat-ctx-edit');
     if (editBtn) {
-      editBtn.style.display = contextMsgSender === 'client' ? 'flex' : 'none';
+      editBtn.style.display = (contextMsgSender === 'client' && !bubbleUrl) ? 'flex' : 'none';
     }
 
     // Toggle Favorite text
