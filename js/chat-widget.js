@@ -586,6 +586,14 @@
             }
           }
           if (payload.eventType === 'UPDATE') {
+            const msgIndex = chatMessagesData.findIndex(m => m.id === msg.id);
+            if (msgIndex !== -1) {
+              chatMessagesData[msgIndex] = {
+                ...chatMessagesData[msgIndex],
+                ...msg,
+                timestamp: msg.timestamp ? new Date(msg.timestamp).getTime() : chatMessagesData[msgIndex].timestamp
+              };
+            }
             if (msg.sender === 'client' && msg.read) {
               const statusEl = document.getElementById('chat-msg-status-' + msg.id);
               if (statusEl) {

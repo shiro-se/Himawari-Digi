@@ -1127,9 +1127,9 @@
                   const tempContainer = document.createElement('div');
                   const oldAppend = messagesEl.appendChild.bind(messagesEl);
                   messagesEl.appendChild = (el) => tempContainer.appendChild(el);
-                  renderedIds.delete(msg.id);
-                  renderCSMessage(msg, msg.id);
-                  renderedIds.add(msg.id);
+                  currentRenderedIds.delete(msg.id);
+                  renderCSMessage(msg, msg.id, true);
+                  currentRenderedIds.add(msg.id);
                   messagesEl.appendChild = oldAppend;
                   wrapperDiv.replaceWith(tempContainer.firstChild);
                 }
