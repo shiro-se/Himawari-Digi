@@ -1404,11 +1404,14 @@
 
       // Handle soft deleted message
       if (msg.deleted_at) {
+        const deleteTime = new Date(msg.deleted_at).getTime();
+        const isWithin24Hours = (Date.now() - deleteTime) <= 24 * 60 * 60 * 1000;
+        
         div.innerHTML = `
           ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
           <div class="cs-msg-bubble cs-msg-deleted" data-id="${escapeAttr(msgId)}" data-sender="${escapeAttr(msg.sender)}" style="background:var(--muted); color:var(--muted-foreground); border:1px solid var(--border); font-style:italic; display:flex; align-items:center; gap:8px;">
             <i class="ph ph-prohibit"></i> Pesan ini telah dihapus.
-            ${!isClient ? `<button onclick="window.undoDeleteCSMessage('${escapeAttr(msgId)}')" style="margin-left:8px; padding:2px 6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:var(--background); color:var(--foreground); cursor:pointer;">Undo</button>` : ''}
+            ${!isClient && isWithin24Hours ? `<button onclick="window.undoDeleteCSMessage('${escapeAttr(msgId)}')" style="margin-left:8px; padding:2px 6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:var(--background); color:var(--foreground); cursor:pointer;">Undo</button>` : ''}
           </div>
         `;
       } else {
