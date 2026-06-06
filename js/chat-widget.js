@@ -595,7 +595,7 @@
                 ds.className = 'chat-date-separator';
                 ds.style =
                   'text-align: center; margin: 1rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
-                ds.innerHTML = `<span style="background: transparent; padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
+                ds.innerHTML = `<span style="background: color-mix(in srgb, var(--muted) 20%, transparent); padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
                 messagesEl.appendChild(ds);
                 currentLastDateSeparator = dateStr;
               }
@@ -818,7 +818,7 @@
         ds.className = 'chat-date-separator';
         ds.style =
           'text-align: center; margin: 1rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
-        ds.innerHTML = `<span style="background: transparent; padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
+        ds.innerHTML = `<span style="background: color-mix(in srgb, var(--muted) 20%, transparent); padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
         messagesEl.appendChild(ds);
         currentLastDateSeparator = dateStr;
       }
