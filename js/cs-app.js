@@ -166,31 +166,47 @@
     }
   }
 
-  window.formatDateSeparator = function(timestamp) {
+  window.formatDateSeparator = function (timestamp) {
     if (!timestamp) return '';
     const date = new Date(timestamp);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const isSameDate = (d1, d2) => d1.getDate() === d2.getDate() && d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear();
+    const isSameDate = (d1, d2) =>
+      d1.getDate() === d2.getDate() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getFullYear() === d2.getFullYear();
 
     if (isSameDate(date, today)) return 'Hari ini';
     if (isSameDate(date, yesterday)) return 'Kemarin';
 
     const diffTime = today.getTime() - date.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays <= 7 && diffDays >= 0) {
       const days = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       return days[date.getDay()];
     }
 
-    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  window.getFileFallbackText = function(url) {
+  window.getFileFallbackText = function (url) {
     if (!url) return '[File]';
     const extMatch = url.split('?')[0].match(/\.([a-z0-9]+)$/i);
     const ext = extMatch ? extMatch[1].toLowerCase() : '';
@@ -1008,20 +1024,15 @@
     hasMoreMessages = true;
     isLoadingMore = false;
     oldestMessageTimestamp = null;
-    
-    const [ { data: msgsData }, { data: pinnedData } ] = await Promise.all([
+
+    const [{ data: msgsData }, { data: pinnedData }] = await Promise.all([
       supabase
         .from('messages')
         .select('*')
         .eq('chat_id', chatId)
         .order('timestamp', { ascending: false })
         .limit(20),
-      supabase
-        .from('messages')
-        .select('*')
-        .eq('chat_id', chatId)
-        .eq('is_pinned', true)
-        .limit(1)
+      supabase.from('messages').select('*').eq('chat_id', chatId).eq('is_pinned', true).limit(1),
     ]);
 
     if (pinnedData && pinnedData.length > 0) {
@@ -1063,13 +1074,16 @@
 
       renderMessagesList(formattedMsgs, firstUnreadMsgId, unreadCount);
       renderChatList();
-      
+
       if (firstUnreadMsgId) {
         setTimeout(() => {
           const sepEl = document.getElementById('cs-unread-separator');
           const container = document.getElementById('cs-messages');
           if (sepEl && container) {
-            container.scrollTo({ top: sepEl.offsetTop - container.offsetTop - 20, behavior: 'smooth' });
+            container.scrollTo({
+              top: sepEl.offsetTop - container.offsetTop - 20,
+              behavior: 'smooth',
+            });
           }
         }, 100);
       } else {
@@ -1097,8 +1111,9 @@
               if (dateStr && dateStr !== currentLastDateSeparator) {
                 const ds = document.createElement('div');
                 ds.className = 'cs-date-separator';
-                ds.style = 'text-align: center; margin: 1.5rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
-                ds.innerHTML = `<span style="background: var(--background); padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
+                ds.style =
+                  'text-align: center; margin: 1.5rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
+                ds.innerHTML = `<span style="padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
                 messagesEl.appendChild(ds);
                 currentLastDateSeparator = dateStr;
               }
@@ -1260,8 +1275,9 @@
       if (dateStr && dateStr !== currentLastDateSeparator) {
         const ds = document.createElement('div');
         ds.className = 'cs-date-separator';
-        ds.style = 'text-align: center; margin: 1.5rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
-        ds.innerHTML = `<span style="background: var(--background); padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
+        ds.style =
+          'text-align: center; margin: 1.5rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted-foreground); position: relative;';
+        ds.innerHTML = `<span style="padding: 0 10px; position: relative; z-index: 2;">${escapeAttr(dateStr)}</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--border) 50%, transparent); z-index: 1;"></div>`;
         messagesEl.appendChild(ds);
         currentLastDateSeparator = dateStr;
       }
@@ -1270,8 +1286,9 @@
         const sep = document.createElement('div');
         sep.id = 'cs-unread-separator';
         sep.className = 'cs-unread-separator';
-        sep.style = 'text-align: center; margin: 1.5rem 0; color: var(--primary); font-size: 0.8rem; font-weight: 600; position: relative;';
-        sep.innerHTML = `<span style="background: var(--background); padding: 0 10px; position: relative; z-index: 2;">${unreadCount} Pesan belum dibaca</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--primary) 30%, transparent); z-index: 1;"></div>`;
+        sep.style =
+          'text-align: center; margin: 1.5rem 0; color: var(--primary); font-size: 0.8rem; font-weight: 600; position: relative;';
+        sep.innerHTML = `<span style="padding: 0 10px; position: relative; z-index: 2;">${unreadCount} Pesan belum dibaca</span><div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--primary) 30%, transparent); z-index: 1;"></div>`;
         messagesEl.appendChild(sep);
       }
 
@@ -1316,7 +1333,8 @@
         const ext = extMatch ? extMatch[1] : '';
         const extUpper = ext.toUpperCase() || 'FILE';
 
-        const isImg = ['jpeg', 'jpg', 'gif', 'png', 'webp', 'svg'].includes(ext) || !urlLower.includes('.');
+        const isImg =
+          ['jpeg', 'jpg', 'gif', 'png', 'webp', 'svg'].includes(ext) || !urlLower.includes('.');
         const isAudio = ['mp3', 'wav', 'ogg', 'm4a'].includes(ext);
         const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
 
@@ -1405,8 +1423,8 @@
       // Handle soft deleted message
       if (msg.deleted_at) {
         const deleteTime = new Date(msg.deleted_at).getTime();
-        const isWithin24Hours = (Date.now() - deleteTime) <= 24 * 60 * 60 * 1000;
-        
+        const isWithin24Hours = Date.now() - deleteTime <= 24 * 60 * 60 * 1000;
+
         div.innerHTML = `
           ${isClient ? `<div class="cs-msg-avatar">${window.chatSanitize(initials)}</div>` : ''}
           <div class="cs-msg-bubble cs-msg-deleted" data-id="${escapeAttr(msgId)}" data-sender="${escapeAttr(msg.sender)}" style="background:var(--muted); color:var(--muted-foreground); border:1px solid var(--border); font-style:italic; display:flex; align-items:center; gap:8px;">
@@ -1759,13 +1777,13 @@
     const data = currentTab === 'archive' ? archiveData : chatsData;
     const chat = data[selectedChatId];
     if (!chat) return null;
-    
+
     const { data: msgsData } = await supabase
       .from('messages')
       .select('*')
       .eq('chat_id', selectedChatId)
       .order('timestamp', { ascending: true });
-      
+
     const messages = msgsData ? msgsData : [];
     return {
       clientName: chat.info?.clientName || 'Unknown',
@@ -1907,7 +1925,7 @@
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-    } catch(e) {
+    } catch (e) {
       window.open(url, '_blank');
     }
   };
@@ -1922,14 +1940,22 @@
   const csResetBtn = document.getElementById('cs-lightbox-reset');
   const csDownloadBtn = document.getElementById('cs-lightbox-download');
 
-  let csScale = 1, csPanning = false, csPointX = 0, csPointY = 0, csStartX = 0, csStartY = 0;
+  let csScale = 1,
+    csPanning = false,
+    csPointX = 0,
+    csPointY = 0,
+    csStartX = 0,
+    csStartY = 0;
 
   const setCSLightboxTransform = () => {
-    if (csLightboxImg) csLightboxImg.style.transform = `translate(${csPointX}px, ${csPointY}px) scale(${csScale})`;
+    if (csLightboxImg)
+      csLightboxImg.style.transform = `translate(${csPointX}px, ${csPointY}px) scale(${csScale})`;
   };
 
   const resetCSLightbox = () => {
-    csScale = 1; csPointX = 0; csPointY = 0;
+    csScale = 1;
+    csPointX = 0;
+    csPointY = 0;
     setCSLightboxTransform();
   };
 
@@ -1940,7 +1966,9 @@
       csStartY = e.clientY - csPointY;
       csPanning = true;
     };
-    document.addEventListener('mouseup', () => { csPanning = false; });
+    document.addEventListener('mouseup', () => {
+      csPanning = false;
+    });
     document.addEventListener('mousemove', (e) => {
       if (!csPanning || csScale <= 1) return;
       csPointX = e.clientX - csStartX;
@@ -1955,8 +1983,16 @@
     };
   }
 
-  if (csZoomInBtn) csZoomInBtn.onclick = () => { csScale = Math.min(csScale + 0.2, 5); setCSLightboxTransform(); };
-  if (csZoomOutBtn) csZoomOutBtn.onclick = () => { csScale = Math.max(csScale - 0.2, 0.5); setCSLightboxTransform(); };
+  if (csZoomInBtn)
+    csZoomInBtn.onclick = () => {
+      csScale = Math.min(csScale + 0.2, 5);
+      setCSLightboxTransform();
+    };
+  if (csZoomOutBtn)
+    csZoomOutBtn.onclick = () => {
+      csScale = Math.max(csScale - 0.2, 0.5);
+      setCSLightboxTransform();
+    };
   if (csResetBtn) csResetBtn.onclick = resetCSLightbox;
 
   const closeCSLightbox = () => {
@@ -2003,14 +2039,15 @@
 
     async function loadMoreMessages() {
       if (!selectedChatId || isLoadingMore || !hasMoreMessages) return;
-      
+
       isLoadingMore = true;
-      
+
       const loadingEl = document.createElement('div');
-      loadingEl.style = 'text-align: center; padding: 10px; font-size: 0.8rem; color: var(--muted-foreground);';
+      loadingEl.style =
+        'text-align: center; padding: 10px; font-size: 0.8rem; color: var(--muted-foreground);';
       loadingEl.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Memuat...';
       messagesEl.prepend(loadingEl);
-      
+
       const { data: msgsData } = await supabase
         .from('messages')
         .select('*')
@@ -2018,13 +2055,13 @@
         .lt('timestamp', new Date(oldestMessageTimestamp).toISOString())
         .order('timestamp', { ascending: false })
         .limit(20);
-        
+
       if (msgsData && msgsData.length > 0) {
         const msgs = msgsData.reverse();
         oldestMessageTimestamp = msgs[0].timestamp;
-        
+
         const chatSource = currentTab === 'archive' ? archiveData : chatsData;
-        
+
         msgs.forEach((m) => {
           const msg = {
             ...m,
@@ -2035,20 +2072,22 @@
             chatSource[selectedChatId].messages[m.id] = msg;
           }
         });
-        
+
         if (msgs.length < 20) hasMoreMessages = false;
-        
-        const allMsgs = Object.values(chatSource[selectedChatId].messages).sort((a,b) => a.timestamp - b.timestamp);
+
+        const allMsgs = Object.values(chatSource[selectedChatId].messages).sort(
+          (a, b) => a.timestamp - b.timestamp
+        );
         const oldScrollHeight = messagesEl.scrollHeight;
-        
+
         renderMessagesList(allMsgs, null, 0);
-        
+
         messagesEl.scrollTop = messagesEl.scrollHeight - oldScrollHeight;
       } else {
         hasMoreMessages = false;
         loadingEl.remove();
       }
-      
+
       isLoadingMore = false;
     }
 
@@ -2236,7 +2275,7 @@
 
       const editBtn = document.getElementById('cs-ctx-edit');
       if (editBtn) {
-        editBtn.style.display = (csContextMsgSender === 'cs' && !bubbleUrl) ? 'flex' : 'none';
+        editBtn.style.display = csContextMsgSender === 'cs' && !bubbleUrl ? 'flex' : 'none';
       }
 
       const pinBtn = document.getElementById('cs-ctx-pin');
