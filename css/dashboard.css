@@ -1,0 +1,1515 @@
+
+body.cs-body {
+  font-family: 'Inter', sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+
+/* ── Topbar ── */
+.cs-topbar {
+  height: 60px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  flex-shrink: 0;
+  z-index: 1000;
+}
+.cs-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.cs-topbar-logo {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+.cs-topbar-logo span {
+  color: var(--primary);
+}
+.cs-topbar-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--primary);
+}
+.cs-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.cs-topbar-user {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+@media (min-width: 768px) {
+  .cs-topbar-user {
+    display: flex;
+  }
+}
+.cs-topbar-user-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.cs-topbar-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  font-size: 1.1rem;
+}
+.cs-topbar-btn:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.cs-notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: bold;
+  padding: 0.1rem 0.35rem;
+  border-radius: 10px;
+  border: 2px solid var(--card);
+  pointer-events: none;
+}
+.animate-ring {
+  animation: ring 1s ease-in-out;
+}
+@keyframes ring {
+  0% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(15deg);
+  }
+  20% {
+    transform: rotate(-10deg);
+  }
+  30% {
+    transform: rotate(5deg);
+  }
+  40% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+  60% {
+    transform: rotate(-2deg);
+  }
+  70% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+.cs-notif-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 320px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  display: none;
+  flex-direction: column;
+  z-index: 100;
+}
+.cs-notif-dropdown.show {
+  display: flex;
+  animation: csFadeIn 0.2s ease;
+}
+.cs-notif-dropdown-header {
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.cs-notif-dropdown-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+.cs-notif-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+}
+.cs-notif-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.cs-notif-item:last-child {
+  border-bottom: none;
+}
+.cs-notif-item:hover {
+  background: var(--muted);
+}
+.cs-notif-item-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--foreground);
+}
+.cs-notif-item-desc {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cs-notif-item-time {
+  font-size: 0.65rem;
+  color: var(--primary);
+  align-self: flex-end;
+  margin-top: 0.25rem;
+}
+
+/* ── Main Layout ── */
+.cs-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.cs-sidebar {
+  width: 100%;
+  max-width: 360px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+@media (max-width: 767px) {
+  .cs-sidebar {
+    max-width: 100%;
+    position: absolute;
+    inset: 60px 0 0 0;
+    z-index: 10;
+  }
+  .cs-sidebar.hidden-mobile {
+    transform: translateX(-100%);
+  }
+}
+
+.cs-sidebar-header {
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.cs-sidebar-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cs-sidebar-header h2 .cs-count-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  min-width: 1.2rem;
+  text-align: center;
+}
+.cs-search {
+  width: 100%;
+  padding: 0.6rem 0.75rem 0.6rem 2.2rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.cs-search:focus {
+  border-color: var(--primary);
+}
+.cs-search-wrap {
+  position: relative;
+}
+.cs-search-wrap i {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  color: var(--muted-foreground);
+}
+
+.cs-chat-list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.cs-chat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+  transition: background 0.15s;
+}
+.cs-chat-item:hover {
+  background: var(--muted);
+}
+.cs-chat-item.active {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border-left: 3px solid var(--primary);
+}
+.cs-chat-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+.cs-chat-presence-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--background);
+  background: #22c55e;
+}
+.cs-chat-presence-dot.inactive {
+  background: var(--muted-foreground);
+}
+.cs-chat-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.cs-chat-meta {
+  flex: 1;
+  min-width: 0;
+}
+.cs-chat-meta-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.15rem;
+}
+.cs-chat-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-chat-time {
+  font-size: 0.65rem;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+.cs-chat-preview {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-chat-unread {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cs-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted-foreground);
+}
+.cs-empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.3;
+}
+.cs-empty-state p {
+  font-size: 0.85rem;
+}
+
+/* ── Chat Detail Area ── */
+.cs-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .cs-detail {
+    position: absolute;
+    inset: 60px 0 0 0;
+    z-index: 15;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .cs-detail.show-mobile {
+    transform: translateX(0);
+  }
+}
+
+.cs-detail-header {
+  height: 60px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+  flex-shrink: 0;
+}
+.cs-detail-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.cs-back-btn {
+  display: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+@media (max-width: 767px) {
+  .cs-back-btn {
+    display: flex;
+  }
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .cs-export-btn,
+  .cs-close-chat-btn {
+    padding: 0.4rem;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+  }
+  .cs-detail-actions {
+    gap: 0.3rem;
+  }
+  .cs-detail-name {
+    max-width: 150px;
+  }
+  .cs-notif-dropdown {
+    position: fixed;
+    top: 65px;
+    right: 15px;
+    left: 15px;
+    width: auto;
+    max-width: none;
+  }
+}
+
+.cs-detail-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-detail-email {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+}
+.cs-detail-status {
+  font-size: 0.6rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cs-detail-status.active {
+  background: color-mix(in srgb, #22c55e 15%, transparent);
+  color: #22c55e;
+}
+.cs-detail-status.closed {
+  background: color-mix(in srgb, #ef4444 15%, transparent);
+  color: #ef4444;
+}
+.cs-detail-status.inactive {
+  background: color-mix(in srgb, var(--muted-foreground) 20%, transparent);
+  color: var(--muted-foreground);
+}
+.cs-close-chat-btn {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ef4444;
+  background: transparent;
+  color: #ef4444;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.cs-close-chat-btn:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* ── Messages ── */
+.cs-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  scrollbar-width: thin;
+  background: color-mix(in srgb, var(--muted) 20%, transparent);
+}
+.cs-msg {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  animation: csMsgIn 0.3s ease;
+}
+@keyframes csMsgIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cs-msg--client {
+}
+.cs-msg--cs {
+  flex-direction: row-reverse;
+}
+.cs-msg--system {
+  justify-content: center;
+  width: 100%;
+}
+.cs-msg--system .cs-msg-bubble {
+  background: color-mix(in srgb, var(--muted) 60%, transparent);
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  text-align: center;
+  border-radius: 1rem;
+}
+.cs-msg-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  text-transform: uppercase;
+}
+.cs-msg-bubble {
+  padding: 0.6rem 0.9rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  word-break: break-word;
+  position: relative;
+  max-width: 75%;
+}
+.cs-msg-options {
+  position: absolute;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.cs-msg-options::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  bottom: -10px;
+  left: -15px;
+}
+.cs-msg--client .cs-msg-options {
+  left: calc(100% + 5px);
+}
+.cs-msg--cs .cs-msg-options {
+  right: calc(100% + 5px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cs-msg-bubble:hover .cs-msg-options {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+.cs-msg-options:hover {
+  background: var(--border);
+}
+.cs-msg--client .cs-msg-bubble {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  color: var(--foreground);
+}
+.cs-msg--cs .cs-msg-bubble {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border-bottom-right-radius: 4px;
+}
+.cs-msg-time-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+}
+.cs-msg--cs .cs-msg-time-container {
+  justify-content: flex-end;
+}
+.cs-msg-time {
+  font-size: 0.6rem;
+  color: var(--muted-foreground);
+}
+.cs-msg-fav-icon {
+  color: #fbbf24;
+  font-size: 0.7rem;
+  margin-left: 2px;
+}
+.cs-msg-edited-text {
+  font-size: 0.6rem;
+  opacity: 0.6;
+  font-style: italic;
+  margin-right: 4px;
+}
+.cs-msg--cs .cs-msg-time {
+  color: color-mix(in srgb, var(--secondary-foreground) 80%, transparent);
+}
+.cs-msg-status {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+.cs-msg-status.sent {
+  color: color-mix(in srgb, var(--primary-foreground) 60%, transparent);
+}
+.cs-msg-status.read {
+  color: #60a5fa;
+}
+
+/* ── Pinned Header ── */
+.cs-pinned-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.cs-pinned-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+.cs-pinned-content {
+  flex: 1;
+  overflow: hidden;
+}
+.cs-pinned-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.cs-pinned-text {
+  font-size: 0.75rem;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-pinned-close {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.cs-pinned-close:hover {
+  background: var(--border);
+  color: var(--foreground);
+}
+.cs-msg--cs .cs-msg-status.sent {
+  color: color-mix(in srgb, var(--secondary-foreground) 60%, transparent);
+}
+.cs-msg--cs .cs-msg-status.read {
+  color: #ffffff;
+}
+
+/* ── Typing indicator ── */
+.cs-typing-indicator {
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.25rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.cs-typing-indicator.show {
+  display: flex;
+}
+.cs-typing-dots {
+  display: flex;
+  gap: 3px;
+}
+.cs-typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  animation: csTypingBounce 1.4s infinite ease-in-out both;
+}
+.cs-typing-dots span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+.cs-typing-dots span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+@keyframes csTypingBounce {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
+
+/* ── Input ── */
+.cs-input-area {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.cs-input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.cs-input:focus {
+  border-color: var(--primary);
+}
+.cs-send-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.cs-send-btn:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+.cs-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Login Page ── */
+.cs-login-page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  padding: 1rem;
+}
+.cs-login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+}
+.cs-login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.cs-login-logo h1 {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+.cs-login-logo h1 span {
+  color: var(--primary);
+}
+.cs-login-logo p {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+.cs-login-field {
+  margin-bottom: 1rem;
+}
+.cs-login-field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--foreground);
+}
+.cs-login-field input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.cs-login-field input:focus {
+  border-color: var(--primary);
+}
+.cs-login-submit {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.cs-login-submit:hover {
+  opacity: 0.9;
+}
+.cs-login-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cs-login-status {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  text-align: center;
+  display: none;
+}
+.cs-login-status.error {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color: #ef4444;
+  display: block;
+}
+.cs-login-status.success {
+  background: color-mix(in srgb, #22c55e 12%, transparent);
+  color: #22c55e;
+  display: block;
+}
+.cs-login-status.info {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  display: block;
+}
+.cs-login-device {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--muted);
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cs-login-device i {
+  font-size: 1rem;
+}
+
+/* ── OTP Input ── */
+.cs-otp-section {
+  display: none;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+.cs-otp-section.show {
+  display: block;
+}
+.cs-otp-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+.cs-otp-input {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.cs-otp-input:focus {
+  border-color: var(--primary);
+}
+.cs-otp-verify {
+  width: 100%;
+  padding: 0.7rem;
+  border-radius: 10px;
+  border: none;
+  background: #22c55e;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: opacity 0.2s;
+}
+.cs-otp-verify:hover {
+  opacity: 0.9;
+}
+.cs-otp-verify:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cs-otp-resend {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.75rem;
+}
+.cs-otp-resend button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ── Spinner ── */
+.cs-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: csSpin 0.6s linear infinite;
+}
+@keyframes csSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes csFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Scrollbar ── */
+.cs-chat-list::-webkit-scrollbar,
+.cs-messages::-webkit-scrollbar {
+  width: 4px;
+}
+.cs-chat-list::-webkit-scrollbar-thumb,
+.cs-messages::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* ── CS Sender Name ── */
+.cs-msg-sender-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 2px;
+  opacity: 0.85;
+}
+
+/* ── Sidebar Tabs ── */
+.cs-sidebar-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.cs-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.cs-tab:hover {
+  background: color-mix(in srgb, var(--primary) 10%, var(--muted));
+}
+.cs-tab.active {
+  background: var(--primary);
+  color: white;
+}
+.cs-tab .cs-count-badge {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--primary);
+}
+.cs-tab.active .cs-count-badge {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* ── Export Chat ── */
+.cs-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.cs-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.cs-export-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.cs-export-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  z-index: 100;
+  min-width: 140px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: csFadeIn 0.2s ease;
+}
+.cs-export-dropdown.show {
+  display: block;
+}
+.cs-export-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: none;
+  color: var(--foreground);
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.cs-export-dropdown button:hover {
+  background: var(--border);
+}
+
+/* ── Attach Button ── */
+.cs-attach-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.cs-attach-btn:hover {
+  color: var(--primary);
+  background: var(--border);
+}
+
+/* ═══════════════════════════════════════════
+         ── Image Message Bubble ──
+         Gunakan struktur berikut di JS kamu:
+         <div class="cs-msg-image-bubble">
+           <img class="cs-msg-image" src="..." />
+           <!-- caption (opsional): -->
+           <div class="cs-msg-image-caption">teks caption</div>
+         </div>
+      ═══════════════════════════════════════════ */
+.cs-msg-image-bubble {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  max-width: 360px;
+  cursor: pointer;
+}
+/* Bubble sent — border menggunakan secondary (hijau) agar selaras */
+.cs-msg--cs .cs-msg-image-bubble {
+  border-color: color-mix(in srgb, var(--secondary) 40%, transparent);
+}
+/* Tanpa caption: radius penuh (sudah dari wrapper) */
+.cs-msg-image-bubble img {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  max-height: 450px;
+  object-fit: cover;
+  transition: transform 0.2s;
+}
+.cs-msg-image-bubble:hover img {
+  transform: scale(1.02);
+}
+/* Caption di bawah gambar */
+.cs-msg-image-caption {
+  padding: 0.4rem 0.7rem 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  border-top: 1px solid var(--border);
+  /* Client bubble caption */
+  background: var(--card);
+  color: var(--foreground);
+}
+/* CS/sent bubble caption mengikuti warna secondary */
+.cs-msg--cs .cs-msg-image-caption {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border-top-color: color-mix(in srgb, var(--secondary-foreground) 15%, transparent);
+}
+
+/* ═══════════════════════════════════════════
+         ── Reply Quote ──
+         Struktur HTML di dalam .cs-msg-bubble:
+         <div class="cs-msg-reply">
+           <div class="cs-msg-reply-author">Nama Pengirim</div>
+           <div class="cs-msg-reply-text">preview pesan...</div>
+         </div>
+         Atau untuk reply ke gambar tambahkan:
+           <img class="cs-msg-reply-thumb" src="..." />
+      ═══════════════════════════════════════════ */
+.cs-msg-reply {
+  display: flex;
+  gap: 7px;
+  align-items: stretch;
+  padding: 5px 8px;
+  border-radius: 7px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  /* Client bubble: solid muted */
+  background: color-mix(in srgb, var(--muted) 80%, transparent);
+  border-left: 2.5px solid var(--primary);
+  overflow: hidden;
+}
+/* CS/sent bubble: transparan relatif terhadap secondary (hijau) */
+.cs-msg--cs .cs-msg-reply {
+  background: rgba(0, 0, 0, 0.15);
+  border-left-color: rgba(255, 255, 255, 0.6);
+}
+.cs-msg-reply-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.cs-msg-reply-author {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Author di dalam sent bubble */
+.cs-msg--cs .cs-msg-reply-author {
+  color: rgba(255, 255, 255, 0.9);
+}
+.cs-msg-reply-text {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+/* Reply text di dalam sent bubble */
+.cs-msg--cs .cs-msg-reply-text {
+  color: rgba(255, 255, 255, 0.6);
+}
+/* Thumbnail gambar di reply (jika reply ke pesan bergambar) */
+.cs-msg-reply-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 5px;
+  object-fit: cover;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ═══════════════════════════════════════════
+         ── Reaction Pills ──
+         Struktur HTML di bawah .cs-msg-bubble:
+         <div class="cs-msg-reactions">
+           <button class="cs-msg-reaction mine">👍 3</button>
+           <button class="cs-msg-reaction">❤️ 1</button>
+         </div>
+         Tambahkan class "mine" jika reaksi milik CS agent.
+      ═══════════════════════════════════════════ */
+.cs-msg-reactions {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+/* CS messages — rata kanan */
+.cs-msg--cs .cs-msg-reactions {
+  justify-content: flex-end;
+}
+.cs-msg-reaction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  padding: 2px 8px 2px 6px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.15s;
+  /* Default: orang lain */
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  line-height: 1.6;
+}
+.cs-msg-reaction:hover {
+  transform: scale(1.08);
+}
+.cs-msg-reaction .cs-reaction-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+/* "mine" — reaksi yang dipilih sendiri oleh CS agent */
+.cs-msg-reaction.mine {
+  border-width: 1.5px;
+  border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+.cs-msg-reaction.mine .cs-reaction-count {
+  color: var(--primary);
+}
+
+/* ── Emoji Picker ── */
+.cs-emoji-picker {
+  position: absolute;
+  bottom: 70px;
+  left: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  animation: csFadeIn 0.2s ease;
+}
+.cs-emoji-btn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition:
+    transform 0.2s,
+    background 0.2s;
+}
+.cs-emoji-btn:hover {
+  background: var(--border);
+  transform: scale(1.2);
+}
+
+/* ── Context Menu ── */
+.cs-context-menu {
+  position: fixed;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  z-index: 100000;
+  min-width: 150px;
+  animation: csFadeIn 0.15s ease;
+}
+.cs-context-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  color: var(--foreground);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.cs-context-menu button:hover {
+  background: var(--border);
+}
+.cs-ctx-reactions {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 6px;
+  border-top: 1px solid var(--border);
+  margin-top: 4px;
+  padding-top: 8px;
+}
+.cs-ctx-reactions button {
+  padding: 4px;
+  width: auto;
+  font-size: 1.1rem;
+}
+.cs-ctx-reactions button:hover {
+  transform: scale(1.2);
+  background: none;
+}
+
+/* ── Lightbox ── */
+.cs-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cs-lightbox-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+}
+.cs-lightbox-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cs-lightbox-content img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: zoom-in;
+}
+.cs-lightbox-content img.zoomed {
+  transform: scale(2.5) !important;
+  cursor: zoom-out;
+}
+.cs-lightbox-actions {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  gap: 12px;
+  z-index: 10005;
+}
+.cs-lightbox-actions a,
+.cs-lightbox-actions button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.cs-lightbox-actions a:hover,
+.cs-lightbox-actions button:hover {
+  background: rgba(255, 255, 255, 0.4);
+}

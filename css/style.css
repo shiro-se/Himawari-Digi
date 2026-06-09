@@ -2,10 +2,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@import 'tailwindcss';
-
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --background: #f8fafc;
   --foreground: #1e293b;
@@ -3309,4 +3305,61 @@ footer {
 }
 .chat-msg--client .hd-audio-time {
   color: white;
+}
+
+/* ── Utilities ── */
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+.lightbox-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.chat-hp {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* ── Utilities ── */
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+.lightbox-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.chat-hp {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
 }

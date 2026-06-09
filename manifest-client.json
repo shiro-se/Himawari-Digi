@@ -1,8 +1,8 @@
 {
-  "name": "HimawariDigi Support",
-  "short_name": "Himawari CS",
-  "description": "Customer Support Dashboard for HimawariDigi",
-  "start_url": "/cs",
+  "name": "HimawariDigi Creative",
+  "short_name": "HimawariDigi",
+  "description": "Agensi web & mobile development Yogyakarta",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d9488",

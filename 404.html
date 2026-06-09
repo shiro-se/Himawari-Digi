@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 - Halaman Tidak Ditemukan | HimawariDigi</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/logo/icon-192x192.png" />
+    <link rel="shortcut icon" href="/assets/logo/icon-192x192.png" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/output.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+  </head>
+  <body class="min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden font-sans m-0 p-0">
+    
+    <!-- Cyber Grid Background -->
+    <div class="absolute inset-0 bg-cyber-grid opacity-30 pointer-events-none z-0"></div>
+    
+    <div class="relative z-10 text-center px-4 max-w-lg mx-auto flex flex-col items-center">
+      <div class="mb-10">
+        <span
+          class="text-4xl md:text-5xl font-black tracking-tighter font-outfit"
+        >
+          <span class="text-foreground dark:text-white">HIMAWARI</span
+          ><span class="text-primary">DIGI</span>
+        </span>
+      </div>
+      
+      <div class="relative inline-block mb-8">
+        <h1 class="text-9xl font-black font-outfit text-transparent bg-clip-text bg-gradient-to-br from-primary to-chart-1 opacity-20 relative z-0" style="font-size: 10rem; line-height: 1;">404</h1>
+        <div class="absolute inset-0 flex items-center justify-center z-10">
+          <i class="ph-bold ph-warning-circle text-6xl text-primary drop-shadow-[0_0_15px_rgba(21,93,252,0.5)]"></i>
+        </div>
+      </div>
+      
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 font-outfit">Waduh! Anda tersesat.</h2>
+      <p class="text-muted-foreground mb-8 text-sm md:text-base max-w-md mx-auto leading-relaxed">
+        Halaman yang Anda cari mungkin telah dihapus, pindah alamat, atau memang tidak pernah ada. Mari kembali ke jalan yang benar.
+      </p>
+      
+      <a href="/" class="btn-cta inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm shadow-[0_4px_24px_rgba(21,93,252,0.3)] transition-all hover:scale-105">
+        <i class="ph-bold ph-house text-lg"></i>
+        <span>Kembali ke Beranda</span>
+      </a>
+    </div>
+
+    <script>
+      // Sync theme with localStorage
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      }
+    </script>
+  </body>
+</html>

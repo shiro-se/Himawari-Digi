@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const toast = document.createElement('div');
     toast.className = `hd-toast ${type}`;
-    
+
     let icon = 'ph-info';
     if (type === 'error') icon = 'ph-warning-circle';
     if (type === 'success') icon = 'ph-check-circle';
@@ -24,15 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const text = typeof window.chatSanitize === 'function' ? window.chatSanitize(message) : message;
     toast.innerHTML = `<i class="ph-fill ${icon}"></i> <span>${text}</span>`;
     container.appendChild(toast);
-    
+
     // Trigger reflow for animation
     void toast.offsetWidth;
     toast.classList.add('show');
-    
+
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => toast.remove(), 300);
     }, 3000);
+  };
+
+  window.handleNewsletter = (event) => {
+    event.preventDefault();
+    const input = event.target.querySelector('input[type="email"]');
+    if (input && input.value) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('Terima kasih telah berlangganan newsletter kami!', 'success');
+      }
+      input.value = '';
+    }
   };
 
   let currentLang = localStorage.getItem('lang') || 'id';
@@ -103,7 +114,117 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const PAGE_META = {
+    '/': {
+      title: 'HimawariDigi — Agensi Web & Mobile Yogyakarta',
+      description: 'HimawariDigi Creative adalah agensi pengembangan web dan mobile app di Yogyakarta. Kami membangun solusi digital skalabel — dari landing page hingga platform SaaS enterprise.'
+    },
+    '/services': {
+      title: 'Layanan Kami — HimawariDigi',
+      description: 'Programmer outsourcing, mobile app development, vibe coding, cloud & DevOps, UI/UX design, dan quality assurance. Semua layanan pengembangan digital dalam satu atap.'
+    },
+    '/services/outsourcing': {
+      title: 'Programmer Outsourcing — HimawariDigi',
+      description: 'Tim developer berpengalaman siap bergabung dengan proyek Anda. Fleksibel, cost-effective, dan terukur hasilnya. Mulai dari 1 developer hingga tim penuh.'
+    },
+    '/services/mobile': {
+      title: 'Mobile App Development — HimawariDigi',
+      description: 'Pengembangan aplikasi iOS dan Android native maupun cross-platform Flutter. Dari desain UI/UX hingga publish ke App Store & Play Store.'
+    },
+    '/services/vibe': {
+      title: 'Vibe Coding — HimawariDigi',
+      description: 'Layanan pengembangan cepat dengan pendekatan AI-assisted coding. Prototype ke production dalam waktu lebih singkat tanpa mengorbankan kualitas.'
+    },
+    '/services/devops': {
+      title: 'Cloud & DevOps — HimawariDigi',
+      description: 'Infrastruktur cloud yang skalabel, CI/CD pipeline, monitoring, dan manajemen server. AWS, GCP, dan Vercel specialist.'
+    },
+    '/services/design': {
+      title: 'UI/UX Design — HimawariDigi',
+      description: 'Desain antarmuka yang intuitif dan estetis. Dari user research, wireframing, prototyping Figma, hingga design system yang konsisten.'
+    },
+    '/services/qa': {
+      title: 'Quality Assurance — HimawariDigi',
+      description: 'Testing menyeluruh — unit test, integration test, E2E testing dengan Playwright & Cypress. Pastikan produk Anda bebas bug sebelum launch.'
+    },
+    '/portfolio': {
+      title: 'Portfolio — HimawariDigi',
+      description: 'Lihat proyek-proyek web dan mobile yang telah kami kerjakan. Dari e-commerce hingga platform SaaS enterprise untuk klien di seluruh Indonesia.'
+    },
+    '/portfolio/web': {
+      title: 'Web Projects — HimawariDigi',
+      description: 'Proyek web development pilihan: e-commerce, SaaS dashboard, landing page, dan company profile. Dibangun dengan teknologi modern dan performa tinggi.'
+    },
+    '/portfolio/mobile': {
+      title: 'Mobile Projects — HimawariDigi',
+      description: 'Aplikasi mobile yang telah diluncurkan di App Store dan Play Store. Flutter, React Native, Swift, dan Kotlin — kami kuasai semua stack mobile.'
+    },
+    '/portfolio/case-studies': {
+      title: 'Case Studies — HimawariDigi',
+      description: 'Studi kasus mendalam proyek pilihan: tantangan bisnis nyata, solusi teknis terukur, dan hasil yang dapat diverifikasi.'
+    },
+    '/about': {
+      title: 'Tentang Kami — HimawariDigi',
+      description: 'Kenali tim di balik HimawariDigi Creative — agensi teknologi dari Yogyakarta yang passionate dalam membangun produk digital berkualitas tinggi.'
+    },
+    '/blog': {
+      title: 'Blog & Insights — HimawariDigi',
+      description: 'Artikel, tutorial, dan insight tentang web development, mobile app, UI/UX design, dan tren teknologi terkini dari tim HimawariDigi.'
+    },
+    '/contact': {
+      title: 'Kontak — HimawariDigi',
+      description: 'Hubungi tim HimawariDigi Creative untuk konsultasi proyek gratis. Kami siap membantu mewujudkan ide digital Anda menjadi kenyataan.'
+    },
+    '/careers': {
+      title: 'Karir — HimawariDigi',
+      description: 'Bergabunglah dengan tim HimawariDigi Creative. Kami mencari developer, designer, dan QA engineer yang passionate dan ingin berkembang bersama.'
+    },
+    '/privacy': {
+      title: 'Kebijakan Privasi — HimawariDigi',
+      description: 'Kebijakan privasi HimawariDigi Creative mengenai pengumpulan, penggunaan, dan perlindungan data pengguna.'
+    },
+    '/terms': {
+      title: 'Syarat & Ketentuan — HimawariDigi',
+      description: 'Syarat dan ketentuan penggunaan layanan dan website HimawariDigi Creative.'
+    },
+    '/cookies': {
+      title: 'Kebijakan Cookie — HimawariDigi',
+      description: 'Informasi tentang penggunaan cookie di website HimawariDigi Creative.'
+    },
+    '/404': {
+      title: 'Halaman Tidak Ditemukan — HimawariDigi',
+      description: 'Maaf, halaman yang Anda cari tidak ditemukan.'
+    }
+  };
+
+  function updatePageMeta(path) {
+    const normalizedPath = path.length > 1 ? path.replace(/\/$/, '') : path;
+
+    const meta = PAGE_META[normalizedPath] || {
+      title: 'HimawariDigi Creative',
+      description: 'Agensi pengembangan web dan mobile app terpercaya di Yogyakarta, Indonesia.'
+    };
+
+    document.title = meta.title;
+
+    let descTag = document.querySelector('meta[name="description"]');
+    if (!descTag) {
+      descTag = document.createElement('meta');
+      descTag.setAttribute('name', 'description');
+      document.head.appendChild(descTag);
+    }
+    descTag.setAttribute('content', meta.description);
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogTitle) ogTitle.setAttribute('content', meta.title);
+    if (ogDesc) ogDesc.setAttribute('content', meta.description);
+    if (ogUrl) ogUrl.setAttribute('content', window.location.href);
+  }
+
   const renderPage = async (pathname, preserveScroll = false) => {
+    updatePageMeta(pathname);
     const route = pathname === '/' ? 'home' : pathname.replace('/', '');
     try {
       let htmlContent = '';
@@ -147,9 +268,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 200);
     } catch (error) {
       console.error('Error loading page:', error);
-      if (route !== 'home') {
-        renderPage('/');
-        history.replaceState(null, null, '/');
+      if (!pathname.includes('404.html')) {
+        window.location.replace('/404.html');
       }
     }
   };

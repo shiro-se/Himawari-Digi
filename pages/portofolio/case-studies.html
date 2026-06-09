@@ -1,0 +1,472 @@
+<style>
+  .cs-hero {
+    padding: 5rem 0 3rem;
+    text-align: center;
+  }
+  .cs-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    padding: 0.3rem 0.85rem;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+  }
+  .cs-hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--foreground);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .cs-hero p {
+    font-size: 1.05rem;
+    color: var(--muted-foreground);
+    max-width: 540px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+
+  /* Featured Case Study */
+  .cs-featured {
+    max-width: 1100px;
+    margin: 0 auto 3.5rem;
+    padding: 0 1.5rem;
+  }
+  .cs-featured-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 700px) {
+    .cs-featured-card {
+      grid-template-columns: 1fr;
+    }
+  }
+  .cs-featured-visual {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary) 20%, transparent),
+      color-mix(in srgb, var(--primary) 5%, transparent)
+    );
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 320px;
+  }
+  .cs-featured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    width: fit-content;
+    margin-bottom: auto;
+  }
+  .cs-featured-icon {
+    font-size: 4.5rem;
+    color: var(--primary);
+    opacity: 0.25;
+    align-self: flex-end;
+  }
+  .cs-featured-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .cs-metric {
+    background: var(--background);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .cs-metric-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .cs-metric-label {
+    font-size: 0.7rem;
+    color: var(--muted-foreground);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .cs-featured-content {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .cs-featured-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 0.6rem;
+  }
+  .cs-featured-content h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--foreground);
+    margin-bottom: 0.85rem;
+    line-height: 1.2;
+  }
+  .cs-featured-content p {
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+  .cs-challenge-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cs-challenge-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+  }
+  .cs-challenge-list li i {
+    color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .cs-industry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .cs-industry-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.22rem 0.65rem;
+    border-radius: 5px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+
+  /* Case Study List */
+  .cs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  .cs-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr auto;
+    align-items: center;
+    gap: 1.5rem;
+    transition:
+      transform 0.25s,
+      box-shadow 0.25s;
+  }
+  @media (max-width: 768px) {
+    .cs-row {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 1rem;
+    }
+  }
+  .cs-row:hover {
+    transform: translateX(4px);
+    box-shadow:
+      -4px 0 0 0 var(--primary),
+      0 8px 24px -8px rgba(0, 0, 0, 0.1);
+  }
+  .cs-row-title h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 0.35rem;
+  }
+  .cs-row-title p {
+    font-size: 0.82rem;
+    color: var(--muted-foreground);
+    line-height: 1.5;
+  }
+  .cs-kpi {
+    text-align: center;
+  }
+  .cs-kpi-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .cs-kpi-key {
+    font-size: 0.68rem;
+    color: var(--muted-foreground);
+    margin-top: 3px;
+  }
+  .cs-row-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .cs-row-tag {
+    font-size: 0.67rem;
+    font-weight: 600;
+    padding: 0.18rem 0.5rem;
+    border-radius: 4px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+  .cs-read-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .cs-read-btn:hover {
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+  .cs-section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--foreground);
+    max-width: 1100px;
+    margin: 2.5rem auto 1.25rem;
+    padding: 0 1.5rem;
+  }
+  .cs-cta {
+    margin: 4rem auto 0;
+    text-align: center;
+    padding: 3rem 1.5rem 4rem;
+    max-width: 600px;
+  }
+  .cs-cta h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--foreground);
+    margin-bottom: 0.75rem;
+  }
+  .cs-cta p {
+    font-size: 0.95rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1.75rem;
+    line-height: 1.7;
+  }
+</style>
+
+<section class="cs-hero">
+  <div class="cs-hero-eyebrow">
+    <i class="ph ph-chart-bar"></i>
+    Portfolio
+  </div>
+  <h1>Case Studies</h1>
+  <p>
+    Studi kasus mendalam dari proyek-proyek pilihan — tantangan nyata, solusi terukur, hasil yang
+    dapat diverifikasi.
+  </p>
+</section>
+
+<!-- Featured Case Study -->
+<div class="cs-featured">
+  <div class="cs-featured-card">
+    <div class="cs-featured-visual">
+      <span class="cs-featured-badge"><i class="ph ph-star"></i> Featured Case</span>
+      <div>
+        <div class="cs-featured-metrics">
+          <div class="cs-metric">
+            <div class="cs-metric-num">↓68%</div>
+            <div class="cs-metric-label">Pengurangan waktu load</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num">3.2×</div>
+            <div class="cs-metric-label">Peningkatan konversi</div>
+          </div>
+          <div class="cs-metric">
+            <div class="cs-metric-num">99.9%</div>
+            <div class="cs-metric-label">Uptime SLA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cs-featured-content">
+      <div class="cs-featured-label">E-Commerce · Retail</div>
+      <h2>Migrasi Platform: Meningkatkan Kecepatan & Konversi Nusantara Store</h2>
+      <p>
+        Klien mengalami bounce rate 74% akibat load time 8+ detik. Kami merancang ulang arsitektur
+        dari monolith PHP ke Next.js + edge CDN, memangkas load time menjadi 1.2 detik.
+      </p>
+      <ul class="cs-challenge-list">
+        <li><i class="ph ph-check-circle-fill"></i> Audit penuh pada legacy codebase PHP 7.4</li>
+        <li>
+          <i class="ph ph-check-circle-fill"></i> Desain ulang database schema & query optimization
+        </li>
+        <li>
+          <i class="ph ph-check-circle-fill"></i> Implementasi ISR (Incremental Static Regeneration)
+        </li>
+        <li><i class="ph ph-check-circle-fill"></i> Zero downtime migration strategy</li>
+      </ul>
+      <div class="cs-industry-tags">
+        <span class="cs-industry-tag">Next.js</span>
+        <span class="cs-industry-tag">Supabase</span>
+        <span class="cs-industry-tag">Vercel Edge</span>
+        <span class="cs-industry-tag">Redis Cache</span>
+      </div>
+      <a href="/contact" data-link class="cs-read-btn">
+        Diskusikan Proyek Serupa <i class="ph ph-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Other Case Studies -->
+<div class="cs-section-title">Semua Studi Kasus</div>
+
+<div class="cs-list">
+  <div class="cs-row">
+    <div class="cs-row-title">
+      <h3>InventoPro — Efisiensi Operasional Pabrik via Dashboard Real-time</h3>
+      <p>
+        Manufaktur · Semarang — Implementasi sistem monitoring stok otomatis, mengurangi kesalahan
+        input manual dari 23% menjadi 0.4%.
+      </p>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">↓98%</div>
+      <div class="cs-kpi-key">Error rate</div>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">6 bln</div>
+      <div class="cs-kpi-key">Payback period</div>
+    </div>
+    <div class="cs-row-tags">
+      <span class="cs-row-tag">React</span>
+      <span class="cs-row-tag">Node.js</span>
+      <span class="cs-row-tag">PostgreSQL</span>
+    </div>
+    <a href="/contact" data-link class="cs-read-btn">Detail <i class="ph ph-arrow-right"></i></a>
+  </div>
+
+  <div class="cs-row">
+    <div class="cs-row-title">
+      <h3>DompetKu — Akuisisi 12.000 Pengguna Organik dalam 90 Hari</h3>
+      <p>
+        FinTech · Nasional — Strategi onboarding + referral loop yang mendorong pertumbuhan organik
+        tanpa anggaran ikberbayar.
+      </p>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">12k</div>
+      <div class="cs-kpi-key">Users (90 hari)</div>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">4.8★</div>
+      <div class="cs-kpi-key">Play Store rating</div>
+    </div>
+    <div class="cs-row-tags">
+      <span class="cs-row-tag">Flutter</span>
+      <span class="cs-row-tag">Firebase</span>
+    </div>
+    <a href="/contact" data-link class="cs-read-btn">Detail <i class="ph ph-arrow-right"></i></a>
+  </div>
+
+  <div class="cs-row">
+    <div class="cs-row-title">
+      <h3>ArkaNusa — SEO Score 12 → 98 dalam 8 Minggu</h3>
+      <p>
+        Corporate · Surabaya — Rebuilding website lama ke Astro + Sanity CMS dengan arsitektur
+        SEO-first yang terstruktur.
+      </p>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">↑8×</div>
+      <div class="cs-kpi-key">Organic traffic</div>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">98/100</div>
+      <div class="cs-kpi-key">Lighthouse SEO</div>
+    </div>
+    <div class="cs-row-tags">
+      <span class="cs-row-tag">Astro</span>
+      <span class="cs-row-tag">Sanity</span>
+      <span class="cs-row-tag">Vercel</span>
+    </div>
+    <a href="/contact" data-link class="cs-read-btn">Detail <i class="ph ph-arrow-right"></i></a>
+  </div>
+
+  <div class="cs-row">
+    <div class="cs-row-title">
+      <h3>TeamSync HRMS — Memangkas Waktu Proses HR dari 3 Hari ke 4 Jam</h3>
+      <p>
+        Enterprise · Bandung — Otomasi alur approval multi-level untuk 400+ karyawan dengan
+        integrasi payroll BPJS otomatis.
+      </p>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">↓87%</div>
+      <div class="cs-kpi-key">Processing time</div>
+    </div>
+    <div class="cs-kpi">
+      <div class="cs-kpi-val">400+</div>
+      <div class="cs-kpi-key">Employees</div>
+    </div>
+    <div class="cs-row-tags">
+      <span class="cs-row-tag">Vue.js</span>
+      <span class="cs-row-tag">Laravel</span>
+    </div>
+    <a href="/contact" data-link class="cs-read-btn">Detail <i class="ph ph-arrow-right"></i></a>
+  </div>
+</div>
+
+<div class="cs-cta">
+  <h2>Ingin hasil seperti ini?</h2>
+  <p>
+    Setiap proyek dimulai dari konsultasi gratis. Ceritakan tantangan bisnis Anda dan kami siapkan
+    pendekatan yang tepat.
+  </p>
+  <a href="/contact" data-link class="btn-cta" style="display: inline-flex">
+    <span>Mulai Konsultasi</span>
+    <i class="ph-bold ph-arrow-right cta-arrow"></i>
+  </a>
+</div>

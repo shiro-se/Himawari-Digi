@@ -1,0 +1,427 @@
+<style>
+  .port-hero {
+    padding: 5rem 0 3rem;
+    text-align: center;
+  }
+  .port-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    padding: 0.3rem 0.85rem;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+  }
+  .port-hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--foreground);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .port-hero p {
+    font-size: 1.05rem;
+    color: var(--muted-foreground);
+    max-width: 540px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .port-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+  .port-filter-btn {
+    padding: 0.45rem 1.1rem;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .port-filter-btn:hover,
+  .port-filter-btn.active {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+  }
+  .port-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .port-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .port-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+  }
+  .port-card-img {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary) 15%, transparent),
+      color-mix(in srgb, var(--primary) 5%, transparent)
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .port-card-img-icon {
+    font-size: 3rem;
+    color: var(--primary);
+    opacity: 0.4;
+  }
+  .port-card-img-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+  }
+  .port-card-img-badge.live {
+    background: color-mix(in srgb, #22c55e 15%, transparent);
+    color: #16a34a;
+    border: 1px solid color-mix(in srgb, #22c55e 30%, transparent);
+  }
+  .port-card-img-badge.dev {
+    background: color-mix(in srgb, #f59e0b 15%, transparent);
+    color: #d97706;
+    border: 1px solid color-mix(in srgb, #f59e0b 30%, transparent);
+  }
+  .port-card-img-badge.concept {
+    background: color-mix(in srgb, var(--muted-foreground) 12%, transparent);
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+  }
+  .port-card-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+  .port-card-body h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+  }
+  .port-card-body p {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  .port-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.1rem;
+  }
+  .port-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+  .port-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+  .port-card-client {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+  }
+  .port-card-client strong {
+    color: var(--foreground);
+    display: block;
+    font-weight: 600;
+  }
+  .port-view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    transition: gap 0.2s;
+  }
+  .port-view-btn:hover {
+    gap: 8px;
+  }
+  .port-cta {
+    margin: 4rem auto 0;
+    text-align: center;
+    padding: 3rem 1.5rem 4rem;
+    max-width: 600px;
+  }
+  .port-cta h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--foreground);
+    margin-bottom: 0.75rem;
+  }
+  .port-cta p {
+    font-size: 0.95rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1.75rem;
+    line-height: 1.7;
+  }
+</style>
+
+<section class="port-hero">
+  <div class="port-hero-eyebrow">
+    <i class="ph ph-browser"></i>
+    Portfolio
+  </div>
+  <h1>Web Projects</h1>
+  <p>
+    Solusi web yang kami bangun — dari landing page konversi tinggi hingga platform SaaS yang
+    skalabel.
+  </p>
+</section>
+
+<div class="port-filter-bar">
+  <button class="port-filter-btn active" onclick="filterPort(this, 'all')">Semua</button>
+  <button class="port-filter-btn" onclick="filterPort(this, 'ecommerce')">E-Commerce</button>
+  <button class="port-filter-btn" onclick="filterPort(this, 'saas')">SaaS / Dashboard</button>
+  <button class="port-filter-btn" onclick="filterPort(this, 'landing')">Landing Page</button>
+  <button class="port-filter-btn" onclick="filterPort(this, 'company')">Company Profile</button>
+</div>
+
+<div class="port-grid">
+  <!-- Card 1 -->
+  <div class="port-card" data-cat="ecommerce">
+    <div class="port-card-img" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd)">
+      <i class="ph ph-storefront port-card-img-icon" style="color: #0284c7"></i>
+      <span class="port-card-img-badge live">Live</span>
+    </div>
+    <div class="port-card-body">
+      <h3>Nusantara Store</h3>
+      <p>
+        Platform e-commerce UMKM dengan fitur multi-vendor, payment gateway lokal, dan dashboard
+        penjual real-time.
+      </p>
+      <div class="port-tags">
+        <span class="port-tag">Next.js</span>
+        <span class="port-tag">Supabase</span>
+        <span class="port-tag">Midtrans</span>
+        <span class="port-tag">Tailwind CSS</span>
+      </div>
+      <div class="port-card-footer">
+        <div class="port-card-client">
+          <strong>Klien Retail</strong>
+          Yogyakarta
+        </div>
+        <a href="/contact" class="port-view-btn" data-link>
+          Diskusi Proyek <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="port-card" data-cat="saas">
+    <div class="port-card-img" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7)">
+      <i class="ph ph-chart-line-up port-card-img-icon" style="color: #16a34a"></i>
+      <span class="port-card-img-badge live">Live</span>
+    </div>
+    <div class="port-card-body">
+      <h3>InventoPro Dashboard</h3>
+      <p>
+        Sistem manajemen inventaris berbasis web untuk usaha manufaktur skala menengah dengan
+        laporan otomatis.
+      </p>
+      <div class="port-tags">
+        <span class="port-tag">React</span>
+        <span class="port-tag">Node.js</span>
+        <span class="port-tag">PostgreSQL</span>
+        <span class="port-tag">Recharts</span>
+      </div>
+      <div class="port-card-footer">
+        <div class="port-card-client">
+          <strong>Klien Manufaktur</strong>
+          Semarang
+        </div>
+        <a href="/contact" class="port-view-btn" data-link>
+          Diskusi Proyek <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="port-card" data-cat="landing">
+    <div class="port-card-img" style="background: linear-gradient(135deg, #fdf4ff, #fae8ff)">
+      <i class="ph ph-megaphone port-card-img-icon" style="color: #a21caf"></i>
+      <span class="port-card-img-badge live">Live</span>
+    </div>
+    <div class="port-card-body">
+      <h3>LaunchKit — Landing Page</h3>
+      <p>
+        Landing page produk SaaS dengan animasi premium, A/B testing terintegrasi, dan conversion
+        rate 4.2%.
+      </p>
+      <div class="port-tags">
+        <span class="port-tag">Vanilla JS</span>
+        <span class="port-tag">Tailwind CSS</span>
+        <span class="port-tag">GSAP</span>
+      </div>
+      <div class="port-card-footer">
+        <div class="port-card-client">
+          <strong>Startup Teknologi</strong>
+          Jakarta
+        </div>
+        <a href="/contact" class="port-view-btn" data-link>
+          Diskusi Proyek <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4 -->
+  <div class="port-card" data-cat="company">
+    <div class="port-card-img" style="background: linear-gradient(135deg, #fff7ed, #ffedd5)">
+      <i class="ph ph-buildings port-card-img-icon" style="color: #ea580c"></i>
+      <span class="port-card-img-badge live">Live</span>
+    </div>
+    <div class="port-card-body">
+      <h3>ArkaNusa Group</h3>
+      <p>
+        Website corporate multi-bahasa (ID/EN) dengan CMS headless, blog terintegrasi, dan SEO score
+        98/100.
+      </p>
+      <div class="port-tags">
+        <span class="port-tag">Astro</span>
+        <span class="port-tag">Sanity CMS</span>
+        <span class="port-tag">Vercel</span>
+      </div>
+      <div class="port-card-footer">
+        <div class="port-card-client">
+          <strong>Klien Korporat</strong>
+          Surabaya
+        </div>
+        <a href="/contact" class="port-view-btn" data-link>
+          Diskusi Proyek <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 5 -->
+  <div class="port-card" data-cat="saas">
+    <div class="port-card-img" style="background: linear-gradient(135deg, #eff6ff, #dbeafe)">
+      <i class="ph ph-users-three port-card-img-icon" style="color: #2563eb"></i>
+      <span class="port-card-img-badge dev">In Dev</span>
+    </div>
+    <div class="port-card-body">
+      <h3>TeamSync HRMS</h3>
+      <p>
+        Platform HR terintegrasi dengan modul absensi, penggajian, dan performance review berbasis
+        AI.
+      </p>
+      <div class="port-tags">
+        <span class="port-tag">Vue.js</span>
+        <span class="port-tag">Laravel</span>
+        <span class="port-tag">MySQL</span>
+        <span class="port-tag">OpenAI API</span>
+      </div>
+      <div class="port-card-footer">
+        <div class="port-card-client">
+          <strong>Klien Perusahaan</strong>
+          Bandung
+        </div>
+        <a href="/contact" class="port-view-btn" data-link>
+          Diskusi Proyek <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 6 -->
+  <div class="port-card" data-cat="ecommerce">
+    <div class="port-card-img" style="background: linear-gradient(135deg, #fff1f2, #ffe4e6)">
+      <i class="ph ph-package port-card-img-icon" style="color: #e11d48"></i>
+      <span class="port-card-img-badge concept">Concept</span>
+    </div>
+    <div class="port-card-body">
+      <h3>Pasar Digital Batik</h3>
+      <p>
+        Marketplace B2B untuk pengrajin batik Yogyakarta dengan fitur AR try-on dan sistem lelang
+        online.
+      </p>
+      <div class="port-tags">
+        <span class="port-tag">Next.js</span>
+        <span class="port-tag">Three.js</span>
+        <span class="port-tag">Stripe</span>
+      </div>
+      <div class="port-card-footer">
+        <div class="port-card-client">
+          <strong>Inisiatif Internal</strong>
+          Yogyakarta
+        </div>
+        <a href="/contact" class="port-view-btn" data-link>
+          Diskusi Proyek <i class="ph ph-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="port-cta">
+  <h2>Punya ide proyek web?</h2>
+  <p>
+    Kami terbuka untuk kolaborasi baru. Ceritakan kebutuhan Anda dan tim kami akan menyiapkan
+    proposal dalam 1×24 jam.
+  </p>
+  <a href="/contact" data-link class="btn-cta" style="display: inline-flex">
+    <span>Mulai Diskusi</span>
+    <i class="ph-bold ph-arrow-right cta-arrow"></i>
+  </a>
+</div>
+
+<script>
+  function filterPort(btn, cat) {
+    document.querySelectorAll('.port-filter-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.port-card').forEach((card) => {
+      const show = cat === 'all' || card.dataset.cat === cat;
+      card.style.display = show ? '' : 'none';
+    });
+  }
+</script>

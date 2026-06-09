@@ -3,21 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <!-- PWA Meta Tags -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0d9488" />
+    <meta
+      name="description"
+      content="HimawariDigi adalah agensi pengembangan web di Yogyakarta. Kami membangun web app, mobile app, dan solusi cloud yang skalabel."
+    />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Himawari CS" />
+    <meta name="apple-mobile-web-app-title" content="HimawariDigi" />
+    <meta property="og:title" content="HimawariDigi — Agensi Web & Mobile" />
+    <meta property="og:description" content="Mitra teknologi terpercaya..." />
+    <meta property="og:image" content="/assets/og-cover.png" />
+    <meta property="og:url" content="https://himawari-digi-creative.vercel.app" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="apple-touch-icon" href="/assets/logo/icon-192x192.png" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest-client.json" />
 
     <title>HimawariDigi - Empowering Your Digital Future</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/logo/icon-192x192.png" />
+    <link rel="shortcut icon" href="/assets/logo/icon-192x192.png" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800;900&display=swap"
       rel="stylesheet"
     />
 
@@ -25,7 +40,17 @@
     <link rel="stylesheet" href="./css/output.css" />
 
     <!-- Phosphor Icons (for premium lightweight icons) -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "HimawariDigi Creative",
+        "url": "https://himawari-digi-creative.vercel.app",
+        "logo": "/assets/logo/icon-192x192.png",
+        "address": { "@type": "PostalAddress", "addressLocality": "Yogyakarta" }
+      }
+    </script>
   </head>
   <body class="min-h-screen flex flex-col font-sans">
     <!-- Navbar -->
@@ -38,15 +63,13 @@
           data-link
         >
           <span
-            class="text-xl md:text-2xl font-black tracking-tighter"
-            style="font-family: 'Outfit', sans-serif"
+            class="text-xl md:text-2xl font-black tracking-tighter font-outfit"
           >
             <span class="text-foreground dark:text-white">HIMAWARI</span
             ><span class="text-primary">DIGI</span>
           </span>
           <span
-            class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase"
-            style="font-family: 'Outfit', sans-serif"
+            class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase font-outfit"
             >CREATIVE</span
           >
         </a>
@@ -60,13 +83,18 @@
 
           <!-- Portfolio Dropdown -->
           <li class="nav-item" id="navPortfolio" data-dropdown>
-            <button class="nav-link" aria-expanded="false" aria-haspopup="true">
+            <button
+              class="nav-link"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-controls="portfolio-dropdown-menu"
+            >
               <span data-i18n="nav_portfolio">Portfolio</span>
               <span class="nav-caret">
                 <i class="ph ph-caret-down" style="font-size: 12px"></i>
               </span>
             </button>
-            <div class="dropdown" role="menu">
+            <div class="dropdown" role="menu" id="portfolio-dropdown-menu">
               <a href="/portfolio/web" class="dropdown-item" data-link>
                 <div class="di-icon"><i class="ph ph-browser"></i></div>
                 <div class="di-text">
@@ -186,15 +214,13 @@
             data-link
           >
             <span
-              class="text-2xl font-black tracking-tighter"
-              style="font-family: 'Outfit', sans-serif"
+              class="text-2xl font-black tracking-tighter font-outfit"
             >
               <span class="text-foreground dark:text-white">HIMAWARI</span
               ><span class="text-primary">DIGI</span>
             </span>
             <span
-              class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase"
-              style="font-family: 'Outfit', sans-serif"
+              class="text-[0.65rem] md:text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase font-outfit"
               >CREATIVE</span
             >
           </a>
@@ -203,19 +229,27 @@
             masalah kompleks menjadi perangkat lunak yang elegan dan berdampak.
           </p>
           <div class="footer-socials">
-            <a href="#" class="social-btn" aria-label="LinkedIn">
+            <a
+              href="https://www.linkedin.com/company/himawaridigital/"
+              class="social-btn"
+              aria-label="LinkedIn"
+            >
               <i class="ph-fill ph-linkedin-logo"></i>
             </a>
-            <a href="#" class="social-btn" aria-label="Twitter / X">
+            <a href="https://twitter.com/HimawariDigi" class="social-btn" aria-label="Twitter / X">
               <i class="ph-fill ph-x-logo"></i>
             </a>
-            <a href="#" class="social-btn" aria-label="GitHub">
+            <a href="https://github.com/HimawariDigi" class="social-btn" aria-label="GitHub">
               <i class="ph-fill ph-github-logo"></i>
             </a>
-            <a href="#" class="social-btn" aria-label="Instagram">
+            <a
+              href="https://instagram.com/himawaridigital"
+              class="social-btn"
+              aria-label="Instagram"
+            >
               <i class="ph-fill ph-instagram-logo"></i>
             </a>
-            <a href="#" class="social-btn" aria-label="Email">
+            <a href="[EMAIL_ADDRESS]" class="social-btn" aria-label="Email">
               <i class="ph ph-envelope"></i>
             </a>
           </div>
@@ -332,15 +366,16 @@
             Dapatkan update terbaru tentang teknologi dan insight dari tim kami, langsung di inbox
             Anda.
           </p>
-          <div class="newsletter-form">
+          <form class="newsletter-form" onsubmit="handleNewsletter(event)">
             <div class="newsletter-input-wrap">
               <input
                 type="email"
                 class="newsletter-input"
                 placeholder="email@kamu.com"
                 aria-label="Email address"
+                required
               />
-              <button class="newsletter-btn" aria-label="Subscribe">
+              <button type="submit" class="newsletter-btn" aria-label="Subscribe">
                 <i class="ph-bold ph-paper-plane-tilt"></i>
               </button>
             </div>
@@ -348,7 +383,7 @@
               <i class="ph ph-lock-simple" style="font-size: 13px"></i>
               <span data-i18n="footer_subscribe_note">Tidak ada spam. Unsubscribe kapan saja.</span>
             </p>
-          </div>
+          </form>
 
           <!-- Location -->
           <div style="margin-top: 1.5rem; display: flex; align-items: flex-start; gap: 8px">
@@ -428,7 +463,9 @@
             </div>
             <div class="chat-header-text">
               <h4 class="chat-header-title" data-i18n="chat_header_title">HimawariDigi Support</h4>
-              <p class="chat-header-subtitle" id="chat-subtitle" data-i18n="chat_header_subtitle">Biasanya membalas dalam beberapa menit</p>
+              <p class="chat-header-subtitle" id="chat-subtitle" data-i18n="chat_header_subtitle">
+                Biasanya membalas dalam beberapa menit
+              </p>
             </div>
           </div>
           <button id="chat-minimize" class="chat-action-btn" aria-label="Minimize chat">
@@ -445,18 +482,39 @@
                 <i class="ph-fill ph-hand-waving"></i>
               </div>
               <h3 data-i18n="chat_prechat_title">Mulai percakapan</h3>
-              <p data-i18n="chat_prechat_desc">Halo! Isi data berikut untuk memulai chat dengan tim kami.</p>
+              <p data-i18n="chat_prechat_desc">
+                Halo! Isi data berikut untuk memulai chat dengan tim kami.
+              </p>
             </div>
             <form id="chat-prechat-form" autocomplete="off">
               <!-- Honeypot (anti-bot) -->
-              <input type="text" name="hp_field" class="chat-hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+              <input
+                type="text"
+                name="hp_field"
+                class="chat-hp"
+                tabindex="-1"
+                autocomplete="off"
+                aria-hidden="true"
+              />
               <div class="chat-form-group">
                 <label for="chat-prechat-name" data-i18n="chat_name_label">Nama kamu</label>
-                <input type="text" id="chat-prechat-name" required minlength="2" maxlength="50" placeholder="John Doe" />
+                <input
+                  type="text"
+                  id="chat-prechat-name"
+                  required
+                  minlength="2"
+                  maxlength="50"
+                  placeholder="John Doe"
+                />
               </div>
               <div class="chat-form-group">
                 <label for="chat-prechat-email" data-i18n="chat_email_label">Email kamu</label>
-                <input type="email" id="chat-prechat-email" required placeholder="john@example.com" />
+                <input
+                  type="email"
+                  id="chat-prechat-email"
+                  required
+                  placeholder="john@example.com"
+                />
               </div>
               <div class="chat-form-group" id="chat-challenge-group">
                 <label id="chat-challenge-label"></label>
@@ -492,7 +550,7 @@
         </div>
 
         <!-- Emoji Picker -->
-        <div class="chat-emoji-picker" id="chat-emoji-picker" style="display:none">
+        <div class="chat-emoji-picker" id="chat-emoji-picker" style="display: none">
           <button type="button" class="chat-emoji-btn">😀</button>
           <button type="button" class="chat-emoji-btn">😂</button>
           <button type="button" class="chat-emoji-btn">🤣</button>
@@ -525,8 +583,8 @@
             <label class="chat-attach-btn" for="chat-image-upload" title="Lampirkan file">
               <i class="ph ph-paperclip"></i>
             </label>
-            <input type="file" id="chat-image-upload" accept="*/*" style="display:none" />
-            
+            <input type="file" id="chat-image-upload" accept="*/*" style="display: none" />
+
             <button type="button" class="chat-attach-btn" id="chat-emoji-toggle" title="Emoji">
               <i class="ph ph-smiley"></i>
             </button>
@@ -549,21 +607,101 @@
           </div>
         </div>
 
-
         <!-- Image Lightbox -->
-        <div class="chat-lightbox" id="chat-lightbox" style="display:none; align-items:center; justify-content:center;">
-          <div class="chat-lightbox-overlay" style="position: absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:999;"></div>
-          
-          <div class="chat-lightbox-toolbar" style="position:absolute; top:15px; right:15px; display:flex; gap:8px; z-index:1001;">
-            <button id="chat-lightbox-zoom-in" title="Zoom In" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-magnifying-glass-plus"></i></button>
-            <button id="chat-lightbox-zoom-out" title="Zoom Out" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-magnifying-glass-minus"></i></button>
-            <button id="chat-lightbox-reset" title="Reset Zoom" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-arrows-out"></i></button>
-            <a id="chat-lightbox-download" download title="Download" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s; text-decoration:none;"><i class="ph ph-download-simple"></i></a>
-            <button id="chat-lightbox-close" title="Close" style="background:rgba(255,255,255,0.1); border:none; color:white; width:36px; height:36px; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:0.2s;"><i class="ph ph-x"></i></button>
+        <div
+          class="chat-lightbox"
+          id="chat-lightbox"
+          style="display: none; align-items: center; justify-content: center"
+        >
+          <div
+            class="chat-lightbox-overlay"
+            style="
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0, 0, 0, 0.85);
+              z-index: 999;
+            "
+          ></div>
+
+          <div
+            class="chat-lightbox-toolbar"
+            style="
+              position: absolute;
+              top: 15px;
+              right: 15px;
+              display: flex;
+              gap: 8px;
+              z-index: 1001;
+            "
+          >
+            <button
+              id="chat-lightbox-zoom-in"
+              class="lightbox-btn"
+              title="Zoom In"
+            >
+              <i class="ph ph-magnifying-glass-plus"></i>
+            </button>
+            <button
+              id="chat-lightbox-zoom-out"
+              class="lightbox-btn"
+              title="Zoom Out"
+            >
+              <i class="ph ph-magnifying-glass-minus"></i>
+            </button>
+            <button
+              id="chat-lightbox-reset"
+              class="lightbox-btn"
+              title="Reset Zoom"
+            >
+              <i class="ph ph-arrows-out"></i>
+            </button>
+            <a
+              id="chat-lightbox-download"
+              class="lightbox-btn"
+              download
+              title="Download"
+              style="text-decoration: none;"
+              ><i class="ph ph-download-simple"></i
+            ></a>
+            <button
+              id="chat-lightbox-close"
+              class="lightbox-btn"
+              title="Close"
+            >
+              <i class="ph ph-x"></i>
+            </button>
           </div>
 
-          <div id="chat-lightbox-img-wrapper" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; z-index:1000;">
-            <img id="chat-lightbox-img" src="" alt="Preview" style="max-width:90%; max-height:90%; object-fit:contain; transition: transform 0.1s ease-out; cursor: grab;" draggable="false" />
+          <div
+            id="chat-lightbox-img-wrapper"
+            style="
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+              position: relative;
+              z-index: 1000;
+            "
+          >
+            <img
+              id="chat-lightbox-img"
+              src=""
+              alt="Preview"
+              loading="lazy"
+              style="
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain;
+                transition: transform 0.1s ease-out;
+                cursor: grab;
+              "
+              draggable="false"
+            />
           </div>
         </div>
       </div>
@@ -577,12 +715,14 @@
     </div>
 
     <!-- Context Menu -->
-    <div class="chat-context-menu" id="chat-context-menu" style="display:none">
+    <div class="chat-context-menu" id="chat-context-menu" style="display: none">
       <button id="chat-ctx-reply"><i class="ph ph-arrow-u-up-left"></i> Reply</button>
       <button id="chat-ctx-copy"><i class="ph ph-copy"></i> Salin</button>
       <button id="chat-ctx-edit"><i class="ph ph-pencil-simple"></i> Edit</button>
       <button id="chat-ctx-fav"><i class="ph ph-star"></i> Favorite</button>
-      <button id="chat-ctx-download" style="display:none;"><i class="ph ph-download-simple"></i> Download File</button>
+      <button id="chat-ctx-download" style="display: none">
+        <i class="ph ph-download-simple"></i> Download File
+      </button>
       <div class="chat-ctx-reactions">
         <button>👍</button>
         <button>❤️</button>
@@ -596,8 +736,8 @@
     <!-- Vercel Speed Insights -->
     <script type="module" src="./js/speed-insights.js"></script>
     <!-- GSAP for Animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="./js/supabase-config.js"></script>
     <!-- Custom Components -->
     <script src="./js/card-swap.js"></script>

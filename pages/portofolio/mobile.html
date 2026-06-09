@@ -1,0 +1,426 @@
+<style>
+  .mob-hero {
+    padding: 5rem 0 3rem;
+    text-align: center;
+  }
+  .mob-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    padding: 0.3rem 0.85rem;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+  }
+  .mob-hero h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--foreground);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .mob-hero p {
+    font-size: 1.05rem;
+    color: var(--muted-foreground);
+    max-width: 540px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .mob-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 3.5rem;
+  }
+  .mob-stat {
+    text-align: center;
+  }
+  .mob-stat-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .mob-stat-label {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin-top: 4px;
+  }
+  .mob-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .mob-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    display: flex;
+    gap: 0;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+  }
+  .mob-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
+  }
+  .mob-card-sidebar {
+    width: 90px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 1.25rem 0.75rem;
+    border-right: 1px solid var(--border);
+  }
+  .mob-app-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+  }
+  .mob-platform-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mob-platform {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  .mob-platform.ios {
+    background: color-mix(in srgb, #3b82f6 12%, transparent);
+    color: #1d4ed8;
+  }
+  .mob-platform.android {
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    color: #15803d;
+  }
+  .mob-platform.flutter {
+    background: color-mix(in srgb, #06b6d4 12%, transparent);
+    color: #0e7490;
+  }
+  .mob-card-body {
+    flex: 1;
+    padding: 1.25rem;
+  }
+  .mob-card-body h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 0.4rem;
+  }
+  .mob-card-body p {
+    font-size: 0.82rem;
+    color: var(--muted-foreground);
+    line-height: 1.55;
+    margin-bottom: 0.85rem;
+  }
+  .mob-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 0.85rem;
+  }
+  .mob-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.18rem 0.55rem;
+    border-radius: 4px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+  }
+  .mob-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mob-status {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+  }
+  .mob-status.published {
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    color: #15803d;
+  }
+  .mob-status.beta {
+    background: color-mix(in srgb, #f59e0b 12%, transparent);
+    color: #b45309;
+  }
+  .mob-status.development {
+    background: color-mix(in srgb, var(--muted-foreground) 12%, transparent);
+    color: var(--muted-foreground);
+  }
+  .mob-downloads {
+    font-size: 0.72rem;
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mob-cta {
+    margin: 4rem auto 0;
+    text-align: center;
+    padding: 3rem 1.5rem 4rem;
+    max-width: 600px;
+  }
+  .mob-cta h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--foreground);
+    margin-bottom: 0.75rem;
+  }
+  .mob-cta p {
+    font-size: 0.95rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1.75rem;
+    line-height: 1.7;
+  }
+  .mob-tech-note {
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .mob-tech-note i {
+    color: var(--primary);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .mob-tech-note p {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+    margin: 0;
+  }
+</style>
+
+<section class="mob-hero">
+  <div class="mob-hero-eyebrow">
+    <i class="ph ph-app-window"></i>
+    Portfolio
+  </div>
+  <h1>Mobile Projects</h1>
+  <p>
+    Aplikasi mobile yang kami rancang dan bangun — dari iOS native hingga cross-platform Flutter.
+  </p>
+</section>
+
+<div class="mob-stats">
+  <div class="mob-stat">
+    <div class="mob-stat-num">8+</div>
+    <div class="mob-stat-label">Aplikasi Diluncurkan</div>
+  </div>
+  <div class="mob-stat">
+    <div class="mob-stat-num">50k+</div>
+    <div class="mob-stat-label">Total Downloads</div>
+  </div>
+  <div class="mob-stat">
+    <div class="mob-stat-num">4.7★</div>
+    <div class="mob-stat-label">Rating Rata-rata</div>
+  </div>
+  <div class="mob-stat">
+    <div class="mob-stat-num">iOS+Droid</div>
+    <div class="mob-stat-label">Platform</div>
+  </div>
+</div>
+
+<div class="mob-tech-note">
+  <i class="ph ph-info"></i>
+  <p>
+    Kami mengembangkan aplikasi native (Swift/Kotlin) dan cross-platform (Flutter/React Native)
+    sesuai kebutuhan dan anggaran klien. Semua proyek melewati proses QA ketat sebelum publish ke
+    App Store & Play Store.
+  </p>
+</div>
+
+<div class="mob-grid">
+  <!-- Card 1 -->
+  <div class="mob-card">
+    <div class="mob-card-sidebar">
+      <div class="mob-app-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6)">
+        <i class="ph-fill ph-wallet" style="color: white"></i>
+      </div>
+      <div class="mob-platform-badges">
+        <span class="mob-platform ios">iOS</span>
+        <span class="mob-platform android">Android</span>
+      </div>
+    </div>
+    <div class="mob-card-body">
+      <h3>DompetKu — Finance App</h3>
+      <p>
+        Aplikasi keuangan pribadi dengan fitur pencatatan otomatis, budget planner, dan laporan
+        visual mingguan.
+      </p>
+      <div class="mob-tags">
+        <span class="mob-tag">Flutter</span>
+        <span class="mob-tag">Firebase</span>
+        <span class="mob-tag">Supabase</span>
+      </div>
+      <div class="mob-card-meta">
+        <span class="mob-status published">Published</span>
+        <span class="mob-downloads"><i class="ph ph-download-simple"></i> 12k+ downloads</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="mob-card">
+    <div class="mob-card-sidebar">
+      <div class="mob-app-icon" style="background: linear-gradient(135deg, #f97316, #fb923c)">
+        <i class="ph-fill ph-fork-knife" style="color: white"></i>
+      </div>
+      <div class="mob-platform-badges">
+        <span class="mob-platform ios">iOS</span>
+        <span class="mob-platform android">Android</span>
+      </div>
+    </div>
+    <div class="mob-card-body">
+      <h3>WargaMakan</h3>
+      <p>
+        Aplikasi pesan antar makanan lokal dengan fitur tracking real-time dan integrasi pembayaran
+        QRIS.
+      </p>
+      <div class="mob-tags">
+        <span class="mob-tag">React Native</span>
+        <span class="mob-tag">Node.js</span>
+        <span class="mob-tag">Socket.io</span>
+      </div>
+      <div class="mob-card-meta">
+        <span class="mob-status published">Published</span>
+        <span class="mob-downloads"><i class="ph ph-download-simple"></i> 8k+ downloads</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="mob-card">
+    <div class="mob-card-sidebar">
+      <div class="mob-app-icon" style="background: linear-gradient(135deg, #10b981, #34d399)">
+        <i class="ph-fill ph-heartbeat" style="color: white"></i>
+      </div>
+      <div class="mob-platform-badges">
+        <span class="mob-platform ios">iOS</span>
+        <span class="mob-platform android">Android</span>
+      </div>
+    </div>
+    <div class="mob-card-body">
+      <h3>HealthTrack Pro</h3>
+      <p>
+        Aplikasi monitoring kesehatan dengan integrasi wearable device, reminder obat, dan
+        konsultasi dokter online.
+      </p>
+      <div class="mob-tags">
+        <span class="mob-tag">Flutter</span>
+        <span class="mob-tag">HealthKit</span>
+        <span class="mob-tag">WebRTC</span>
+      </div>
+      <div class="mob-card-meta">
+        <span class="mob-status published">Published</span>
+        <span class="mob-downloads"><i class="ph ph-download-simple"></i> 20k+ downloads</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4 -->
+  <div class="mob-card">
+    <div class="mob-card-sidebar">
+      <div class="mob-app-icon" style="background: linear-gradient(135deg, #3b82f6, #60a5fa)">
+        <i class="ph-fill ph-graduation-cap" style="color: white"></i>
+      </div>
+      <div class="mob-platform-badges">
+        <span class="mob-platform android">Android</span>
+      </div>
+    </div>
+    <div class="mob-card-body">
+      <h3>BelajarIn — EdTech App</h3>
+      <p>
+        Platform belajar online untuk pelajar SMA dengan fitur video pembelajaran, kuis interaktif,
+        dan leaderboard.
+      </p>
+      <div class="mob-tags">
+        <span class="mob-tag">Kotlin</span>
+        <span class="mob-tag">Jetpack Compose</span>
+        <span class="mob-tag">Firebase</span>
+      </div>
+      <div class="mob-card-meta">
+        <span class="mob-status beta">Beta Testing</span>
+        <span class="mob-downloads"><i class="ph ph-users"></i> 500 beta users</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 5 -->
+  <div class="mob-card">
+    <div class="mob-card-sidebar">
+      <div class="mob-app-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa)">
+        <i class="ph-fill ph-map-trifold" style="color: white"></i>
+      </div>
+      <div class="mob-platform-badges">
+        <span class="mob-platform flutter">Flutter</span>
+      </div>
+    </div>
+    <div class="mob-card-body">
+      <h3>WisataJogja</h3>
+      <p>
+        Panduan wisata Yogyakarta offline-first dengan AR landmark recognition dan rekomendasi
+        kuliner terdekat.
+      </p>
+      <div class="mob-tags">
+        <span class="mob-tag">Flutter</span>
+        <span class="mob-tag">ML Kit</span>
+        <span class="mob-tag">Google Maps</span>
+      </div>
+      <div class="mob-card-meta">
+        <span class="mob-status development">In Development</span>
+        <span class="mob-downloads"><i class="ph ph-clock"></i> Q3 2026</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mob-cta">
+  <h2>Siap bangun aplikasi Anda?</h2>
+  <p>
+    Dari wireframe hingga publish ke App Store — kami tangani semuanya. Konsultasi pertama gratis.
+  </p>
+  <a href="/contact" data-link class="btn-cta" style="display: inline-flex">
+    <span>Konsultasi Gratis</span>
+    <i class="ph-bold ph-arrow-right cta-arrow"></i>
+  </a>
+</div>

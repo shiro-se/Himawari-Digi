@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://himawari-digi-creative.vercel.app/sitemap.xml
