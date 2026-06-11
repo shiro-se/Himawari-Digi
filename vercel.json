@@ -5,7 +5,7 @@
       "destination": "/cs.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!pages/|js/|css/|assets/).*)",
       "destination": "/index.html"
     }
   ],
