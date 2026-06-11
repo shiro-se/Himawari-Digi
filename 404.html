@@ -252,51 +252,6 @@
         }
       }
 
-      /* Center icon */
-      .err-icon-wrap {
-        position: relative;
-        z-index: 2;
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        background: color-mix(in srgb, var(--primary) 10%, transparent);
-        border: 1.5px solid color-mix(in srgb, var(--primary) 30%, transparent);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        animation: iconPop 0.6s 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 35%, transparent);
-      }
-      @keyframes iconPop {
-        from {
-          opacity: 0;
-          transform: scale(0.4);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-
-      .err-icon-wrap::after {
-        content: '';
-        position: absolute;
-        inset: -6px;
-        border-radius: 50%;
-        border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
-        animation: ringPulse 2.5s ease-out infinite;
-      }
-      @keyframes ringPulse {
-        0% {
-          transform: scale(1);
-          opacity: 0.8;
-        }
-        100% {
-          transform: scale(1.8);
-          opacity: 0;
-        }
-      }
-
       .err-icon {
         font-size: 2rem;
         color: var(--primary);
@@ -499,9 +454,6 @@
       <!-- Visual 404 -->
       <div class="err-visual" aria-hidden="true">
         <div class="err-bg-num">404</div>
-        <div class="err-icon-wrap">
-          <i class="ph-bold ph-plug-charging err-icon" aria-hidden="true"></i>
-        </div>
       </div>
 
       <!-- Status chip -->
