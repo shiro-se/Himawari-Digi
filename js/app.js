@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadTranslationFile = async (name) => {
     if (loadedTranslationFiles.has(name)) return;
     try {
-      const res = await fetch(`./js/locales/${name}.json`);
+      const res = await fetch(`/js/locales/${name}.json`);
       if (res.ok) {
         const data = await res.json();
         if (data.en) Object.assign(window.translations.en, data.en);
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pageCache[route]) {
         htmlContent = pageCache[route];
       } else {
-        const response = await fetch(`./pages/${route}.html`);
+        const response = await fetch(`/pages/${route}.html`);
         if (!response.ok) throw new Error('Page not found');
         htmlContent = await response.text();
         pageCache[route] = htmlContent;
