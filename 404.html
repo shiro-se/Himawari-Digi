@@ -3,11 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>404 - Halaman Tidak Ditemukan | HimawariDigi</title>
+    <title>404 — Halaman Tidak Ditemukan | HimawariDigi</title>
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/icon-192x192.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/logo/icon-192x192.png" />
     <link rel="shortcut icon" href="/assets/logo/icon-192x192.png" />
-    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,47 +15,563 @@
     />
     <link rel="stylesheet" href="/css/output.css" />
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+
+    <style>
+      /* ── Reset & base ─────────────────────────────────── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--background);
+        color: var(--foreground);
+        font-family: 'Inter', sans-serif;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* ── Animated dot-grid background ────────────────── */
+      .bg-dots {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image: radial-gradient(
+          circle,
+          color-mix(in srgb, var(--primary) 18%, transparent) 1px,
+          transparent 1px
+        );
+        background-size: 32px 32px;
+        animation: bgDrift 20s linear infinite;
+        opacity: 0.5;
+      }
+      @keyframes bgDrift {
+        from {
+          background-position: 0 0;
+        }
+        to {
+          background-position: 64px 64px;
+        }
+      }
+
+      /* ── Radial vignette ──────────────────────────────── */
+      .bg-vignette {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 80% 70% at 50% 50%,
+          transparent 40%,
+          var(--background) 100%
+        );
+      }
+
+      /* ── Floating orbs ───────────────────────────────── */
+      .orb {
+        position: fixed;
+        border-radius: 50%;
+        z-index: 0;
+        pointer-events: none;
+        filter: blur(60px);
+        opacity: 0.12;
+        animation: orbFloat var(--dur, 12s) ease-in-out infinite;
+      }
+      .orb-1 {
+        width: 320px;
+        height: 320px;
+        top: -80px;
+        left: -80px;
+        background: var(--primary);
+        --dur: 14s;
+      }
+      .orb-2 {
+        width: 260px;
+        height: 260px;
+        bottom: -60px;
+        right: -60px;
+        background: var(--chart-1, var(--primary));
+        --dur: 18s;
+        animation-delay: -7s;
+      }
+      .orb-3 {
+        width: 180px;
+        height: 180px;
+        top: 50%;
+        left: 55%;
+        background: var(--primary);
+        --dur: 10s;
+        animation-delay: -3s;
+        opacity: 0.06;
+      }
+      @keyframes orbFloat {
+        0%,
+        100% {
+          transform: translate(0, 0) scale(1);
+        }
+        50% {
+          transform: translate(20px, -30px) scale(1.08);
+        }
+      }
+
+      /* ── Content wrapper ─────────────────────────────── */
+      .content {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 2rem 1.5rem;
+        max-width: 540px;
+        width: 100%;
+        animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Logo ─────────────────────────────────────────── */
+      .logo {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        text-decoration: none;
+        margin-bottom: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .logo-white {
+        color: var(--foreground);
+      }
+      .logo-primary {
+        color: var(--primary);
+      }
+
+      /* ── 404 visual stack ────────────────────────────── */
+      .err-visual {
+        position: relative;
+        width: 260px;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+      }
+
+      /* Ghost outline 404 */
+      .err-bg-num {
+        font-family: 'Outfit', sans-serif;
+        font-size: 9rem;
+        font-weight: 900;
+        line-height: 1;
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+        -webkit-text-stroke: 2px color-mix(in srgb, var(--primary) 22%, transparent);
+        letter-spacing: -0.05em;
+        animation: numPulse 3.5s ease-in-out infinite;
+        user-select: none;
+      }
+      @keyframes numPulse {
+        0%,
+        100% {
+          -webkit-text-stroke-color: color-mix(in srgb, var(--primary) 22%, transparent);
+        }
+        50% {
+          -webkit-text-stroke-color: color-mix(in srgb, var(--primary) 45%, transparent);
+        }
+      }
+
+      /* Glitch layers */
+      .err-bg-num::before,
+      .err-bg-num::after {
+        content: '404';
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+        animation: glitch 5s infinite;
+      }
+      .err-bg-num::before {
+        -webkit-text-stroke: 1.5px color-mix(in srgb, #e24b4a 40%, transparent);
+        animation-delay: 0s;
+        clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      }
+      .err-bg-num::after {
+        -webkit-text-stroke: 1.5px color-mix(in srgb, var(--primary) 40%, transparent);
+        animation-delay: 0.08s;
+        clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+      }
+      @keyframes glitch {
+        0%,
+        90%,
+        100% {
+          transform: translate(0, 0);
+          opacity: 0;
+        }
+        91% {
+          transform: translate(-4px, -2px);
+          opacity: 1;
+        }
+        92% {
+          transform: translate(4px, 2px);
+          opacity: 1;
+        }
+        93% {
+          transform: translate(-2px, 0);
+          opacity: 1;
+        }
+        94%,
+        89% {
+          transform: translate(0, 0);
+          opacity: 0;
+        }
+      }
+
+      /* Center icon */
+      .err-icon-wrap {
+        position: relative;
+        z-index: 2;
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+        border: 1.5px solid color-mix(in srgb, var(--primary) 30%, transparent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: iconPop 0.6s 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 35%, transparent);
+      }
+      @keyframes iconPop {
+        from {
+          opacity: 0;
+          transform: scale(0.4);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .err-icon-wrap::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+        animation: ringPulse 2.5s ease-out infinite;
+      }
+      @keyframes ringPulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.8;
+        }
+        100% {
+          transform: scale(1.8);
+          opacity: 0;
+        }
+      }
+
+      .err-icon {
+        font-size: 2rem;
+        color: var(--primary);
+      }
+
+      /* ── Status chip ─────────────────────────────────── */
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.85rem;
+        border-radius: 99px;
+        background: color-mix(in srgb, #e24b4a 10%, transparent);
+        color: #e24b4a;
+        border: 1px solid color-mix(in srgb, #e24b4a 25%, transparent);
+        margin-bottom: 1rem;
+      }
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #e24b4a;
+        animation: blink 1.2s ease-in-out infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.2;
+        }
+      }
+
+      /* ── Typography ──────────────────────────────────── */
+      .err-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(1.6rem, 5vw, 2.25rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        color: var(--foreground);
+        margin: 0 0 0.75rem;
+        animation: fadeUp 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      .err-desc {
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: var(--muted-foreground);
+        margin: 0 0 2rem;
+        max-width: 400px;
+        animation: fadeUp 0.7s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      /* ── CTA buttons ─────────────────────────────────── */
+      .cta-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        animation: fadeUp 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.7rem 1.5rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        background: var(--primary);
+        color: var(--primary-foreground);
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s,
+          filter 0.2s;
+        box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 35%, transparent);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+        box-shadow: 0 8px 28px color-mix(in srgb, var(--primary) 45%, transparent);
+      }
+
+      .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.7rem 1.25rem;
+        border-radius: 10px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        background: transparent;
+        color: var(--foreground);
+        text-decoration: none;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        transition:
+          background 0.2s,
+          transform 0.2s,
+          border-color 0.2s;
+      }
+      .btn-ghost:hover {
+        background: var(--accent);
+        border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+        transform: translateY(-2px);
+      }
+
+      /* ── Quick links ─────────────────────────────────── */
+      .quick-links {
+        margin-top: 2.5rem;
+        animation: fadeUp 0.7s 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .quick-links-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted-foreground);
+        margin-bottom: 0.75rem;
+      }
+      .quick-links-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .quick-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.35rem 0.85rem;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--muted-foreground) 8%, transparent);
+        color: var(--muted-foreground);
+        text-decoration: none;
+        border: 1px solid var(--border);
+        transition:
+          background 0.2s,
+          color 0.2s,
+          transform 0.2s;
+      }
+      .quick-link:hover {
+        background: color-mix(in srgb, var(--primary) 10%, transparent);
+        color: var(--primary);
+        border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+        transform: translateY(-1px);
+      }
+
+      /* ── Error code footer ───────────────────────────── */
+      .err-footer {
+        position: fixed;
+        bottom: 1.25rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        z-index: 10;
+        animation: fadeUp 0.7s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      .err-footer-inner {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.7rem;
+        color: var(--muted-foreground);
+        opacity: 0.5;
+      }
+      .err-footer-sep {
+        opacity: 0.4;
+      }
+    </style>
   </head>
-  <body class="min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden font-sans m-0 p-0">
-    
-    <!-- Cyber Grid Background -->
-    <div class="absolute inset-0 bg-cyber-grid opacity-30 pointer-events-none z-0"></div>
-    
-    <div class="relative z-10 text-center px-4 max-w-lg mx-auto flex flex-col items-center">
-      <div class="mb-10">
-        <span
-          class="text-4xl md:text-5xl font-black tracking-tighter font-outfit"
-        >
-          <span class="text-foreground dark:text-white">HIMAWARI</span
-          ><span class="text-primary">DIGI</span>
-        </span>
-      </div>
-      
-      <div class="relative inline-block mb-8">
-        <h1 class="text-9xl font-black font-outfit text-transparent bg-clip-text bg-gradient-to-br from-primary to-chart-1 opacity-20 relative z-0" style="font-size: 10rem; line-height: 1;">404</h1>
-        <div class="absolute inset-0 flex items-center justify-center z-10">
-          <i class="ph-bold ph-warning-circle text-6xl text-primary drop-shadow-[0_0_15px_rgba(21,93,252,0.5)]"></i>
+
+  <body>
+    <!-- Animated background layers -->
+    <div class="bg-dots" aria-hidden="true"></div>
+    <div class="bg-vignette" aria-hidden="true"></div>
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+    <div class="orb orb-3" aria-hidden="true"></div>
+
+    <main class="content">
+      <!-- Logo -->
+      <a href="/" class="logo" aria-label="HimawariDigi — Kembali ke beranda">
+        <span class="logo-white">HIMAWARI</span><span class="logo-primary">DIGI</span>
+      </a>
+
+      <!-- Visual 404 -->
+      <div class="err-visual" aria-hidden="true">
+        <div class="err-bg-num">404</div>
+        <div class="err-icon-wrap">
+          <i class="ph-bold ph-plug-charging err-icon" aria-hidden="true"></i>
         </div>
       </div>
-      
-      <h2 class="text-2xl md:text-3xl font-bold mb-4 font-outfit">Waduh! Anda tersesat.</h2>
-      <p class="text-muted-foreground mb-8 text-sm md:text-base max-w-md mx-auto leading-relaxed">
-        Halaman yang Anda cari mungkin telah dihapus, pindah alamat, atau memang tidak pernah ada. Mari kembali ke jalan yang benar.
-      </p>
-      
-      <a href="/" class="btn-cta inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-sm shadow-[0_4px_24px_rgba(21,93,252,0.3)] transition-all hover:scale-105">
-        <i class="ph-bold ph-house text-lg"></i>
-        <span>Kembali ke Beranda</span>
-      </a>
-    </div>
 
+      <!-- Status chip -->
+      <div class="status-chip" role="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        Error 404 · Tidak Ditemukan
+      </div>
+
+      <!-- Copy -->
+      <h1 class="err-title">Koneksi Terputus</h1>
+      <p class="err-desc">
+        Halaman yang Anda cari tidak ada, mungkin sudah pindah, atau URL-nya salah ketik. Tidak
+        perlu khawatir — mari kembali ke jalur yang benar.
+      </p>
+
+      <!-- Primary CTAs -->
+      <div class="cta-group">
+        <a href="/" class="btn-primary">
+          <i class="ph-bold ph-house" aria-hidden="true"></i>
+          Beranda
+        </a>
+        <button
+          onclick="history.length > 1 ? history.back() : (location.href = '/')"
+          class="btn-ghost"
+        >
+          <i class="ph-bold ph-arrow-left" aria-hidden="true"></i>
+          Halaman sebelumnya
+        </button>
+      </div>
+
+      <!-- Quick links -->
+      <div class="quick-links">
+        <p class="quick-links-label">Atau mungkin Anda mencari</p>
+        <div class="quick-links-row">
+          <a href="/services" class="quick-link">
+            <i class="ph ph-squares-four" aria-hidden="true"></i>
+            Layanan
+          </a>
+          <a href="/portfolio" class="quick-link">
+            <i class="ph ph-briefcase" aria-hidden="true"></i>
+            Portfolio
+          </a>
+          <a href="/about" class="quick-link">
+            <i class="ph ph-users" aria-hidden="true"></i>
+            Tentang Kami
+          </a>
+          <a href="/contact" class="quick-link">
+            <i class="ph ph-chat-dots" aria-hidden="true"></i>
+            Kontak
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer hint -->
+    <footer class="err-footer">
+      <div class="err-footer-inner">
+        <span>© 2026 HimawariDigi</span>
+        <span class="err-footer-sep">·</span>
+        <span>himawari-digi-creative.vercel.app</span>
+      </div>
+    </footer>
+
+    <!-- Theme sync (must run before paint) -->
     <script>
-      // Sync theme with localStorage
-      const theme = localStorage.getItem('theme');
-      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-      }
+      const t = localStorage.getItem('theme');
+      const prefersDark =
+        t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.classList.toggle('dark', prefersDark);
+      document.documentElement.classList.toggle('light', !prefersDark);
     </script>
   </body>
 </html>
