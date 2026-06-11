@@ -243,7 +243,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderPage = async (pathname, preserveScroll = false) => {
     updatePageMeta(pathname);
     const route = pathname === '/' ? 'home' : pathname.replace('/', '');
+
     try {
+      // ── 1. Hentikan semua proses halaman sebelumnya ──────────────────────
+      activeIntervals.forEach(clearInterval);
+      activeIntervals = [];
+
+      activeScrollListeners.forEach(({ fn }) => window.removeEventListener('scroll', fn));
+      activeScrollListeners = [];
+
+      activeRafs.forEach((id) => cancelAnimationFrame(id));
+      activeRafs = [];
+
+      // ── 2. Tampilkan skeleton segera (tidak ada jeda blank) ──────────────
+      appContent.classList.remove('fade-in');
+      if (typeof window.getSkeletonHTML === 'function') {
+        appContent.innerHTML = window.getSkeletonHTML(route);
+      } else {
+        // Fallback jika skeleton.js belum dimuat
+        appContent.style.opacity = '0';
+      }
+
+      if (!preserveScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // ── 3. Fetch HTML page + translations (berjalan saat skeleton tampil) ─
       let htmlContent = '';
       if (pageCache[route]) {
         htmlContent = pageCache[route];
@@ -254,32 +279,17 @@ document.addEventListener('DOMContentLoaded', () => {
         pageCache[route] = htmlContent;
       }
 
-      activeIntervals.forEach(clearInterval);
-      activeIntervals = [];
-
-      activeScrollListeners.forEach(({ fn }) => window.removeEventListener('scroll', fn));
-      activeScrollListeners = [];
-
-      activeRafs.forEach((id) => cancelAnimationFrame(id));
-      activeRafs = [];
-
-      appContent.classList.remove('fade-in');
-      appContent.style.opacity = '0';
-
-      // Scroll to top with smooth animation before rendering new page (only if not language toggle)
-      if (!preserveScroll) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
       await loadTranslationFile('common');
       await loadTranslationFile('chat');
       await loadTranslationFile(route);
 
+      // ── 4. Ganti skeleton → konten nyata + fade-in ───────────────────────
       setTimeout(() => {
+        appContent.style.opacity = ''; // reset inline opacity jika ada
         appContent.innerHTML = htmlContent;
-        appContent.style.opacity = '1';
+        void appContent.offsetWidth; // force reflow agar animasi fade-in bisa replay
         appContent.classList.add('fade-in');
-        translateDOM(); // Translate newly injected page content
+        translateDOM(); // translate konten yang baru diinjek
         updateNav(pathname);
         initPageComponents(route);
       }, 200);
