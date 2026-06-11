@@ -252,11 +252,6 @@
         }
       }
 
-      .err-icon {
-        font-size: 2rem;
-        color: var(--primary);
-      }
-
       /* ── Status chip ─────────────────────────────────── */
       .status-chip {
         display: inline-flex;
@@ -314,29 +309,53 @@
       /* ── CTA buttons ─────────────────────────────────── */
       .cta-group {
         display: flex;
+        flex-direction: column; /* stack on mobile */
+        align-items: stretch; /* full width on mobile */
         gap: 10px;
-        flex-wrap: wrap;
-        justify-content: center;
+        width: 100%;
+        max-width: 320px; /* cap width so buttons don't stretch on tablet */
         animation: fadeUp 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
       }
+      @media (min-width: 480px) {
+        .cta-group {
+          flex-direction: row; /* side by side on larger screens */
+          align-items: center;
+          justify-content: center;
+          width: auto;
+          max-width: none;
+        }
+      }
 
-      .btn-primary {
+      /* shared base for both button types — prevents browser reset differences */
+      .btn-primary,
+      .btn-ghost {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
-        padding: 0.7rem 1.5rem;
+        padding: 0.75rem 1.4rem;
         border-radius: 10px;
+        font-family: 'Inter', sans-serif;
         font-size: 0.875rem;
-        font-weight: 700;
-        background: var(--primary);
-        color: var(--primary-foreground);
+        font-weight: 600;
         text-decoration: none;
-        border: none;
         cursor: pointer;
+        line-height: 1;
+        white-space: nowrap;
+        -webkit-appearance: none;
+        appearance: none; /* kill browser button styles */
         transition:
           transform 0.2s,
           box-shadow 0.2s,
-          filter 0.2s;
+          background 0.2s,
+          filter 0.2s,
+          border-color 0.2s;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border: 1.5px solid var(--primary);
         box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 35%, transparent);
       }
       .btn-primary:hover {
@@ -346,26 +365,14 @@
       }
 
       .btn-ghost {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 0.7rem 1.25rem;
-        border-radius: 10px;
-        font-size: 0.875rem;
-        font-weight: 600;
         background: transparent;
         color: var(--foreground);
-        text-decoration: none;
-        cursor: pointer;
-        border: 1px solid var(--border);
-        transition:
-          background 0.2s,
-          transform 0.2s,
-          border-color 0.2s;
+        border: 1.5px solid var(--border);
       }
       .btn-ghost:hover {
-        background: var(--accent);
+        background: color-mix(in srgb, var(--primary) 8%, transparent);
         border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+        color: var(--primary);
         transform: translateY(-2px);
       }
 
@@ -475,13 +482,14 @@
           <i class="ph-bold ph-house" aria-hidden="true"></i>
           Beranda
         </a>
-        <button
+        <a
+          href="javascript:void(0)"
           onclick="history.length > 1 ? history.back() : (location.href = '/')"
           class="btn-ghost"
         >
           <i class="ph-bold ph-arrow-left" aria-hidden="true"></i>
           Halaman sebelumnya
-        </button>
+        </a>
       </div>
 
       <!-- Quick links -->
