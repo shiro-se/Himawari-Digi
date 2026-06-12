@@ -5,7 +5,10 @@
   function getSkeletonType(route) {
     if (route === 'home') return 'home';
     if (route === 'services' || route.startsWith('services/')) return 'services';
-    if (route === 'portfolio' || route.startsWith('portfolio/')) return 'portfolio';
+    if (route === 'portfolio/web') return 'portfolio-web';
+    if (route === 'portfolio/mobile') return 'portfolio-mobile';
+    if (route === 'portfolio/case-studies') return 'portfolio-case-studies';
+    if (route === 'portfolio') return 'portfolio';
     if (route === 'about') return 'about';
     if (route === 'blog') return 'blog';
     if (route === 'contact') return 'contact';
