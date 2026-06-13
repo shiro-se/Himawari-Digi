@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       await loadTranslationFile('common');
       await loadTranslationFile('chat');
-      await loadTranslationFile(route);
+      await loadTranslationFile(route.split('/')[0]);
 
       // ── 4. Ganti skeleton → konten nyata + fade-in ───────────────────────
       setTimeout(() => {
@@ -1084,8 +1084,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           setTimeout(() => {
-            if (infoName) infoName.textContent = CARDS[clamped].name;
-            if (infoDesc) infoDesc.textContent = CARDS[clamped].desc;
+            if (infoName) {
+              infoName.setAttribute('data-i18n', `home_services_card_${clamped}`);
+              infoName.innerHTML = window.translations?.[currentLang]?.[`home_services_card_${clamped}`] || CARDS[clamped].name;
+            }
+            if (infoDesc) {
+              infoDesc.setAttribute('data-i18n', `home_services_info_${clamped}`);
+              infoDesc.innerHTML = window.translations?.[currentLang]?.[`home_services_info_${clamped}`] || CARDS[clamped].desc;
+            }
 
             if (infoTag) {
               infoTag.innerHTML = CARDS[clamped].tags
