@@ -31,7 +31,17 @@
     "services_step4_desc": "Smooth CI/CD deployment and ongoing monitoring and support.",
     "services_cta_title": "Have a Project in Mind?",
     "services_cta_desc": "Let's discuss how we can turn your vision into reality. Free consultation, no strings attached.",
-    "services_cta_btn1": "Start a Conversation"
+    "services_cta_btn1": "Start a Conversation",
+    "sv_tag_team": "Dedicated Team",
+    "sv_tag_contracts": "Flexible Contracts",
+    "sv_tag_talent": "Vetted Talent",
+    "sv_tag_new": "New",
+    "sv_tag_ai": "AI-Assisted",
+    "sv_tag_mvp": "Rapid MVP",
+    "sv_tag_llm": "LLM Integration",
+    "sv_tag_auto": "Automated",
+    "sv_tag_e2e": "E2E Testing",
+    "sv_tag_ci": "CI Integration"
   },
   "id": {
     "services_title": "Solusi Digital <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">Menyeluruh</span>",
@@ -65,6 +75,16 @@
     "services_step4_desc": "Proses rilis aplikasi super mulus berkat CI/CD, plus dukungan perbaikan jangka panjang.",
     "services_cta_title": "Punya Proyek Impian?",
     "services_cta_desc": "Yuk ngobrol gimana caranya wujudin bayangan ide Anda jadi aplikasi nyata. Tanya-tanya gratis santai aja!",
-    "services_cta_btn1": "Ngobrol Yuk"
+    "services_cta_btn1": "Ngobrol Yuk",
+    "sv_tag_team": "Tim Terdedikasi",
+    "sv_tag_contracts": "Kontrak Fleksibel",
+    "sv_tag_talent": "Talenta Terkurasi",
+    "sv_tag_new": "Baru",
+    "sv_tag_ai": "Bantuan AI",
+    "sv_tag_mvp": "MVP Cepat",
+    "sv_tag_llm": "Integrasi LLM",
+    "sv_tag_auto": "Otomatis",
+    "sv_tag_e2e": "Testing E2E",
+    "sv_tag_ci": "Integrasi CI"
   }
 }

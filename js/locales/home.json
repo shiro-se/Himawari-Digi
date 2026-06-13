@@ -104,7 +104,10 @@
     "home_cta_btn_2": "View Services",
     "home_cta_perk_1": "Free Consultation",
     "home_cta_perk_2": "No Commitment",
-    "home_cta_perk_3": "NDA Available"
+    "home_cta_perk_3": "NDA Available",
+    "home_cta_title2": "Ready to build your app?",
+    "home_cta_desc2": "From wireframe to App Store publishing — we got you covered.",
+    "home_cta_btn2": "Free Consultation"
   },
   "id": {
     "home_hero_build": "Kami Membangun",
@@ -211,6 +214,9 @@
     "home_cta_btn_2": "Lihat Layanan",
     "home_cta_perk_1": "Konsultasi Gratis",
     "home_cta_perk_2": "Tanpa Ikatan",
-    "home_cta_perk_3": "Tersedia NDA"
+    "home_cta_perk_3": "Tersedia NDA",
+    "home_cta_title2": "Siap bangun aplikasi Anda?",
+    "home_cta_desc2": "Dari wireframe hingga publish ke App Store — kami siap membantu.",
+    "home_cta_btn2": "Konsultasi Gratis"
   }
 }

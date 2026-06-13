@@ -16,7 +16,14 @@
     "chat_end_title": "Chat ended",
     "chat_end_desc": "Thank you for contacting us! Feel free to start a new chat anytime.",
     "chat_challenge_label": "Security check: What is {a} + {b}?",
-    "chat_new_chat": "New Chat"
+    "chat_new_chat": "New Chat",
+    "chat_pinned": "Pinned Message",
+    "chat_secured": "Secured by",
+    "chat_reply": "Reply",
+    "chat_copy": "Copy",
+    "chat_edit": "Edit",
+    "chat_fav": "Favorite",
+    "chat_dl": "Download File"
   },
   "id": {
     "chat_prechat_title": "Mulai percakapan",
@@ -35,6 +42,13 @@
     "chat_end_title": "Chat selesai",
     "chat_end_desc": "Terima kasih sudah menghubungi kami! Silakan mulai chat baru kapan saja.",
     "chat_challenge_label": "Keamanan: Berapa {a} + {b}?",
-    "chat_new_chat": "Chat Baru"
+    "chat_new_chat": "Chat Baru",
+    "chat_pinned": "Pesan Disematkan",
+    "chat_secured": "Secured by",
+    "chat_reply": "Balas",
+    "chat_copy": "Salin",
+    "chat_edit": "Edit",
+    "chat_fav": "Favorit",
+    "chat_dl": "Unduh File"
   }
 }

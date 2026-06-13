@@ -25,7 +25,22 @@
     "footer_subscribe_note": "We care about your data. No spam.",
     "footer_rights": "All rights reserved.",
     "footer_careers": "Careers",
-    "footer_cookies": "Cookies"
+    "footer_cookies": "Cookies",
+    "drawer_outsource": "Programmer Outsourcing",
+    "drawer_mobile": "Mobile App Development",
+    "drawer_vibe": "Vibe Coding",
+    "drawer_cloud": "Cloud & DevOps",
+    "drawer_uiux": "UI/UX Design",
+    "drawer_qa": "Quality Assurance",
+    "drawer_about": "About Us",
+    "drawer_port": "Portfolio",
+    "drawer_blog": "Blog & Insights",
+    "drawer_contact": "Contact Us",
+    "footer_yogya": "Yogyakarta, Indonesia",
+    "footer_timezone": "WIB (UTC+7) · Remote-first",
+    "footer_made_with": "Made with",
+    "footer_in_yogya": "in Yogyakarta.",
+    "footer_systems": "All systems operational"
   },
   "id": {
     "nav_services": "Layanan",
@@ -53,6 +68,21 @@
     "footer_subscribe_note": "Kami sangat menjaga privasi Anda. Anti-spam.",
     "footer_rights": "Hak cipta dilindungi.",
     "footer_careers": "Karir",
-    "footer_cookies": "Cookies"
+    "footer_cookies": "Cookies",
+    "drawer_outsource": "Programmer Outsourcing",
+    "drawer_mobile": "Pengembangan Aplikasi Mobile",
+    "drawer_vibe": "Vibe Coding",
+    "drawer_cloud": "Cloud & DevOps",
+    "drawer_uiux": "Desain UI/UX",
+    "drawer_qa": "Quality Assurance",
+    "drawer_about": "Tentang Kami",
+    "drawer_port": "Portofolio",
+    "drawer_blog": "Blog & Wawasan",
+    "drawer_contact": "Hubungi Kami",
+    "footer_yogya": "Yogyakarta, Indonesia",
+    "footer_timezone": "WIB (UTC+7) · Remote-first",
+    "footer_made_with": "Dibuat dengan",
+    "footer_in_yogya": "di Yogyakarta.",
+    "footer_systems": "Semua sistem berjalan normal"
   }
 }
