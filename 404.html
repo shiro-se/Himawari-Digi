@@ -308,17 +308,18 @@
       }
 
       /* ── CTA buttons ─────────────────────────────────── */
+      /* ── CTA buttons ─────────────────────────────────── */
       .cta-group {
         display: flex;
         flex-direction: column;
-        align-items: center; /* ← stretch → center agar tidak melebar penuh */
+        align-items: stretch; /* ← stretch agar tombol selebar container di mobile */
         gap: 10px;
         width: 100%;
         max-width: 320px;
         animation: fadeUp 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
       }
+
       @media (min-width: 600px) {
-        /* ← 480px → 600px agar ada cukup ruang */
         .cta-group {
           flex-direction: row;
           align-items: center;
@@ -328,7 +329,7 @@
         }
       }
 
-      /* shared base for both button types — prevents browser reset differences */
+      /* shared base for both button types */
       .btn-primary,
       .btn-ghost {
         display: inline-flex;
@@ -345,13 +346,21 @@
         line-height: 1;
         white-space: nowrap;
         -webkit-appearance: none;
-        appearance: none; /* kill browser button styles */
+        appearance: none;
+        width: 100%; /* ← tambahkan ini agar tombol sama lebar di mobile */
         transition:
           transform 0.2s,
           box-shadow 0.2s,
           background 0.2s,
           filter 0.2s,
           border-color 0.2s;
+      }
+
+      @media (min-width: 600px) {
+        .btn-primary,
+        .btn-ghost {
+          width: auto; /* ← reset ke auto di desktop */
+        }
       }
 
       .btn-primary {
