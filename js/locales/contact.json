@@ -14,7 +14,18 @@
     "contact_social_title": "Follow Us",
     "contact_name_ph": "John Doe",
     "contact_email_ph": "john@company.com",
-    "contact_msg_ph": "Tell us about your project..."
+    "contact_msg_ph": "Tell us about your project...",
+    "contact_email_lbl": "Email Us",
+    "contact_call_lbl": "Call Us",
+    "contact_visit_lbl": "Visit Us",
+    "contact_form_fname": "First Name",
+    "contact_form_lname": "Last Name",
+    "contact_form_subject": "Subject",
+    "contact_form_subj_opt0": "Select a topic...",
+    "contact_form_subj_opt1": "New Project Inquiry",
+    "contact_form_subj_opt2": "Outsourcing Request",
+    "contact_form_subj_opt3": "Partnership Opportunity",
+    "contact_form_subj_opt4": "General Question"
   },
   "id": {
     "contact_title": "Mari Bangun Sesuatu Yang <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">Hebat Bersama</span>",
@@ -31,6 +42,17 @@
     "contact_social_title": "Ikuti Kami",
     "contact_name_ph": "Budi Santoso",
     "contact_email_ph": "budi@perusahaan.com",
-    "contact_msg_ph": "Ceritain dong tentang proyekmu..."
+    "contact_msg_ph": "Ceritain dong tentang proyekmu...",
+    "contact_email_lbl": "Email Kami",
+    "contact_call_lbl": "Hubungi Kami",
+    "contact_visit_lbl": "Kunjungi Kami",
+    "contact_form_fname": "Nama Depan",
+    "contact_form_lname": "Nama Belakang",
+    "contact_form_subject": "Subjek",
+    "contact_form_subj_opt0": "Pilih topik...",
+    "contact_form_subj_opt1": "Pertanyaan Proyek Baru",
+    "contact_form_subj_opt2": "Permintaan Outsourcing",
+    "contact_form_subj_opt3": "Peluang Kerja Sama",
+    "contact_form_subj_opt4": "Pertanyaan Umum"
   }
 }

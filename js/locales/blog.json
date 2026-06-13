@@ -7,7 +7,15 @@
     "blog_feat_badge": "Featured",
     "blog_feat_title": "Vibe Coding: How AI Is Reshaping the Future of Software Development",
     "blog_feat_desc": "Explore how AI-assisted development is transforming the way software teams work — from rapid prototyping to production-ready code in a fraction of the time.",
-    "blog_read_btn": "Read article"
+    "blog_read_btn": "Read article",
+    "blog_post_title_2": "Design Systems That Scale: Lessons From Building 20+ Products",
+    "blog_post_desc_2": "How we structure our design tokens, components, and documentation for long-term maintainability.",
+    "blog_post_title_3": "Why We Chose Next.js App Router for Our Latest Enterprise Project",
+    "blog_post_desc_3": "Server components, streaming, and the real-world performance gains we measured.",
+    "blog_post_title_4": "The Testing Pyramid in Practice: Our QA Strategy Explained",
+    "blog_post_desc_4": "Unit, integration, E2E — how we balance speed and coverage in our testing workflow.",
+    "blog_post_title_5": "Remote-First, Impact-Driven: How We Built Our Engineering Culture",
+    "blog_post_desc_5": "Our approach to asynchronous communication, trust, and continuous learning."
   },
   "id": {
     "blog_title": "Pemikiran, Tutorial & <span class=\"text-transparent bg-clip-text bg-linear-to-r from-primary to-chart-2\">Wawasan</span>",
@@ -17,6 +25,14 @@
     "blog_feat_badge": "Pilihan",
     "blog_feat_title": "Vibe Coding: Gimana AI Merombak Masa Depan Pembuatan Aplikasi",
     "blog_feat_desc": "Cari tahu gimana AI ngubah cara kerja tim software developer — mulai dari bikin prototipe sampai kode siap pakai dengan sangat cepat.",
-    "blog_read_btn": "Baca artikel"
+    "blog_read_btn": "Baca artikel",
+    "blog_post_title_2": "Sistem Desain yang Skalabel: Pelajaran dari 20+ Produk",
+    "blog_post_desc_2": "Cara kami menyusun token desain, komponen, dan dokumentasi agar mudah dipelihara jangka panjang.",
+    "blog_post_title_3": "Mengapa Kami Memilih Next.js App Router untuk Proyek Enterprise Terbaru",
+    "blog_post_desc_3": "Server components, streaming, dan peningkatan performa nyata yang kami ukur.",
+    "blog_post_title_4": "Piramida Testing dalam Praktik: Strategi QA Kami",
+    "blog_post_desc_4": "Unit, integrasi, E2E — cara kami menyeimbangkan kecepatan dan cakupan dalam testing.",
+    "blog_post_title_5": "Utamakan Remote dan Dampak Nyata: Cara Kami Membangun Budaya Tim",
+    "blog_post_desc_5": "Pendekatan kami pada komunikasi asinkron, kepercayaan, dan pembelajaran tanpa henti."
   }
 }

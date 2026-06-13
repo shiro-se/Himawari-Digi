@@ -39,7 +39,7 @@
                 <i class="ph-fill ph-envelope-simple"></i>
               </div>
               <div>
-                <h4 class="font-bold mb-1">Email Us</h4>
+                <h4 class="font-bold mb-1" data-i18n="contact_email_lbl">Email Us</h4>
                 <p class="text-sm text-muted-foreground">hello@himawaridigi.com</p>
                 <p class="text-sm text-muted-foreground">support@himawaridigi.com</p>
               </div>
@@ -56,7 +56,7 @@
                 <i class="ph-fill ph-phone"></i>
               </div>
               <div>
-                <h4 class="font-bold mb-1">Call Us</h4>
+                <h4 class="font-bold mb-1" data-i18n="contact_call_lbl">Call Us</h4>
                 <p class="text-sm text-muted-foreground">+62 812 3456 7890</p>
                 <p class="text-xs text-muted-foreground mt-1">Mon–Fri, 09:00–18:00 WIB</p>
               </div>
@@ -73,7 +73,7 @@
                 <i class="ph-fill ph-map-pin"></i>
               </div>
               <div>
-                <h4 class="font-bold mb-1">Visit Us</h4>
+                <h4 class="font-bold mb-1" data-i18n="contact_visit_lbl">Visit Us</h4>
                 <p class="text-sm text-muted-foreground">Yogyakarta, Indonesia</p>
                 <p class="text-xs text-muted-foreground mt-1">Remote-first · WIB (UTC+7)</p>
               </div>
@@ -118,9 +118,9 @@
         <!-- Form Side -->
         <div class="lg:col-span-3 reveal-on-scroll">
           <div class="p-8 md:p-10 rounded-3xl bg-card border border-border">
-            <h3 class="text-2xl font-bold mb-2">Send Us a Message</h3>
+            <h3 class="text-2xl font-bold mb-2" data-i18n="contact_send">Send Us a Message</h3>
             <p class="text-sm text-muted-foreground mb-8">
-              Fill out the form and we'll respond within one business day.
+              <span data-i18n="contact_hero_desc">Fill out the form and we'll respond within one business day.</span>
             </p>
 
             <form
@@ -132,7 +132,7 @@
             >
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-2">
-                  <label class="text-sm font-medium">First Name</label>
+                  <label class="text-sm font-medium" data-i18n="contact_form_fname">First Name</label>
                   <input
                     type="text"
                     class="w-full px-4 py-3 rounded-xl border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
@@ -140,7 +140,7 @@
                   />
                 </div>
                 <div class="space-y-2">
-                  <label class="text-sm font-medium">Last Name</label>
+                  <label class="text-sm font-medium" data-i18n="contact_form_lname">Last Name</label>
                   <input
                     type="text"
                     class="w-full px-4 py-3 rounded-xl border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
@@ -149,7 +149,7 @@
                 </div>
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium">Email</label>
+                <label class="text-sm font-medium" data-i18n="contact_email">Email</label>
                 <input
                   type="email"
                   class="w-full px-4 py-3 rounded-xl border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
@@ -157,19 +157,19 @@
                 />
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium">Subject</label>
+                <label class="text-sm font-medium" data-i18n="contact_form_subject">Subject</label>
                 <select
                   class="w-full px-4 py-3 rounded-xl border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-muted-foreground"
                 >
-                  <option value="">Select a topic...</option>
-                  <option>New Project Inquiry</option>
-                  <option>Outsourcing Request</option>
-                  <option>Partnership Opportunity</option>
-                  <option>General Question</option>
+                  <option value="" data-i18n="contact_form_subj_opt0">Select a topic...</option>
+                  <option data-i18n="contact_form_subj_opt1">New Project Inquiry</option>
+                  <option data-i18n="contact_form_subj_opt2">Outsourcing Request</option>
+                  <option data-i18n="contact_form_subj_opt3">Partnership Opportunity</option>
+                  <option data-i18n="contact_form_subj_opt4">General Question</option>
                 </select>
               </div>
               <div class="space-y-2">
-                <label class="text-sm font-medium">Message</label>
+                <label class="text-sm font-medium" data-i18n="contact_message">Message</label>
                 <textarea
                   rows="5"
                   class="w-full px-4 py-3 rounded-xl border border-input bg-transparent focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
