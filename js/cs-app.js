@@ -8,7 +8,6 @@
 
   const supabase = window.supabaseClient;
   if (!supabase) {
-    console.error('Supabase client not initialized');
     return;
   }
 
@@ -378,7 +377,7 @@
       if (error) throw error;
       return true;
     } catch (e) {
-      console.error('Supabase Auth error:', e);
+      if (window.showToast) window.showToast('Gagal mengirim kode OTP. Coba lagi.', 'error');
       return false;
     }
   }
@@ -390,7 +389,6 @@
 
     for (const type of typesToTry) {
       try {
-        console.log(`Mencoba verifikasi OTP dengan tipe: ${type}, kode: ${inputCode}`);
         const { data, error } = await supabase.auth.verifyOtp({
           email: currentEmail,
           token: inputCode,
@@ -405,7 +403,7 @@
       }
     }
 
-    console.error('Verify error:', lastError);
+    if (window.showToast) window.showToast('Gagal memverifikasi kode OTP. Coba lagi.', 'error');
     return false;
   }
 
@@ -494,7 +492,7 @@
         if (provisionError && provisionError.code !== '23505') {
           // 23505 = unique_violation, artinya CS ini memang sudah terdaftar
           // sebelumnya — itu normal dan aman diabaikan, bukan error sungguhan.
-          console.error('CS auto-provision failed:', provisionError);
+          if (window.showToast) window.showToast('Gagal mendaftar sebagai CS. Coba lagi.', 'error');
         }
       }
 
@@ -558,7 +556,6 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredInstallPrompt = e;
-      console.log('[Install] beforeinstallprompt captured');
     });
 
     function showInstallModal() {
@@ -617,7 +614,6 @@
         if (deferredInstallPrompt) {
           deferredInstallPrompt.prompt();
           const { outcome } = await deferredInstallPrompt.userChoice;
-          console.log('[Install] User choice:', outcome);
           deferredInstallPrompt = null;
           if (outcome === 'accepted') {
             installModal.style.display = 'none';
@@ -659,7 +655,6 @@
   async function listenForChats() {
     const { data: chats, error } = await supabase.from('chats').select('*').eq('status', 'active');
     if (error) {
-      console.error('Error fetching active chats:', error);
       if (window.showToast) window.showToast('Error memuat chat aktif: ' + error.message, 'error');
     }
     const newChatsData = {};
@@ -1589,7 +1584,10 @@
         { onConflict: 'chat_id' }
       )
       .then(({ error }) => {
-        if (error) console.error('sendCSTyping error:', error);
+        if (error) {
+          if (window.showToast)
+            window.showToast('Gagal mengirim status typing. Coba lagi.', 'error');
+        }
       });
 
     clearTimeout(typingTimeout);
@@ -1609,7 +1607,10 @@
         { onConflict: 'chat_id' }
       )
       .then(({ error }) => {
-        if (error) console.error('clearCSTyping error:', error);
+        if (error) {
+          if (window.showToast)
+            window.showToast('Gagal menghapus status typing. Coba lagi.', 'error');
+        }
       });
   }
 
@@ -2255,7 +2256,6 @@
 
           if (window.showToast) window.showToast('File berhasil dikirim', 'success');
         } catch (err) {
-          console.error(err);
           if (window.showToast) window.showToast('Gagal upload file', 'error');
         }
 
@@ -2391,7 +2391,6 @@
         if (error) throw error;
         if (window.showToast) window.showToast('Pesan berhasil dihapus', 'success');
       } catch (err) {
-        console.error('Delete error:', err);
         if (window.showToast) window.showToast('Gagal menghapus pesan', 'error');
       }
     };
@@ -2405,7 +2404,6 @@
         if (error) throw error;
         if (window.showToast) window.showToast('Penghapusan dibatalkan', 'success');
       } catch (err) {
-        console.error('Undo error:', err);
         if (window.showToast) window.showToast('Gagal membatalkan penghapusan', 'error');
       }
     };
@@ -2788,7 +2786,6 @@
 
   async function subscribeToPush() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.warn('Push messaging is not supported on this device');
       if (window.showToast) window.showToast('Push tidak didukung di perangkat ini.', 'warning');
       return;
     }
@@ -2797,11 +2794,9 @@
       // Step 1: Register SW dan tunggu sampai BENAR-BENAR aktif
       await navigator.serviceWorker.register('/sw.js');
       const swReg = await navigator.serviceWorker.ready;
-      console.log('[Push] SW ready, scope:', swReg.scope);
 
       // Step 2: Minta izin notifikasi (pada iOS, ini harus dari user gesture)
       const permission = await Notification.requestPermission();
-      console.log('[Push] Permission result:', permission);
       if (permission !== 'granted') {
         if (window.showToast)
           window.showToast(
@@ -2814,7 +2809,6 @@
       // Step 3: Hapus subscription lama (jika ada) agar buat baru yang fresh
       const oldSub = await swReg.pushManager.getSubscription();
       if (oldSub) {
-        console.log('[Push] Unsubscribing old subscription...');
         await oldSub.unsubscribe();
       }
 
@@ -2825,7 +2819,6 @@
       });
 
       const subData = JSON.parse(JSON.stringify(subscription));
-      console.log('[Push] New subscription endpoint:', subData.endpoint.slice(-30));
 
       // Step 5: Simpan ke DB (upsert berdasarkan endpoint agar multi-device OK)
       const { error: upsertError } = await supabase.from('push_subscriptions').upsert(
@@ -2841,18 +2834,15 @@
       );
 
       if (upsertError) {
-        console.error('[Push] DB save error:', upsertError);
         if (window.showToast)
           window.showToast('Gagal menyimpan subscription: ' + upsertError.message, 'error');
         return;
       }
 
-      console.log('[Push] Subscription saved to DB successfully!');
       if (window.showToast) {
         window.showToast('Push Notifikasi aktif untuk perangkat ini.', 'success');
       }
     } catch (e) {
-      console.error('[Push] Registration failed:', e);
       if (window.showToast) {
         window.showToast('Gagal mengaktifkan notifikasi: ' + e.message, 'error');
       }
