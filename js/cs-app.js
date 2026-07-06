@@ -489,14 +489,12 @@
       if (session?.user) {
         const { error: provisionError } = await supabase
           .from('cs_agents')
-          .upsert(
-            { user_id: session.user.id, email: session.user.email },
-            { onConflict: 'user_id' }
-          );
-        if (provisionError) {
+          .insert({ user_id: session.user.id, email: session.user.email });
+
+        if (provisionError && provisionError.code !== '23505') {
+          // 23505 = unique_violation, artinya CS ini memang sudah terdaftar
+          // sebelumnya — itu normal dan aman diabaikan, bukan error sungguhan.
           console.error('CS auto-provision failed:', provisionError);
-          // Tidak menghentikan login — kalau gagal, akses tetap akan
-          // ditolak RLS di query lain, jadi aman untuk lanjut saja.
         }
       }
 
