@@ -237,7 +237,6 @@
   const loginForm = document.getElementById('cs-login-form');
   const loginNameInput = document.getElementById('cs-login-name');
   const loginSubmit = document.getElementById('cs-login-submit');
-  const loginStatus = document.getElementById('cs-login-status');
   const deviceText = document.getElementById('cs-device-text');
   const otpSection = document.getElementById('cs-otp-section');
   const otpInput = document.getElementById('cs-otp-input');
@@ -351,11 +350,6 @@
     csName = '';
   }
 
-  function showStatus(msg, type) {
-    loginStatus.textContent = msg;
-    loginStatus.className = 'cs-login-status ' + type;
-  }
-
   // Get approximate location via free API
   async function getLocation() {
     try {
@@ -444,7 +438,6 @@
 
     loginSubmit.disabled = true;
     loginSubmit.innerHTML = '<span class="cs-spinner"></span> Mengirim kode...';
-    showStatus('', '');
 
     const sent = await sendOTP(name);
 
@@ -458,9 +451,10 @@
       document.querySelector('.cs-login-step[data-step="2"]')?.classList.add('active');
       if (window.csFocusOtpFirstBox) window.csFocusOtpFirstBox();
       startResendCooldown();
-      showStatus('Kode dikirim ke tim admin.', 'success');
+      if (window.showToast) window.showToast('Kode dikirim ke tim admin.', 'success');
     } else {
-      showStatus('Gagal mengirim kode. Cek kredensial email Supabase Anda.', 'error');
+      if (window.showToast)
+        window.showToast('Gagal mengirim kode. Cek kredensial email Supabase Anda.', 'error');
       loginSubmit.disabled = false;
       loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
     }
@@ -508,7 +502,7 @@
       localStorage.setItem('hd_cs_name', csName);
       setTimeout(() => showDashboard(), 650);
     } else {
-      showStatus('Kode salah atau sudah kedaluwarsa.', 'error');
+      if (window.showToast) window.showToast('Kode salah atau sudah kedaluwarsa.', 'error');
       if (window.csShakeOtpBoxes) window.csShakeOtpBoxes();
       if (window.csResetOtpBoxes) window.csResetOtpBoxes();
       otpVerifyBtn.disabled = true;
@@ -522,11 +516,11 @@
     if (!name || resendCooldown > 0) return;
 
     otpResendBtn.disabled = true;
-    showStatus('Mengirim ulang kode...', 'info');
+    if (window.showToast) window.showToast('Mengirim ulang kode...', 'info');
     if (window.csResetOtpBoxes) window.csResetOtpBoxes();
     await sendOTP(name);
     startResendCooldown();
-    showStatus('Kode baru telah dikirim.', 'success');
+    if (window.showToast) window.showToast('Kode baru telah dikirim.', 'success');
   });
 
   // ═══════════════════════════════════════════════════════════════
@@ -1906,7 +1900,6 @@
         loginSubmit.disabled = false;
         loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
         loginNameInput.value = '';
-        loginStatus.className = 'cs-login-status';
         closeModal();
       },
     });
