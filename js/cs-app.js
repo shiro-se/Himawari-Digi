@@ -1007,7 +1007,7 @@
 
     function syncHidden() {
       hiddenInput.value = boxes.map((b) => b.value).join('');
-      otpVerifyBtn.disabled = hiddenInput.value.length !== 5;
+      otpVerifyBtn.disabled = hiddenInput.value.length !== 6;
     }
 
     boxes.forEach((box, idx) => {
@@ -1019,8 +1019,8 @@
           boxes[idx + 1].focus();
         }
         syncHidden();
-        if (hiddenInput.value.length === 5 && !otpVerifyBtn.disabled) {
-          otpVerifyBtn.click(); // auto-submit begitu 5 digit terisi
+        if (hiddenInput.value.length === 6 && !otpVerifyBtn.disabled) {
+          otpVerifyBtn.click(); // auto-submit begitu 6 digit terisi
         }
       });
 
@@ -1060,7 +1060,7 @@
           });
         syncHidden();
         boxes[Math.min(paste.length, boxes.length - 1)].focus();
-        if (hiddenInput.value.length === 5) otpVerifyBtn.click();
+        if (hiddenInput.value.length === 6) otpVerifyBtn.click();
       });
     });
 
