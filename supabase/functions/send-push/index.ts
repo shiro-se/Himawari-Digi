@@ -12,9 +12,9 @@ webPush.setVapidDetails(
 );
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  // Hanya ijinkan method POST dan hilangkan origin '*' karena request datang dari webhook internal Supabase
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-webhook-secret',
 };
 
 serve(async (req) => {
@@ -24,6 +24,19 @@ serve(async (req) => {
   }
 
   try {
+    // Validasi Webhook Secret
+    const webhookSecret = Deno.env.get('WEBHOOK_SECRET');
+    const authHeader = req.headers.get('authorization') || req.headers.get('x-webhook-secret');
+    
+    // Jika webhook secret di set di environment, validasi authorization
+    if (webhookSecret && authHeader !== webhookSecret && authHeader !== `Bearer ${webhookSecret}`) {
+      console.error('Unauthorized request: invalid webhook secret');
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      });
+    }
+
     const payload = await req.json()
     const message = payload.record;
     if (!message) throw new Error("No record found in payload");
