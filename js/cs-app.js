@@ -479,7 +479,27 @@
     const valid = await verifyOTP(code);
 
     if (valid) {
-      showStatus('Verifikasi berhasil! Memuat dashboard...', 'success');
+      // Auto-provisioning: daftarkan diri sendiri ke cs_agents.
+      // Aman karena dibatasi RLS: hanya sesi ber-email himawaridigi@gmail.com
+      // yang boleh insert baris untuk dirinya sendiri (lihat policy
+      // "CS Self Provision"). Upsert supaya aman dipanggil berkali-kali.
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { error: provisionError } = await supabase
+          .from('cs_agents')
+          .upsert(
+            { user_id: session.user.id, email: session.user.email },
+            { onConflict: 'user_id' }
+          );
+        if (provisionError) {
+          console.error('CS auto-provision failed:', provisionError);
+          // Tidak menghentikan login — kalau gagal, akses tetap akan
+          // ditolak RLS di query lain, jadi aman untuk lanjut saja.
+        }
+      }
+
       csName = loginNameInput.value.trim();
       localStorage.setItem('hd_cs_name', csName);
       setTimeout(() => showDashboard(), 500);
