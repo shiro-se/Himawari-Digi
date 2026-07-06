@@ -134,13 +134,13 @@ const configTemplate = `// ═════════════════�
 
       const img = new Image();
       const url = URL.createObjectURL(file);
-      
+
       img.onload = () => {
         URL.revokeObjectURL(url);
-        
+
         let width = img.width;
         let height = img.height;
-        
+
         if (width > maxWidth) {
           height = Math.round((height * maxWidth) / width);
           width = maxWidth;
@@ -149,14 +149,14 @@ const configTemplate = `// ═════════════════�
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-        
+
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        
+
         // Preserve PNG transparency; convert others to JPEG
         const outType = file.type === 'image/png' ? 'image/png' : (file.type === 'image/webp' ? 'image/webp' : 'image/jpeg');
         const outExt = outType === 'image/png' ? '.png' : (outType === 'image/webp' ? '.webp' : '.jpg');
-        
+
         canvas.toBlob((blob) => {
           if (!blob) return reject(new Error('Canvas toBlob failed'));
           // Re-create a File object
@@ -167,7 +167,7 @@ const configTemplate = `// ═════════════════�
           resolve(newFile);
         }, outType, quality);
       };
-      
+
       img.onerror = () => reject(new Error('Failed to load image for compression'));
       img.src = url;
     });
@@ -196,7 +196,7 @@ const configTemplate = `// ═════════════════�
     const player = btn.closest('.hd-audio-player');
     const audio = player.querySelector('.hd-audio-element');
     const icon = btn.querySelector('i');
-    
+
     // Pause all other audio
     document.querySelectorAll('.hd-audio-element').forEach(a => {
       if (a !== audio && !a.paused) {
@@ -277,7 +277,6 @@ const configTemplate = `// ═════════════════�
     setTimeout(() => window.bindAudioPlayers(), 500);
   }
 
-  console.log('🔥 HimawariDigi Chat — Supabase initialized');
 })();
 `;
 
