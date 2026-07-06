@@ -133,14 +133,21 @@
           <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 0.75rem">
             Kode telah dikirim ke <strong>himawaridigi@gmail.com</strong>
           </p>
-          <input
-            type="text"
-            id="cs-otp-input"
-            class="cs-otp-input"
-            maxlength="10"
-            placeholder="00000000"
-            inputmode="numeric"
-          />
+          <div class="cs-otp-boxes" id="cs-otp-boxes">
+            <input
+              type="text"
+              class="cs-otp-box"
+              maxlength="1"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              data-idx="0"
+            />
+            <input type="text" class="cs-otp-box" maxlength="1" inputmode="numeric" data-idx="1" />
+            <input type="text" class="cs-otp-box" maxlength="1" inputmode="numeric" data-idx="2" />
+            <input type="text" class="cs-otp-box" maxlength="1" inputmode="numeric" data-idx="3" />
+            <input type="text" class="cs-otp-box" maxlength="1" inputmode="numeric" data-idx="4" />
+          </div>
+          <input type="hidden" id="cs-otp-input" value="" />
           <button id="cs-otp-verify" class="cs-otp-verify" disabled>Verifikasi</button>
           <div class="cs-otp-resend" id="cs-otp-resend">
             <button id="cs-otp-resend-btn" disabled>Kirim ulang kode</button>

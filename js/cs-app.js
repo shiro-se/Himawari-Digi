@@ -456,7 +456,7 @@
       otpSection.classList.add('show');
       document.querySelector('.cs-login-step[data-step="1"]')?.classList.replace('active', 'done');
       document.querySelector('.cs-login-step[data-step="2"]')?.classList.add('active');
-      otpInput.focus();
+      if (window.csFocusOtpFirstBox) window.csFocusOtpFirstBox();
       startResendCooldown();
       showStatus('Kode dikirim ke tim admin.', 'success');
     } else {
@@ -466,26 +466,16 @@
     }
   });
 
-  // OTP input
-  otpInput.addEventListener('input', () => {
-    otpVerifyBtn.disabled = otpInput.value.length < 6;
-  });
-
-  otpInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (!otpVerifyBtn.disabled) otpVerifyBtn.click();
-    }
-  });
+  bindOtpBoxes();
 
   // OTP verify
   otpVerifyBtn.addEventListener('click', async () => {
-    // Bersihkan kode dari spasi tersembunyi/karakter tak terlihat saat copas
     const rawCode = otpInput.value;
     const code = rawCode.replace(/[^0-9]/g, '');
 
-    if (code.length < 6 || code.length > 10) {
-      if (window.showToast) window.showToast('Panjang kode tidak valid.', 'warning');
+    if (code.length !== 5) {
+      if (window.showToast) window.showToast('Masukkan 5 digit kode verifikasi.', 'warning');
+      if (window.csShakeOtpBoxes) window.csShakeOtpBoxes();
       return;
     }
 
@@ -495,10 +485,7 @@
     const valid = await verifyOTP(code);
 
     if (valid) {
-      // Auto-provisioning: daftarkan diri sendiri ke cs_agents.
-      // Aman karena dibatasi RLS: hanya sesi ber-email himawaridigi@gmail.com
-      // yang boleh insert baris untuk dirinya sendiri (lihat policy
-      // "CS Self Provision"). Upsert supaya aman dipanggil berkali-kali.
+      // Auto-provisioning: daftarkan diri sendiri ke cs_agents. (BLOK INI TIDAK BERUBAH)
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -508,8 +495,6 @@
           .insert({ user_id: session.user.id, email: session.user.email });
 
         if (provisionError && provisionError.code !== '23505') {
-          // 23505 = unique_violation, artinya CS ini memang sudah terdaftar
-          // sebelumnya — itu normal dan aman diabaikan, bukan error sungguhan.
           if (window.showToast) window.showToast('Gagal mendaftar sebagai CS. Coba lagi.', 'error');
         }
       }
@@ -517,15 +502,16 @@
       otpVerifyBtn.innerHTML = '<i class="ph-bold ph-check-circle"></i>';
       document.querySelector('.cs-login-step[data-step="2"]')?.classList.add('done');
       document.querySelector('.cs-login-card')?.classList.add('cs-success-pulse');
-      if (bootSkeleton) bootSkeleton.classList.add('variant-dashboard'); // siapkan skeleton dashboard
+      if (bootSkeleton) bootSkeleton.classList.add('variant-dashboard');
+
       csName = loginNameInput.value.trim();
       localStorage.setItem('hd_cs_name', csName);
       setTimeout(() => showDashboard(), 650);
     } else {
       showStatus('Kode salah atau sudah kedaluwarsa.', 'error');
-      otpInput.value = '';
-      otpInput.focus();
-      otpVerifyBtn.disabled = false;
+      if (window.csShakeOtpBoxes) window.csShakeOtpBoxes();
+      if (window.csResetOtpBoxes) window.csResetOtpBoxes();
+      otpVerifyBtn.disabled = true;
       otpVerifyBtn.textContent = 'Verifikasi';
     }
   });
@@ -537,6 +523,7 @@
 
     otpResendBtn.disabled = true;
     showStatus('Mengirim ulang kode...', 'info');
+    if (window.csResetOtpBoxes) window.csResetOtpBoxes();
     await sendOTP(name);
     startResendCooldown();
     showStatus('Kode baru telah dikirim.', 'success');
@@ -1010,6 +997,93 @@
       </div>`;
     }
     chatList.insertAdjacentHTML('afterbegin', html);
+  }
+
+  function bindOtpBoxes() {
+    const boxes = Array.from(document.querySelectorAll('.cs-otp-box'));
+    const hiddenInput = document.getElementById('cs-otp-input');
+    const wrapper = document.getElementById('cs-otp-boxes');
+    if (!boxes.length || !hiddenInput) return;
+
+    function syncHidden() {
+      hiddenInput.value = boxes.map((b) => b.value).join('');
+      otpVerifyBtn.disabled = hiddenInput.value.length !== 5;
+    }
+
+    boxes.forEach((box, idx) => {
+      box.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, '').slice(-1);
+        e.target.value = val;
+        box.classList.toggle('filled', !!val);
+        if (val && idx < boxes.length - 1) {
+          boxes[idx + 1].focus();
+        }
+        syncHidden();
+        if (hiddenInput.value.length === 5 && !otpVerifyBtn.disabled) {
+          otpVerifyBtn.click(); // auto-submit begitu 5 digit terisi
+        }
+      });
+
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          if (!box.value && idx > 0) {
+            boxes[idx - 1].focus();
+            boxes[idx - 1].value = '';
+            boxes[idx - 1].classList.remove('filled');
+            syncHidden();
+          } else {
+            box.classList.remove('filled');
+          }
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          e.preventDefault();
+          boxes[idx - 1].focus();
+        } else if (e.key === 'ArrowRight' && idx < boxes.length - 1) {
+          e.preventDefault();
+          boxes[idx + 1].focus();
+        } else if (e.key === 'Enter' && !otpVerifyBtn.disabled) {
+          otpVerifyBtn.click();
+        }
+      });
+
+      box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData)
+          .getData('text')
+          .replace(/[^0-9]/g, '');
+        if (!paste) return;
+        paste
+          .slice(0, boxes.length)
+          .split('')
+          .forEach((ch, i) => {
+            boxes[i].value = ch;
+            boxes[i].classList.add('filled');
+          });
+        syncHidden();
+        boxes[Math.min(paste.length, boxes.length - 1)].focus();
+        if (hiddenInput.value.length === 5) otpVerifyBtn.click();
+      });
+    });
+
+    window.csResetOtpBoxes = function () {
+      boxes.forEach((b) => {
+        b.value = '';
+        b.classList.remove('filled');
+      });
+      hiddenInput.value = '';
+      otpVerifyBtn.disabled = true;
+      boxes[0].focus();
+    };
+
+    window.csShakeOtpBoxes = function () {
+      if (!wrapper) return;
+      wrapper.classList.remove('cs-otp-shake');
+      void wrapper.offsetWidth;
+      wrapper.classList.add('cs-otp-shake');
+    };
+
+    window.csFocusOtpFirstBox = function () {
+      boxes[0].focus();
+    };
   }
 
   function getLastMessage(messages) {
@@ -1822,8 +1896,13 @@
         showLogin();
 
         // Reset login form
+        loginForm.classList.remove('cs-fade-out');
         loginForm.style.display = 'block';
         otpSection.classList.remove('show');
+        if (window.csResetOtpBoxes) window.csResetOtpBoxes();
+        document.querySelector('.cs-login-step[data-step="1"]')?.classList.add('active');
+        document.querySelector('.cs-login-step[data-step="1"]')?.classList.remove('done');
+        document.querySelector('.cs-login-step[data-step="2"]')?.classList.remove('active', 'done');
         loginSubmit.disabled = false;
         loginSubmit.innerHTML = '<i class="ph-bold ph-sign-in"></i> Kirim Kode Verifikasi';
         loginNameInput.value = '';
