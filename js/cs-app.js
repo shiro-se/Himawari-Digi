@@ -1580,12 +1580,17 @@
     if (!selectedChatId) return;
     supabase
       .from('typing_status')
-      .upsert({
-        chat_id: selectedChatId,
-        cs_is_typing: true,
-        cs_timestamp: new Date().toISOString(),
-      })
-      .then();
+      .upsert(
+        {
+          chat_id: selectedChatId,
+          cs_is_typing: true,
+          cs_timestamp: new Date().toISOString(),
+        },
+        { onConflict: 'chat_id' }
+      )
+      .then(({ error }) => {
+        if (error) console.error('sendCSTyping error:', error);
+      });
 
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => clearCSTyping(), 3000);
@@ -1595,12 +1600,17 @@
     if (!selectedChatId) return;
     supabase
       .from('typing_status')
-      .upsert({
-        chat_id: selectedChatId,
-        cs_is_typing: false,
-        cs_timestamp: new Date().toISOString(),
-      })
-      .then();
+      .upsert(
+        {
+          chat_id: selectedChatId,
+          cs_is_typing: false,
+          cs_timestamp: new Date().toISOString(),
+        },
+        { onConflict: 'chat_id' }
+      )
+      .then(({ error }) => {
+        if (error) console.error('clearCSTyping error:', error);
+      });
   }
 
   // ── Close Chat ────────────────────────────────────────────────
