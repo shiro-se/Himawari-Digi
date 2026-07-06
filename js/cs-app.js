@@ -23,6 +23,18 @@
   // ── State ─────────────────────────────────────────────────────
   let globalMessagesListener = null;
   let csName = localStorage.getItem('hd_cs_name') || '';
+  const bootSkeleton = document.getElementById('cs-boot-skeleton');
+  if (bootSkeleton) {
+    // Tebak varian skeleton yang tepat sebelum session dicek, biar tidak "flash"
+    bootSkeleton.classList.toggle('variant-dashboard', !!csName);
+    bootSkeleton.classList.toggle('variant-login', !csName);
+  }
+  function hideBootSkeleton() {
+    if (bootSkeleton) {
+      bootSkeleton.classList.add('cs-boot-hide');
+      setTimeout(() => bootSkeleton.remove(), 400);
+    }
+  }
   let selectedChatId = null;
   let oldestMessageTimestamp = null;
   let isLoadingMore = false;
@@ -303,6 +315,7 @@
     } else {
       showLogin();
     }
+    hideBootSkeleton();
   }
 
   let isExplicitLogout = false;
@@ -436,8 +449,13 @@
     const sent = await sendOTP(name);
 
     if (sent) {
+      loginForm.classList.add('cs-fade-out');
+      setTimeout(() => {
+        loginForm.style.display = 'none';
+      }, 280);
       otpSection.classList.add('show');
-      loginForm.style.display = 'none';
+      document.querySelector('.cs-login-step[data-step="1"]')?.classList.replace('active', 'done');
+      document.querySelector('.cs-login-step[data-step="2"]')?.classList.add('active');
       otpInput.focus();
       startResendCooldown();
       showStatus('Kode dikirim ke tim admin.', 'success');
@@ -496,9 +514,13 @@
         }
       }
 
+      otpVerifyBtn.innerHTML = '<i class="ph-bold ph-check-circle"></i>';
+      document.querySelector('.cs-login-step[data-step="2"]')?.classList.add('done');
+      document.querySelector('.cs-login-card')?.classList.add('cs-success-pulse');
+      if (bootSkeleton) bootSkeleton.classList.add('variant-dashboard'); // siapkan skeleton dashboard
       csName = loginNameInput.value.trim();
       localStorage.setItem('hd_cs_name', csName);
-      setTimeout(() => showDashboard(), 500);
+      setTimeout(() => showDashboard(), 650);
     } else {
       showStatus('Kode salah atau sudah kedaluwarsa.', 'error');
       otpInput.value = '';
@@ -527,6 +549,8 @@
   let chatsListener = null;
 
   function initDashboard() {
+    showChatListSkeleton();
+
     // Request browser notification permission
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
@@ -967,6 +991,25 @@
     chatList.scrollTop = scrollTop;
 
     // Unread badge is now managed by updateNotifUI()
+  }
+
+  function showChatListSkeleton() {
+    chatListEmpty.style.display = 'none';
+    Array.from(chatList.children).forEach((c) => {
+      if (c !== chatListEmpty) c.remove();
+    });
+    let html = '';
+    for (let i = 0; i < 6; i++) {
+      html += `
+      <div class="cs-chat-skel-row">
+        <div class="sk-block" style="width:2.5rem;height:2.5rem;border-radius:50%;"></div>
+        <div style="flex:1;">
+          <div class="sk-block" style="width:${60 + (i % 3) * 10}%;height:.85rem;margin-bottom:.4rem;border-radius:4px;"></div>
+          <div class="sk-block" style="width:${75 + (i % 2) * 10}%;height:.7rem;border-radius:4px;"></div>
+        </div>
+      </div>`;
+    }
+    chatList.insertAdjacentHTML('afterbegin', html);
   }
 
   function getLastMessage(messages) {

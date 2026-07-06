@@ -26,12 +26,87 @@
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
   </head>
   <body class="cs-body">
+    <!-- ═══ BOOT SKELETON (tampil sebelum login/dashboard siap) ═══ -->
+    <div id="cs-boot-skeleton" class="cs-boot-skeleton variant-login">
+      <div class="cs-boot-login-card">
+        <div
+          class="sk-block"
+          style="width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 1.25rem"
+        ></div>
+        <div class="sk-block" style="width: 60%; height: 1.25rem; margin: 0 auto 0.5rem"></div>
+        <div class="sk-block" style="width: 80%; height: 0.8rem; margin: 0 auto 2rem"></div>
+        <div
+          class="sk-block"
+          style="width: 100%; height: 2.75rem; border-radius: 10px; margin-bottom: 1rem"
+        ></div>
+        <div class="sk-block" style="width: 100%; height: 2.75rem; border-radius: 12px"></div>
+      </div>
+
+      <div class="cs-boot-dash">
+        <div class="cs-boot-dash-topbar">
+          <div class="sk-block" style="width: 140px; height: 1.1rem; border-radius: 6px"></div>
+          <div style="display: flex; gap: 0.5rem">
+            <div class="sk-block" style="width: 36px; height: 36px; border-radius: 8px"></div>
+            <div class="sk-block" style="width: 36px; height: 36px; border-radius: 8px"></div>
+            <div class="sk-block" style="width: 36px; height: 36px; border-radius: 8px"></div>
+          </div>
+        </div>
+        <div class="cs-boot-dash-body">
+          <div class="cs-boot-dash-sidebar">
+            <div
+              class="sk-block"
+              style="width: 100%; height: 2.25rem; border-radius: 8px; margin-bottom: 1rem"
+            ></div>
+            <div class="cs-boot-chat-row">
+              <div class="sk-block" style="width: 2.5rem; height: 2.5rem; border-radius: 50%"></div>
+              <div style="flex: 1">
+                <div
+                  class="sk-block"
+                  style="width: 70%; height: 0.9rem; margin-bottom: 0.4rem"
+                ></div>
+                <div class="sk-block" style="width: 90%; height: 0.75rem"></div>
+              </div>
+            </div>
+            <div class="cs-boot-chat-row">
+              <div class="sk-block" style="width: 2.5rem; height: 2.5rem; border-radius: 50%"></div>
+              <div style="flex: 1">
+                <div
+                  class="sk-block"
+                  style="width: 60%; height: 0.9rem; margin-bottom: 0.4rem"
+                ></div>
+                <div class="sk-block" style="width: 80%; height: 0.75rem"></div>
+              </div>
+            </div>
+            <div class="cs-boot-chat-row">
+              <div class="sk-block" style="width: 2.5rem; height: 2.5rem; border-radius: 50%"></div>
+              <div style="flex: 1">
+                <div
+                  class="sk-block"
+                  style="width: 65%; height: 0.9rem; margin-bottom: 0.4rem"
+                ></div>
+                <div class="sk-block" style="width: 85%; height: 0.75rem"></div>
+              </div>
+            </div>
+          </div>
+          <div class="cs-boot-dash-detail"></div>
+        </div>
+      </div>
+    </div>
     <!-- ═══ LOGIN VIEW ═══ -->
     <div id="cs-login-view" class="cs-login-page">
+      <div class="cs-login-blob cs-login-blob-1"></div>
+      <div class="cs-login-blob cs-login-blob-2"></div>
+      <div class="cs-login-blob cs-login-blob-3"></div>
       <div class="cs-login-card">
         <div class="cs-login-logo">
           <h1>HIMAWARI<span>DIGI</span></h1>
           <p>CS Dashboard — Login</p>
+        </div>
+
+        <div class="cs-login-steps">
+          <div class="cs-login-step active" data-step="1"><span>1</span>Nama</div>
+          <div class="cs-login-step-line"></div>
+          <div class="cs-login-step" data-step="2"><span>2</span>Verifikasi</div>
         </div>
 
         <form id="cs-login-form">
