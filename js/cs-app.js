@@ -473,8 +473,8 @@
     const rawCode = otpInput.value;
     const code = rawCode.replace(/[^0-9]/g, '');
 
-    if (code.length !== 5) {
-      if (window.showToast) window.showToast('Masukkan 5 digit kode verifikasi.', 'warning');
+    if (code.length !== 6) {
+      if (window.showToast) window.showToast('Masukkan 6 digit kode verifikasi.', 'warning');
       if (window.csShakeOtpBoxes) window.csShakeOtpBoxes();
       return;
     }
