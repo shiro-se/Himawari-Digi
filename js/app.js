@@ -1204,20 +1204,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastDot = steps[steps.length - 1].querySelector('.workflow-step-dot');
     const TRIGGER_RATIO = 0.55;
 
-    function update() {
+    let lineTop = 0;
+    let lineLeft = 0;
+    let lineLength = 0;
+
+    function measureLine() {
       const timelineRect = timeline.getBoundingClientRect();
       const firstRect = firstDot.getBoundingClientRect();
       const lastRect = lastDot.getBoundingClientRect();
 
-      // Titik tengah vertikal dot pertama & terakhir, relatif ke container timeline
-      const lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
+      // Titik tengah horizontal & vertikal dot pertama, relatif terhadap container timeline
+      lineLeft = firstRect.left + firstRect.width / 2 - timelineRect.left;
+      lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
       const lineBottom = lastRect.top + lastRect.height / 2 - timelineRect.top;
-      const lineLength = lineBottom - lineTop;
+      lineLength = lineBottom - lineTop;
 
+      track.style.left = lineLeft + 'px';
       track.style.top = lineTop + 'px';
       track.style.height = lineLength + 'px';
-      progressBar.style.top = lineTop + 'px';
 
+      progressBar.style.left = lineLeft + 'px';
+      progressBar.style.top = lineTop + 'px';
+    }
+
+    function update() {
+      const timelineRect = timeline.getBoundingClientRect();
       const triggerY = window.innerHeight * TRIGGER_RATIO;
 
       steps.forEach((step) => {
@@ -1227,16 +1238,20 @@ document.addEventListener('DOMContentLoaded', () => {
         step.classList.toggle('is-active', dotCenter <= triggerY);
       });
 
+      // Progress dihitung dalam PX (bukan %) supaya tidak pernah melebihi lineLength
       const passed = Math.min(Math.max(triggerY - (timelineRect.top + lineTop), 0), lineLength);
-      const percent = lineLength > 0 ? (passed / lineLength) * 100 : 0;
-      progressBar.style.height = percent + '%';
+      progressBar.style.height = passed + 'px';
     }
 
+    measureLine();
     update();
 
     window.addEventListener('scroll', update, { passive: true });
     activeScrollListeners.push({ fn: update });
 
-    window.addEventListener('resize', update);
+    window.addEventListener('resize', () => {
+      measureLine();
+      update();
+    });
   }
 });

@@ -3577,23 +3577,20 @@ footer {
 }
 .workflow-line-track {
   position: absolute;
-  left: 27px;
   width: 3px;
   background: var(--border);
   border-radius: 999px;
-  z-index: 1;
-  /* top & height di-set otomatis via JS */
+  z-index: 0;
+  /* left, top, height di-set otomatis via JS */
 }
 .workflow-line-progress {
   position: absolute;
-  left: 27px;
   width: 3px;
   background: linear-gradient(180deg, var(--primary), var(--chart-2));
   border-radius: 999px;
   box-shadow: 0 0 14px color-mix(in srgb, var(--primary) 55%, transparent);
-  transition: height 0.15s linear;
-  z-index: 1;
-  /* top di-set via JS */
+  z-index: 0;
+  /* left, top, height di-set otomatis via JS, transition di-handle inline saat update */
 }
 
 .workflow-step {
