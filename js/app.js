@@ -1195,20 +1195,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initWorkflowTimeline() {
     const timeline = document.getElementById('workflow-timeline');
+    const track = document.getElementById('workflow-track');
     const progressBar = document.getElementById('workflow-progress');
-    if (!timeline || !progressBar) return;
+    if (!timeline || !track || !progressBar) return;
 
     const steps = Array.from(timeline.querySelectorAll('.workflow-step'));
-    const TRIGGER_RATIO = 0.55; // garis pemicu di 55% tinggi viewport
+    const TRIGGER_RATIO = 0.55;
+
+    let lineTop = 0;
+    let lineLength = 0;
+
+    function measureLine() {
+      const timelineRect = timeline.getBoundingClientRect();
+      const firstDot = steps[0].querySelector('.workflow-step-dot');
+      const lastDot = steps[steps.length - 1].querySelector('.workflow-step-dot');
+
+      const firstRect = firstDot.getBoundingClientRect();
+      const lastRect = lastDot.getBoundingClientRect();
+
+      // Titik tengah vertikal dot pertama & terakhir, relatif terhadap container timeline
+      lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
+      const lineBottom = lastRect.top + lastRect.height / 2 - timelineRect.top;
+      lineLength = lineBottom - lineTop;
+
+      track.style.top = lineTop + 'px';
+      track.style.height = lineLength + 'px';
+      progressBar.style.top = lineTop + 'px';
+    }
 
     function update() {
-      const rect = timeline.getBoundingClientRect();
       const triggerY = window.innerHeight * TRIGGER_RATIO;
-
-      const total = rect.height;
-      const passed = Math.min(Math.max(triggerY - rect.top, 0), total);
-      const percent = total > 0 ? (passed / total) * 100 : 0;
-      progressBar.style.height = percent + '%';
 
       steps.forEach((step) => {
         const dot = step.querySelector('.workflow-step-dot');
@@ -1216,11 +1232,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const dotCenter = dotRect.top + dotRect.height / 2;
         step.classList.toggle('is-active', dotCenter <= triggerY);
       });
+
+      // Hitung progress berdasarkan posisi garis yang sudah diukur (bukan tinggi container)
+      const timelineRect = timeline.getBoundingClientRect();
+      const passed = Math.min(Math.max(triggerY - (timelineRect.top + lineTop), 0), lineLength);
+      const percent = lineLength > 0 ? (passed / lineLength) * 100 : 0;
+      progressBar.style.height = percent + '%';
     }
 
+    measureLine();
     update();
+
     window.addEventListener('scroll', update, { passive: true });
     activeScrollListeners.push({ fn: update });
-    window.addEventListener('resize', update);
+
+    window.addEventListener('resize', () => {
+      measureLine();
+      update();
+    });
   }
 });

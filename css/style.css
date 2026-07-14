@@ -3575,26 +3575,7 @@ footer {
 #workflow-timeline {
   padding-left: 4px;
 }
-.workflow-line-track {
-  position: absolute;
-  left: 27px;
-  top: 8px;
-  bottom: 8px;
-  width: 3px;
-  background: var(--border);
-  border-radius: 999px;
-}
-.workflow-line-progress {
-  position: absolute;
-  left: 27px;
-  top: 8px;
-  width: 3px;
-  height: 0%;
-  background: linear-gradient(180deg, var(--primary), var(--chart-2));
-  border-radius: 999px;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--primary) 55%, transparent);
-  transition: height 0.15s linear;
-}
+
 .workflow-step {
   position: relative;
   display: flex;
