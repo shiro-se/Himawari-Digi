@@ -1200,30 +1200,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!timeline || !track || !progressBar) return;
 
     const steps = Array.from(timeline.querySelectorAll('.workflow-step'));
+    const firstDot = steps[0].querySelector('.workflow-step-dot');
+    const lastDot = steps[steps.length - 1].querySelector('.workflow-step-dot');
     const TRIGGER_RATIO = 0.55;
 
-    let lineTop = 0;
-    let lineLength = 0;
-
-    function measureLine() {
+    function update() {
       const timelineRect = timeline.getBoundingClientRect();
-      const firstDot = steps[0].querySelector('.workflow-step-dot');
-      const lastDot = steps[steps.length - 1].querySelector('.workflow-step-dot');
-
       const firstRect = firstDot.getBoundingClientRect();
       const lastRect = lastDot.getBoundingClientRect();
 
-      // Titik tengah vertikal dot pertama & terakhir, relatif terhadap container timeline
-      lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
+      // Titik tengah vertikal dot pertama & terakhir, relatif ke container timeline
+      const lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
       const lineBottom = lastRect.top + lastRect.height / 2 - timelineRect.top;
-      lineLength = lineBottom - lineTop;
+      const lineLength = lineBottom - lineTop;
 
       track.style.top = lineTop + 'px';
       track.style.height = lineLength + 'px';
       progressBar.style.top = lineTop + 'px';
-    }
 
-    function update() {
       const triggerY = window.innerHeight * TRIGGER_RATIO;
 
       steps.forEach((step) => {
@@ -1233,22 +1227,16 @@ document.addEventListener('DOMContentLoaded', () => {
         step.classList.toggle('is-active', dotCenter <= triggerY);
       });
 
-      // Hitung progress berdasarkan posisi garis yang sudah diukur (bukan tinggi container)
-      const timelineRect = timeline.getBoundingClientRect();
       const passed = Math.min(Math.max(triggerY - (timelineRect.top + lineTop), 0), lineLength);
       const percent = lineLength > 0 ? (passed / lineLength) * 100 : 0;
       progressBar.style.height = percent + '%';
     }
 
-    measureLine();
     update();
 
     window.addEventListener('scroll', update, { passive: true });
     activeScrollListeners.push({ fn: update });
 
-    window.addEventListener('resize', () => {
-      measureLine();
-      update();
-    });
+    window.addEventListener('resize', update);
   }
 });
