@@ -1167,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function initServiceTabs() {
     const tabs = document.querySelectorAll('.svc-tab-btn');
     const panels = document.querySelectorAll('.svc-panel');
+    const panelWrap = document.querySelector('.svc-panel-wrap');
     if (!tabs.length) return;
 
     tabs.forEach((btn) => {
@@ -1188,6 +1189,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { opacity: 0, y: 10 },
             { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }
           );
+        }
+
+        // Di mobile, pastikan panel terlihat penuh setelah pilih tab tanpa scroll manual
+        if (window.innerWidth < 768 && panelWrap) {
+          const rect = panelWrap.getBoundingClientRect();
+          const alreadyVisible = rect.top >= 0 && rect.top < window.innerHeight * 0.3;
+          if (!alreadyVisible) {
+            panelWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         }
       });
     });

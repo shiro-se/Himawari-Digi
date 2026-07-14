@@ -3687,3 +3687,59 @@ footer {
     font-size: 1.2rem;
   }
 }
+
+/* ── Mobile: Tab list jadi horizontal scroll strip ── */
+@media (max-width: 767px) {
+  .svc-tab-list {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+  .svc-tab-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .svc-tab-btn {
+    flex: 0 0 auto;
+    width: auto;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    padding: 10px 14px;
+    min-width: 84px;
+    scroll-snap-align: start;
+  }
+
+  .svc-tab-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .svc-tab-text {
+    align-items: center;
+  }
+
+  .svc-tab-label {
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  /* Sembunyikan sub-label & caret di mobile biar ringkas */
+  .svc-tab-sub,
+  .svc-tab-caret {
+    display: none;
+  }
+
+  .svc-panel-wrap {
+    padding: 1.5rem;
+    min-height: unset;
+  }
+}
