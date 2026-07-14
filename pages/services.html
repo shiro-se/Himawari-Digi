@@ -28,275 +28,414 @@
     </div>
   </section>
 
-  <!-- Services Grid -->
-  <section class="pb-24">
+  <!-- Tech Stack -->
+  <section class="py-20 border-y border-border bg-muted/30 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12 reveal-on-scroll">
+      <p class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3">
+        Tech Stack
+      </p>
+      <h2 class="text-3xl md:text-5xl font-bold">Teknologi yang Kami Kuasai</h2>
+    </div>
+
+    <div
+      class="relative space-y-4 [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]"
+    >
+      <div class="flex gap-4 animate-scroll-left w-max">
+        <!-- Baris 1 -->
+        <div class="stack-badge">
+          <i class="ph-fill ph-atom" style="color: #61dafb"></i><span>React</span>
+        </div>
+        <div class="stack-badge"><i class="ph-fill ph-triangle"></i><span>Next.js</span></div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-wind" style="color: #38bdf8"></i><span>Tailwind CSS</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-hexagon" style="color: #3c873a"></i><span>Node.js</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-code" style="color: #ff2d20"></i><span>PHP / Laravel</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-database" style="color: #4169e1"></i><span>PostgreSQL</span>
+        </div>
+        <!-- Duplikat untuk loop mulus -->
+        <div class="stack-badge">
+          <i class="ph-fill ph-atom" style="color: #61dafb"></i><span>React</span>
+        </div>
+        <div class="stack-badge"><i class="ph-fill ph-triangle"></i><span>Next.js</span></div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-wind" style="color: #38bdf8"></i><span>Tailwind CSS</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-hexagon" style="color: #3c873a"></i><span>Node.js</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-code" style="color: #ff2d20"></i><span>PHP / Laravel</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-database" style="color: #4169e1"></i><span>PostgreSQL</span>
+        </div>
+      </div>
+      <div class="flex gap-4 animate-scroll-right w-max">
+        <!-- Baris 2 -->
+        <div class="stack-badge">
+          <i class="ph-fill ph-lightning" style="color: #3ecf8e"></i><span>Supabase</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-cloud" style="color: #ff9900"></i><span>AWS</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-cube" style="color: #2496ed"></i><span>Docker</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-steering-wheel" style="color: #326ce5"></i><span>Kubernetes</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-magic-wand" style="color: #88ce02"></i><span>GSAP</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-figma-logo" style="color: #f24e1e"></i><span>Figma</span>
+        </div>
+        <!-- Duplikat -->
+        <div class="stack-badge">
+          <i class="ph-fill ph-lightning" style="color: #3ecf8e"></i><span>Supabase</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-cloud" style="color: #ff9900"></i><span>AWS</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-cube" style="color: #2496ed"></i><span>Docker</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-steering-wheel" style="color: #326ce5"></i><span>Kubernetes</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-magic-wand" style="color: #88ce02"></i><span>GSAP</span>
+        </div>
+        <div class="stack-badge">
+          <i class="ph-fill ph-figma-logo" style="color: #f24e1e"></i><span>Figma</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Tabs -->
+  <section class="pb-24" id="services-tabs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Service 1 -->
-        <div
-          class="group p-8 md:p-10 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all duration-500 relative overflow-hidden reveal-on-scroll"
-        >
+      <div class="flex flex-wrap justify-center gap-2 mb-12 reveal-on-scroll" role="tablist">
+        <button class="svc-tab-btn active" data-tab="web" role="tab" aria-selected="true">
+          <i class="ph-fill ph-browser"></i><span>Web Development</span>
+        </button>
+        <button class="svc-tab-btn" data-tab="vibe" role="tab" aria-selected="false">
+          <i class="ph-fill ph-magic-wand"></i><span>Vibe Coding</span>
+        </button>
+        <button class="svc-tab-btn" data-tab="cloud" role="tab" aria-selected="false">
+          <i class="ph-fill ph-cloud-arrow-up"></i><span>Cloud & DevOps</span>
+        </button>
+        <button class="svc-tab-btn" data-tab="qa" role="tab" aria-selected="false">
+          <i class="ph-fill ph-shield-check"></i><span>Q&A Testing</span>
+        </button>
+        <button class="svc-tab-btn" data-tab="outsourcing" role="tab" aria-selected="false">
+          <i class="ph-fill ph-users-three"></i><span>IT Outsourcing</span>
+        </button>
+        <button class="svc-tab-btn" data-tab="design" role="tab" aria-selected="false">
+          <i class="ph-fill ph-pen-nib"></i><span>UI/UX Design</span>
+        </button>
+      </div>
+
+      <!-- WEB -->
+      <div
+        class="svc-panel active grid-cols-1 md:grid-cols-2 gap-10 items-center p-8 md:p-12 rounded-3xl bg-card border border-border"
+        data-panel="web"
+      >
+        <div>
           <div
-            class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-6">
-              <div
-                class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-              >
-                <i class="ph-fill ph-browser"></i>
-              </div>
-              <span class="text-xs font-mono text-muted-foreground">01</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-3" data-i18n="services_card1_title">
-              Web & Mobile Development
-            </h3>
-            <p class="text-muted-foreground leading-relaxed mb-6">
-              <span data-i18n="services_card1_desc"
-                >High-performance, scalable applications built with React, Next.js, Flutter, and
-                modern frameworks. From responsive web apps to native mobile experiences — we
-                deliver pixel-perfect results.</span
-              >
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >React</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Next.js</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Flutter</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Node.js</span
-              >
-            </div>
+            class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl mb-6"
+          >
+            <i class="ph-fill ph-browser"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3" data-i18n="services_card1_title">
+            Web & Mobile Development
+          </h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            <span data-i18n="services_card1_desc"
+              >High-performance, scalable applications built with React, Next.js, Flutter, and
+              modern frameworks. From responsive web apps to native mobile experiences — we deliver
+              pixel-perfect results.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >React</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Next.js</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Flutter</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Node.js</span
+            >
           </div>
         </div>
-
-        <!-- Service 2 -->
-        <div
-          class="group p-8 md:p-10 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all duration-500 relative overflow-hidden reveal-on-scroll"
-        >
-          <div
-            class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-6">
-              <div
-                class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-              >
-                <i class="ph-fill ph-users-three"></i>
-              </div>
-              <span class="text-xs font-mono text-muted-foreground">02</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-3" data-i18n="services_card2_title">
-              Programmer Outsourcing
-            </h3>
-            <p class="text-muted-foreground leading-relaxed mb-6">
-              <span data-i18n="services_card2_desc"
-                >Carefully vetted developers who integrate seamlessly with your team. Whether you
-                need frontend specialists, backend engineers, or full-stack talent — we match the
-                right people to your project.</span
-              >
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Dedicated Team</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Flexible Contracts</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Vetted Talent</span
-              >
-            </div>
+        <div class="bg-muted/40 rounded-2xl p-6">
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Arsitektur scalable & performant</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>SEO-friendly & PWA-ready</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Integrasi API & database modern</span>
           </div>
         </div>
+      </div>
 
-        <!-- Service 3 -->
-        <div
-          class="group p-8 md:p-10 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all duration-500 relative overflow-hidden reveal-on-scroll"
-        >
+      <!-- VIBE CODING -->
+      <div
+        class="svc-panel grid-cols-1 md:grid-cols-2 gap-10 items-center p-8 md:p-12 rounded-3xl bg-card border border-border"
+        data-panel="vibe"
+      >
+        <div>
           <div
-            class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-6">
-              <div
-                class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-              >
-                <i class="ph-fill ph-magic-wand"></i>
-              </div>
-              <div class="flex items-center gap-2">
-                <span
-                  class="px-2 py-0.5 bg-linear-to-r from-primary to-chart-2 text-primary-foreground text-[0.6rem] font-bold rounded-full uppercase tracking-wider"
-                  >New</span
-                >
-                <span class="text-xs font-mono text-muted-foreground">03</span>
-              </div>
-            </div>
-            <h3 class="text-2xl font-bold mb-3" data-i18n="services_card3_title">
-              Vibe Coding (AI-Driven)
-            </h3>
-            <p class="text-muted-foreground leading-relaxed mb-6">
-              <span data-i18n="services_card3_desc"
-                >Rapid prototyping and development powered by cutting-edge AI and LLMs. Turn ideas
-                into working prototypes in days, not months. Perfect for MVPs and rapid iteration
-                cycles.</span
-              >
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >AI-Assisted</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Rapid MVP</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >LLM Integration</span
-              >
-            </div>
+            class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl mb-6"
+          >
+            <i class="ph-fill ph-magic-wand"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3" data-i18n="services_card3_title">
+            Vibe Coding (AI-Driven)
+          </h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            <span data-i18n="services_card3_desc"
+              >Rapid prototyping and development powered by cutting-edge AI and LLMs. Turn ideas
+              into working prototypes in days, not months. Perfect for MVPs and rapid iteration
+              cycles.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >AI-Assisted</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Rapid MVP</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >LLM Integration</span
+            >
           </div>
         </div>
-
-        <!-- Service 4 -->
-        <div
-          class="group p-8 md:p-10 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all duration-500 relative overflow-hidden reveal-on-scroll"
-        >
-          <div
-            class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-6">
-              <div
-                class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-              >
-                <i class="ph-fill ph-cloud-arrow-up"></i>
-              </div>
-              <span class="text-xs font-mono text-muted-foreground">04</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-3" data-i18n="services_card4_title">Cloud & DevOps</h3>
-            <p class="text-muted-foreground leading-relaxed mb-6">
-              <span data-i18n="services_card4_desc"
-                >Robust CI/CD pipelines, container orchestration with Docker & Kubernetes, and
-                reliable cloud infrastructure on AWS and GCP. We ensure your applications scale
-                effortlessly.</span
-              >
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >AWS</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Docker</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Kubernetes</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >CI/CD</span
-              >
-            </div>
+        <div class="bg-muted/40 rounded-2xl p-6">
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Prototype jadi dalam hitungan hari</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Iterasi cepat berbasis AI</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Cocok untuk validasi ide/MVP</span>
           </div>
         </div>
+      </div>
 
-        <!-- Service 5 -->
-        <div
-          class="group p-8 md:p-10 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all duration-500 relative overflow-hidden reveal-on-scroll"
-        >
+      <!-- CLOUD & DEVOPS -->
+      <div
+        class="svc-panel grid-cols-1 md:grid-cols-2 gap-10 items-center p-8 md:p-12 rounded-3xl bg-card border border-border"
+        data-panel="cloud"
+      >
+        <div>
           <div
-            class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-6">
-              <div
-                class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-              >
-                <i class="ph-fill ph-pen-nib"></i>
-              </div>
-              <span class="text-xs font-mono text-muted-foreground">05</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-3" data-i18n="services_card5_title">UI/UX Design</h3>
-            <p class="text-muted-foreground leading-relaxed mb-6">
-              <span data-i18n="services_card5_desc"
-                >Beautiful, intuitive interfaces crafted through user research, wireframing, and
-                pixel-perfect design. We create experiences that delight users and drive
-                conversion.</span
-              >
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Figma</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Prototyping</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Design System</span
-              >
-            </div>
+            class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl mb-6"
+          >
+            <i class="ph-fill ph-cloud-arrow-up"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3" data-i18n="services_card4_title">Cloud & DevOps</h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            <span data-i18n="services_card4_desc"
+              >Robust CI/CD pipelines, container orchestration with Docker & Kubernetes, and
+              reliable cloud infrastructure on AWS and GCP. We ensure your applications scale
+              effortlessly.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >AWS</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Docker</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Kubernetes</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >CI/CD</span
+            >
           </div>
         </div>
+        <div class="bg-muted/40 rounded-2xl p-6">
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>CI/CD pipeline otomatis</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Container orchestration</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Monitoring & auto-scaling</span>
+          </div>
+        </div>
+      </div>
 
-        <!-- Service 6 -->
-        <div
-          class="group p-8 md:p-10 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all duration-500 relative overflow-hidden reveal-on-scroll"
-        >
+      <!-- Q&A TESTING -->
+      <div
+        class="svc-panel grid-cols-1 md:grid-cols-2 gap-10 items-center p-8 md:p-12 rounded-3xl bg-card border border-border"
+        data-panel="qa"
+      >
+        <div>
           <div
-            class="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          ></div>
-          <div class="relative z-10">
-            <div class="flex items-start justify-between mb-6">
-              <div
-                class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-              >
-                <i class="ph-fill ph-shield-check"></i>
-              </div>
-              <span class="text-xs font-mono text-muted-foreground">06</span>
-            </div>
-            <h3 class="text-2xl font-bold mb-3" data-i18n="services_card6_title">
-              Quality Assurance
-            </h3>
-            <p class="text-muted-foreground leading-relaxed mb-6">
-              <span data-i18n="services_card6_desc"
-                >Comprehensive automated and manual testing — unit, integration, E2E, and
-                performance. We catch bugs before your users do and ensure production-ready
-                quality.</span
-              >
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >Automated</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >E2E Testing</span
-              >
-              <span
-                class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
-                >CI Integration</span
-              >
-            </div>
+            class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl mb-6"
+          >
+            <i class="ph-fill ph-shield-check"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3" data-i18n="services_card6_title">
+            Quality Assurance
+          </h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            <span data-i18n="services_card6_desc"
+              >Comprehensive automated and manual testing — unit, integration, E2E, and performance.
+              We catch bugs before your users do and ensure production-ready quality.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Automated</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >E2E Testing</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >CI Integration</span
+            >
+          </div>
+        </div>
+        <div class="bg-muted/40 rounded-2xl p-6">
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Unit & integration testing</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>End-to-end automation</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Bug-free sebelum rilis</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- IT OUTSOURCING -->
+      <div
+        class="svc-panel grid-cols-1 md:grid-cols-2 gap-10 items-center p-8 md:p-12 rounded-3xl bg-card border border-border"
+        data-panel="outsourcing"
+      >
+        <div>
+          <div
+            class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl mb-6"
+          >
+            <i class="ph-fill ph-users-three"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3" data-i18n="services_card2_title">
+            Programmer Outsourcing
+          </h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            <span data-i18n="services_card2_desc"
+              >Carefully vetted developers who integrate seamlessly with your team. Whether you need
+              frontend specialists, backend engineers, or full-stack talent — we match the right
+              people to your project.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Dedicated Team</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Flexible Contracts</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Vetted Talent</span
+            >
+          </div>
+        </div>
+        <div class="bg-muted/40 rounded-2xl p-6">
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Developer pre-vetted</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Kontrak fleksibel</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Terintegrasi dengan tim Anda</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI/UX DESIGN -->
+      <div
+        class="svc-panel grid-cols-1 md:grid-cols-2 gap-10 items-center p-8 md:p-12 rounded-3xl bg-card border border-border"
+        data-panel="design"
+      >
+        <div>
+          <div
+            class="w-16 h-16 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-4xl mb-6"
+          >
+            <i class="ph-fill ph-pen-nib"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-3" data-i18n="services_card5_title">UI/UX Design</h3>
+          <p class="text-muted-foreground leading-relaxed mb-6">
+            <span data-i18n="services_card5_desc"
+              >Beautiful, intuitive interfaces crafted through user research, wireframing, and
+              pixel-perfect design. We create experiences that delight users and drive
+              conversion.</span
+            >
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Figma</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Prototyping</span
+            >
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full border border-border text-muted-foreground"
+              >Design System</span
+            >
+          </div>
+        </div>
+        <div class="bg-muted/40 rounded-2xl p-6">
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Riset pengguna mendalam</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Wireframe → high-fidelity</span>
+          </div>
+          <div class="svc-highlight">
+            <i class="ph-fill ph-check-circle"></i><span>Design system yang konsisten</span>
           </div>
         </div>
       </div>
@@ -306,14 +445,16 @@
   <!-- Workflow -->
   <section class="py-24 bg-muted/50 border-y border-border">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-16 reveal-on-scroll">
+      <div class="text-center max-w-2xl mx-auto mb-20 reveal-on-scroll">
         <p
           class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3"
           data-i18n="services_flow_eyebrow"
         >
           How we work
         </p>
-        <h2 class="text-3xl md:text-5xl font-bold mb-6" data-i18n="services_flow_title">Our Process</h2>
+        <h2 class="text-3xl md:text-5xl font-bold mb-6" data-i18n="services_flow_title">
+          Our Process
+        </h2>
         <p class="text-lg text-muted-foreground">
           <span data-i18n="services_flow_desc"
             >A proven, transparent workflow designed to deliver exceptional results every
@@ -322,66 +463,69 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal-on-scroll">
-        <div
-          class="text-center p-8 rounded-3xl bg-card border border-border group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold mx-auto mb-5"
-          >
-            1
+      <div class="relative max-w-2xl mx-auto" id="workflow-timeline">
+        <div class="workflow-line-track"></div>
+        <div class="workflow-line-progress" id="workflow-progress"></div>
+
+        <div class="workflow-step reveal-on-scroll" data-step="1">
+          <div class="workflow-step-marker">
+            <div class="workflow-step-dot"><i class="ph-fill ph-magnifying-glass"></i></div>
           </div>
-          <h4 class="text-lg font-bold mb-2" data-i18n="services_step1">Discovery</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="services_step1_desc"
-              >Understanding your business goals, target audience, and technical requirements.</span
-            >
-          </p>
+          <div class="workflow-step-content">
+            <span class="workflow-step-num">01</span>
+            <h4 class="text-lg font-bold mb-2" data-i18n="services_step1">Discovery</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="services_step1_desc"
+                >Understanding your business goals, target audience, and technical
+                requirements.</span
+              >
+            </p>
+          </div>
         </div>
-        <div
-          class="text-center p-8 rounded-3xl bg-card border border-border group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-primary/80 text-primary-foreground flex items-center justify-center text-lg font-bold mx-auto mb-5"
-          >
-            2
+
+        <div class="workflow-step reveal-on-scroll" data-step="2">
+          <div class="workflow-step-marker">
+            <div class="workflow-step-dot"><i class="ph-fill ph-pen-nib"></i></div>
           </div>
-          <h4 class="text-lg font-bold mb-2" data-i18n="services_step2">Design</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="services_step2_desc"
-              >Wireframing and visual design focused on user experience and conversion.</span
-            >
-          </p>
+          <div class="workflow-step-content">
+            <span class="workflow-step-num">02</span>
+            <h4 class="text-lg font-bold mb-2" data-i18n="services_step2">Design</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="services_step2_desc"
+                >Wireframing and visual design focused on user experience and conversion.</span
+              >
+            </p>
+          </div>
         </div>
-        <div
-          class="text-center p-8 rounded-3xl bg-card border border-border group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-primary/60 text-primary-foreground flex items-center justify-center text-lg font-bold mx-auto mb-5"
-          >
-            3
+
+        <div class="workflow-step reveal-on-scroll" data-step="3">
+          <div class="workflow-step-marker">
+            <div class="workflow-step-dot"><i class="ph-fill ph-code"></i></div>
           </div>
-          <h4 class="text-lg font-bold mb-2" data-i18n="services_step3">Development</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="services_step3_desc"
-              >Agile coding paired with rigorous automated and manual testing.</span
-            >
-          </p>
+          <div class="workflow-step-content">
+            <span class="workflow-step-num">03</span>
+            <h4 class="text-lg font-bold mb-2" data-i18n="services_step3">Development</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="services_step3_desc"
+                >Agile coding paired with rigorous automated and manual testing.</span
+              >
+            </p>
+          </div>
         </div>
-        <div
-          class="text-center p-8 rounded-3xl bg-card border border-border group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-primary/40 text-primary-foreground flex items-center justify-center text-lg font-bold mx-auto mb-5"
-          >
-            4
+
+        <div class="workflow-step reveal-on-scroll" data-step="4">
+          <div class="workflow-step-marker">
+            <div class="workflow-step-dot"><i class="ph-fill ph-rocket-launch"></i></div>
           </div>
-          <h4 class="text-lg font-bold mb-2" data-i18n="services_step4">Launch & Support</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="services_step4_desc"
-              >Smooth CI/CD deployment and ongoing monitoring and support.</span
-            >
-          </p>
+          <div class="workflow-step-content">
+            <span class="workflow-step-num">04</span>
+            <h4 class="text-lg font-bold mb-2" data-i18n="services_step4">Launch & Support</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="services_step4_desc"
+                >Smooth CI/CD deployment and ongoing monitoring and support.</span
+              >
+            </p>
+          </div>
         </div>
       </div>
     </div>

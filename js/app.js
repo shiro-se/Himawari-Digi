@@ -448,6 +448,13 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
 
+    // ── Services-only components ────────────────────────────────────────
+
+    if (route === 'services') {
+      initServiceTabs();
+      initWorkflowTimeline();
+    }
+
     // ── Home-only components ──────────────────────────────────────────────
 
     if (route === 'home') {
@@ -1086,11 +1093,15 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
             if (infoName) {
               infoName.setAttribute('data-i18n', `home_services_card_${clamped}`);
-              infoName.innerHTML = window.translations?.[currentLang]?.[`home_services_card_${clamped}`] || CARDS[clamped].name;
+              infoName.innerHTML =
+                window.translations?.[currentLang]?.[`home_services_card_${clamped}`] ||
+                CARDS[clamped].name;
             }
             if (infoDesc) {
               infoDesc.setAttribute('data-i18n', `home_services_info_${clamped}`);
-              infoDesc.innerHTML = window.translations?.[currentLang]?.[`home_services_info_${clamped}`] || CARDS[clamped].desc;
+              infoDesc.innerHTML =
+                window.translations?.[currentLang]?.[`home_services_info_${clamped}`] ||
+                CARDS[clamped].desc;
             }
 
             if (infoTag) {
@@ -1151,5 +1162,66 @@ document.addEventListener('DOMContentLoaded', () => {
       rafId = requestAnimationFrame(tick);
       activeRafs.push(rafId);
     }
+  }
+
+  function initServiceTabs() {
+    const tabs = document.querySelectorAll('.svc-tab-btn');
+    const panels = document.querySelectorAll('.svc-panel');
+    if (!tabs.length) return;
+
+    tabs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        tabs.forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        panels.forEach((p) => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        const panel = document.querySelector(`.svc-panel[data-panel="${btn.dataset.tab}"]`);
+        panel.classList.add('active');
+
+        // Optional: animasi masuk pakai GSAP (kamu sudah load GSAP)
+        if (window.gsap) {
+          gsap.fromTo(
+            panel,
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+          );
+        }
+      });
+    });
+  }
+
+  function initWorkflowTimeline() {
+    const timeline = document.getElementById('workflow-timeline');
+    const progressBar = document.getElementById('workflow-progress');
+    if (!timeline || !progressBar) return;
+
+    const steps = Array.from(timeline.querySelectorAll('.workflow-step'));
+    const TRIGGER_RATIO = 0.55; // garis pemicu di 55% tinggi viewport
+
+    function update() {
+      const rect = timeline.getBoundingClientRect();
+      const triggerY = window.innerHeight * TRIGGER_RATIO;
+
+      const total = rect.height;
+      const passed = Math.min(Math.max(triggerY - rect.top, 0), total);
+      const percent = total > 0 ? (passed / total) * 100 : 0;
+      progressBar.style.height = percent + '%';
+
+      steps.forEach((step) => {
+        const dot = step.querySelector('.workflow-step-dot');
+        const dotRect = dot.getBoundingClientRect();
+        const dotCenter = dotRect.top + dotRect.height / 2;
+        step.classList.toggle('is-active', dotCenter <= triggerY);
+      });
+    }
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    activeScrollListeners.push({ fn: update });
+    window.addEventListener('resize', update);
   }
 });
