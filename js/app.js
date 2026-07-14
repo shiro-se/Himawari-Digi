@@ -1191,12 +1191,16 @@ document.addEventListener('DOMContentLoaded', () => {
           );
         }
 
-        // Di mobile, pastikan panel terlihat penuh setelah pilih tab tanpa scroll manual
+        // Di mobile, geser secukupnya saja kalau panel belum terlihat — bukan lompat ke atas
         if (window.innerWidth < 768 && panelWrap) {
           const rect = panelWrap.getBoundingClientRect();
-          const alreadyVisible = rect.top >= 0 && rect.top < window.innerHeight * 0.3;
-          if (!alreadyVisible) {
-            panelWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const headerOffset = 90; // kira-kira tinggi navbar fixed, sesuaikan kalau perlu
+          const isHiddenAbove = rect.top < headerOffset;
+          const isHiddenBelow = rect.top > window.innerHeight * 0.6;
+
+          if (isHiddenAbove || isHiddenBelow) {
+            const delta = rect.top - headerOffset - 12;
+            window.scrollBy({ top: delta, behavior: 'smooth' });
           }
         }
       });
@@ -1214,20 +1218,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const lastDot = steps[steps.length - 1].querySelector('.workflow-step-dot');
     const TRIGGER_RATIO = 0.55;
 
-    let lineTop = 0;
-    let lineLeft = 0;
-    let lineLength = 0;
-
-    function measureLine() {
+    function update() {
       const timelineRect = timeline.getBoundingClientRect();
       const firstRect = firstDot.getBoundingClientRect();
       const lastRect = lastDot.getBoundingClientRect();
 
-      // Titik tengah horizontal & vertikal dot pertama, relatif terhadap container timeline
-      lineLeft = firstRect.left + firstRect.width / 2 - timelineRect.left;
-      lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
+      // Diukur ulang setiap kali update() jalan, jadi selalu akurat
+      // walau posisi dot masih bergeser akibat animasi reveal-on-scroll
+      const lineLeft = firstRect.left + firstRect.width / 2 - timelineRect.left;
+      const lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
       const lineBottom = lastRect.top + lastRect.height / 2 - timelineRect.top;
-      lineLength = lineBottom - lineTop;
+      const lineLength = lineBottom - lineTop;
 
       track.style.left = lineLeft + 'px';
       track.style.top = lineTop + 'px';
@@ -1235,10 +1236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       progressBar.style.left = lineLeft + 'px';
       progressBar.style.top = lineTop + 'px';
-    }
 
-    function update() {
-      const timelineRect = timeline.getBoundingClientRect();
       const triggerY = window.innerHeight * TRIGGER_RATIO;
 
       steps.forEach((step) => {
@@ -1248,20 +1246,15 @@ document.addEventListener('DOMContentLoaded', () => {
         step.classList.toggle('is-active', dotCenter <= triggerY);
       });
 
-      // Progress dihitung dalam PX (bukan %) supaya tidak pernah melebihi lineLength
       const passed = Math.min(Math.max(triggerY - (timelineRect.top + lineTop), 0), lineLength);
       progressBar.style.height = passed + 'px';
     }
 
-    measureLine();
     update();
 
     window.addEventListener('scroll', update, { passive: true });
     activeScrollListeners.push({ fn: update });
 
-    window.addEventListener('resize', () => {
-      measureLine();
-      update();
-    });
+    window.addEventListener('resize', update);
   }
 });
