@@ -328,6 +328,12 @@ document.addEventListener('DOMContentLoaded', () => {
         (href !== '/' && pathname.startsWith(href));
       item.classList.toggle('active', isActive);
     });
+
+    // ── Bottom Dock: Portfolio button (bukan <a>, jadi dicek terpisah) ──────
+    const dockPortfolioBtn = document.getElementById('dock-portfolio');
+    if (dockPortfolioBtn) {
+      dockPortfolioBtn.classList.toggle('active', pathname.startsWith('/portfolio'));
+    }
   };
 
   document.body.addEventListener('click', (e) => {
@@ -405,6 +411,39 @@ document.addEventListener('DOMContentLoaded', () => {
     dropdown?.addEventListener('mouseenter', () => clearTimeout(timer));
     dropdown?.addEventListener('mouseleave', close);
   });
+
+  // ── Mobile Dock: Portfolio Popup ──────────────────────────────────────────
+  const dockPortfolioBtn = document.getElementById('dock-portfolio');
+  const dockPortfolioPopup = document.getElementById('dock-portfolio-popup');
+  const dockPopupOverlay = document.getElementById('dock-popup-overlay');
+
+  if (dockPortfolioBtn && dockPortfolioPopup && dockPopupOverlay) {
+    const openDockPopup = () => {
+      dockPortfolioPopup.classList.add('is-open');
+      dockPopupOverlay.classList.add('is-open');
+      dockPortfolioBtn.setAttribute('aria-expanded', 'true');
+    };
+    const closeDockPopup = () => {
+      dockPortfolioPopup.classList.remove('is-open');
+      dockPopupOverlay.classList.remove('is-open');
+      dockPortfolioBtn.setAttribute('aria-expanded', 'false');
+    };
+
+    dockPortfolioBtn.addEventListener('click', () => {
+      const isOpen = dockPortfolioPopup.classList.contains('is-open');
+      isOpen ? closeDockPopup() : openDockPopup();
+    });
+
+    dockPopupOverlay.addEventListener('click', closeDockPopup);
+
+    // Tutup popup begitu salah satu sub-link diklik (sebelum navigasi SPA)
+    dockPortfolioPopup.querySelectorAll('[data-link]').forEach((link) => {
+      link.addEventListener('click', closeDockPopup);
+    });
+
+    // Tutup popup saat pindah halaman lewat cara lain (back/forward, dsb)
+    window.addEventListener('popstate', closeDockPopup);
+  }
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-item[data-dropdown]')) {
@@ -1314,4 +1353,4 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-});
+};);

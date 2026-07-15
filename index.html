@@ -163,40 +163,77 @@
 
     <!-- Mobile Bottom Dock -->
     <nav class="mobile-dock" id="mobile-dock" aria-label="Mobile navigation dock">
-      <a href="/" class="dock-item" data-link id="dock-home">
+      <a href="/" class="dock-item" data-link id="dock-home" aria-label="Home">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-house"></i>
         </div>
-        <span class="dock-label" data-i18n="nav_home">Home</span>
       </a>
 
-      <a href="/services" class="dock-item" data-link id="dock-services">
+      <a href="/services" class="dock-item" data-link id="dock-services" aria-label="Services">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-stack-plus"></i>
         </div>
-        <span class="dock-label" data-i18n="nav_services">Services</span>
       </a>
 
-      <a href="/portfolio" class="dock-item" data-link id="dock-portfolio">
+      <!-- Portfolio: toggle popup instead of direct link -->
+      <button
+        type="button"
+        class="dock-item"
+        id="dock-portfolio"
+        aria-label="Portfolio"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-briefcase"></i>
         </div>
-        <span class="dock-label" data-i18n="nav_portfolio">Portfolio</span>
-      </a>
+      </button>
 
-      <a href="/about" class="dock-item" data-link id="dock-about">
+      <a href="/about" class="dock-item" data-link id="dock-about" aria-label="About">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-users"></i>
         </div>
-        <span class="dock-label" data-i18n="nav_about">About</span>
       </a>
 
-      <a href="/contact" class="dock-item" data-link id="dock-contact">
+      <a href="/contact" class="dock-item" data-link id="dock-contact" aria-label="Contact">
         <div class="dock-icon-wrap">
           <i class="ph-bold ph-phone"></i>
         </div>
-        <span class="dock-label" data-i18n="nav_contact">Contact</span>
       </a>
+
+      <!-- Portfolio Popup Sheet -->
+      <div class="dock-popup" id="dock-portfolio-popup" role="menu">
+        <div class="dock-popup-arrow"></div>
+        <a href="/portfolio/web" class="dock-popup-item" data-link role="menuitem">
+          <div class="dock-popup-icon"><i class="ph ph-browser"></i></div>
+          <div class="dock-popup-text">
+            <span class="dock-popup-title" data-i18n="nav_portfolio_web">Web Projects</span>
+            <span class="dock-popup-desc" data-i18n="nav_portfolio_web_desc"
+              >Solusi web dari landing page hingga SaaS</span
+            >
+          </div>
+        </a>
+        <a href="/portfolio/mobile" class="dock-popup-item" data-link role="menuitem">
+          <div class="dock-popup-icon"><i class="ph ph-app-window"></i></div>
+          <div class="dock-popup-text">
+            <span class="dock-popup-title" data-i18n="nav_portfolio_mobile">Mobile Projects</span>
+            <span class="dock-popup-desc" data-i18n="nav_portfolio_mobile_desc"
+              >Aplikasi mobile yang telah diluncurkan</span
+            >
+          </div>
+        </a>
+        <a href="/portfolio/case-studies" class="dock-popup-item" data-link role="menuitem">
+          <div class="dock-popup-icon"><i class="ph ph-chart-line-up"></i></div>
+          <div class="dock-popup-text">
+            <span class="dock-popup-title" data-i18n="nav_portfolio_cases">Case Studies</span>
+            <span class="dock-popup-desc" data-i18n="nav_portfolio_cases_desc"
+              >Studi kasus mendalam proyek pilihan</span
+            >
+          </div>
+        </a>
+      </div>
+
+      <div class="dock-popup-overlay" id="dock-popup-overlay"></div>
     </nav>
 
     <!-- Main Content Container (Dynamic) -->
