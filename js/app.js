@@ -449,14 +449,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
 
     // ── Services-only components ────────────────────────────────────────
-
     if (route === 'services') {
       initServiceTabs();
-      initWorkflowTimeline();
+      initVerticalTimeline('workflow-timeline', 'workflow-track', 'workflow-progress');
+    }
+
+    // ── About-only components ───────────────────────────────────────────
+    if (route === 'about') {
+      initAboutStats();
+      initVerticalTimeline('journey-timeline', 'journey-track', 'journey-progress');
     }
 
     // ── Home-only components ──────────────────────────────────────────────
-
     if (route === 'home') {
       if (typeof window.initCardSwap === 'function') {
         window.initCardSwap();
@@ -1207,13 +1211,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function initWorkflowTimeline() {
-    const timeline = document.getElementById('workflow-timeline');
-    const track = document.getElementById('workflow-track');
-    const progressBar = document.getElementById('workflow-progress');
+  function initVerticalTimeline(timelineId, trackId, progressId) {
+    const timeline = document.getElementById(timelineId);
+    const track = document.getElementById(trackId);
+    const progressBar = document.getElementById(progressId);
     if (!timeline || !track || !progressBar) return;
 
     const steps = Array.from(timeline.querySelectorAll('.workflow-step'));
+    if (!steps.length) return;
     const firstDot = steps[0].querySelector('.workflow-step-dot');
     const lastDot = steps[steps.length - 1].querySelector('.workflow-step-dot');
     const TRIGGER_RATIO = 0.55;
@@ -1223,8 +1228,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const firstRect = firstDot.getBoundingClientRect();
       const lastRect = lastDot.getBoundingClientRect();
 
-      // Diukur ulang setiap kali update() jalan, jadi selalu akurat
-      // walau posisi dot masih bergeser akibat animasi reveal-on-scroll
       const lineLeft = firstRect.left + firstRect.width / 2 - timelineRect.left;
       const lineTop = firstRect.top + firstRect.height / 2 - timelineRect.top;
       const lineBottom = lastRect.top + lastRect.height / 2 - timelineRect.top;
@@ -1256,5 +1259,46 @@ document.addEventListener('DOMContentLoaded', () => {
     activeScrollListeners.push({ fn: update });
 
     window.addEventListener('resize', update);
+  }
+
+  function initAboutStats() {
+    const statsSection = document.getElementById('about-stats');
+    if (!statsSection) return;
+
+    const counters = statsSection.querySelectorAll('.stat-count');
+    if (!counters.length) return;
+
+    const DURATION = 1400;
+
+    function animateCounter(el) {
+      const target = parseInt(el.dataset.target, 10) || 0;
+      const start = performance.now();
+
+      function step(now) {
+        const progress = Math.min((now - start) / DURATION, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+        el.textContent = Math.round(eased * target);
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = target;
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            counters.forEach(animateCounter);
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
+
+    observer.observe(statsSection);
   }
 });
