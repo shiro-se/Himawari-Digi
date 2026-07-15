@@ -1353,4 +1353,4 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-};);
+});
