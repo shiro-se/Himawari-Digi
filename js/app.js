@@ -458,6 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (route === 'about') {
       initAboutStats();
       initVerticalTimeline('journey-timeline', 'journey-track', 'journey-progress');
+      initFlipCards('.mv-flip-card');
+      initFlipCards('.team-flip-card');
     }
 
     // ── Home-only components ──────────────────────────────────────────────
@@ -1300,5 +1302,16 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     observer.observe(statsSection);
+  }
+
+  function initFlipCards(selector) {
+    document.querySelectorAll(selector).forEach((card) => {
+      card.addEventListener('click', () => {
+        // Fallback untuk touch device (hover tidak berlaku)
+        if (window.matchMedia('(hover: none)').matches) {
+          card.classList.toggle('is-flipped');
+        }
+      });
+    });
   }
 });

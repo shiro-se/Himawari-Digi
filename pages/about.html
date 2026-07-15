@@ -32,35 +32,48 @@
   <section class="pb-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 reveal-on-scroll">
-        <div class="p-8 md:p-10 rounded-3xl bg-card border border-border">
-          <div
-            class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6"
-          >
-            <i class="ph-fill ph-target"></i>
+        <div class="mv-flip-card">
+          <div class="mv-flip-inner">
+            <div class="mv-flip-front">
+              <i class="ph-bold ph-arrow-clockwise mv-flip-hint"></i>
+              <div class="mv-flip-icon"><i class="ph-fill ph-target"></i></div>
+              <h3 class="text-2xl font-bold mb-2" data-i18n="about_mission">Our Mission</h3>
+              <p class="text-sm text-muted-foreground">Hover untuk baca selengkapnya</p>
+            </div>
+            <div class="mv-flip-back">
+              <div class="mv-flip-icon mv-flip-icon-back"><i class="ph-fill ph-target"></i></div>
+              <h3 class="text-xl font-bold mb-3" data-i18n="about_mission">Our Mission</h3>
+              <p class="text-sm leading-relaxed">
+                <span data-i18n="about_mission_full"
+                  >To democratize access to world-class software development. We partner with
+                  businesses of all sizes — from ambitious startups to established enterprises —
+                  delivering solutions that are elegant, scalable, and built to last.</span
+                >
+              </p>
+            </div>
           </div>
-          <h3 class="text-2xl font-bold mb-4" data-i18n="about_mission">Our Mission</h3>
-          <p class="text-muted-foreground leading-relaxed">
-            <span data-i18n="about_mission_full"
-              >To democratize access to world-class software development. We partner with businesses
-              of all sizes — from ambitious startups to established enterprises — delivering
-              solutions that are elegant, scalable, and built to last.</span
-            >
-          </p>
         </div>
-        <div class="p-8 md:p-10 rounded-3xl bg-card border border-border">
-          <div
-            class="w-14 h-14 rounded-2xl bg-linear-to-br from-primary/20 to-chart-2/10 text-primary flex items-center justify-center text-3xl mb-6"
-          >
-            <i class="ph-fill ph-eye"></i>
+
+        <div class="mv-flip-card">
+          <div class="mv-flip-inner">
+            <div class="mv-flip-front">
+              <i class="ph-bold ph-arrow-clockwise mv-flip-hint"></i>
+              <div class="mv-flip-icon"><i class="ph-fill ph-eye"></i></div>
+              <h3 class="text-2xl font-bold mb-2" data-i18n="about_vision">Our Vision</h3>
+              <p class="text-sm text-muted-foreground">Hover untuk baca selengkapnya</p>
+            </div>
+            <div class="mv-flip-back">
+              <div class="mv-flip-icon mv-flip-icon-back"><i class="ph-fill ph-eye"></i></div>
+              <h3 class="text-xl font-bold mb-3" data-i18n="about_vision">Our Vision</h3>
+              <p class="text-sm leading-relaxed">
+                <span data-i18n="about_vision_full"
+                  >To become Southeast Asia's most trusted software house — known for technical
+                  excellence, transparent collaboration, and products that genuinely move the needle
+                  for our clients' businesses.</span
+                >
+              </p>
+            </div>
           </div>
-          <h3 class="text-2xl font-bold mb-4" data-i18n="about_vision">Our Vision</h3>
-          <p class="text-muted-foreground leading-relaxed">
-            <span data-i18n="about_vision_full"
-              >To become Southeast Asia's most trusted software house — known for technical
-              excellence, transparent collaboration, and products that genuinely move the needle for
-              our clients' businesses.</span
-            >
-          </p>
         </div>
       </div>
     </div>
@@ -115,52 +128,49 @@
           Our Core Values
         </h2>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal-on-scroll">
-        <div
-          class="p-8 rounded-3xl bg-card border border-border text-center group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform"
-          >
-            <i class="ph-fill ph-handshake"></i>
+
+      <div class="value-list reveal-on-scroll">
+        <div class="value-item">
+          <span class="value-num">01</span>
+          <div class="value-icon"><i class="ph-fill ph-handshake"></i></div>
+          <div class="value-body">
+            <h4 class="text-xl font-bold mb-2" data-i18n="about_val1_title">Transparency</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="about_val1_desc"
+                >Open communication, honest timelines, and clear pricing. No hidden surprises.</span
+              >
+            </p>
           </div>
-          <h4 class="text-xl font-bold mb-3" data-i18n="about_val1_title">Transparency</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="about_val1_desc"
-              >Open communication, honest timelines, and clear pricing. No hidden surprises.</span
-            >
-          </p>
+          <i class="ph-bold ph-plus value-toggle"></i>
         </div>
-        <div
-          class="p-8 rounded-3xl bg-card border border-border text-center group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform"
-          >
-            <i class="ph-fill ph-lightning"></i>
+
+        <div class="value-item">
+          <span class="value-num">02</span>
+          <div class="value-icon"><i class="ph-fill ph-lightning"></i></div>
+          <div class="value-body">
+            <h4 class="text-xl font-bold mb-2" data-i18n="about_val2_title">Excellence</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="about_val2_desc"
+                >We don't ship "good enough." Every line of code is crafted with care and
+                intention.</span
+              >
+            </p>
           </div>
-          <h4 class="text-xl font-bold mb-3" data-i18n="about_val2_title">Excellence</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="about_val2_desc"
-              >We don't ship "good enough." Every line of code is crafted with care and
-              intention.</span
-            >
-          </p>
+          <i class="ph-bold ph-plus value-toggle"></i>
         </div>
-        <div
-          class="p-8 rounded-3xl bg-card border border-border text-center group hover:border-primary/40 transition-all duration-300"
-        >
-          <div
-            class="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform"
-          >
-            <i class="ph-fill ph-users"></i>
+
+        <div class="value-item">
+          <span class="value-num">03</span>
+          <div class="value-icon"><i class="ph-fill ph-users"></i></div>
+          <div class="value-body">
+            <h4 class="text-xl font-bold mb-2" data-i18n="about_val3_title">Partnership</h4>
+            <p class="text-sm text-muted-foreground leading-relaxed">
+              <span data-i18n="about_val3_desc"
+                >Your success is our success. We treat every project as if it were our own.</span
+              >
+            </p>
           </div>
-          <h4 class="text-xl font-bold mb-3" data-i18n="about_val3_title">Partnership</h4>
-          <p class="text-sm text-muted-foreground leading-relaxed">
-            <span data-i18n="about_val3_desc"
-              >Your success is our success. We treat every project as if it were our own.</span
-            >
-          </p>
+          <i class="ph-bold ph-plus value-toggle"></i>
         </div>
       </div>
     </div>
@@ -169,7 +179,7 @@
   <!-- Journey -->
   <section class="py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-12 reveal-on-scroll">
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal-on-scroll">
         <p
           class="text-xs font-mono tracking-widest uppercase text-muted-foreground mb-3"
           data-i18n="about_journey_eyebrow"
@@ -187,15 +197,12 @@
         </p>
       </div>
 
-      <div class="relative max-w-3xl mx-auto" id="journey-timeline">
+      <div class="relative max-w-4xl mx-auto" id="journey-timeline">
         <div class="workflow-line-track" id="journey-track"></div>
         <div class="workflow-line-progress" id="journey-progress"></div>
 
-        <div class="workflow-step reveal-on-scroll" data-step="1">
-          <div class="workflow-step-marker">
-            <div class="workflow-step-dot"><i class="ph-fill ph-flag"></i></div>
-          </div>
-          <div class="workflow-step-card">
+        <div class="workflow-step journey-row journey-row-right reveal-on-scroll" data-step="1">
+          <div class="journey-card">
             <div class="workflow-step-head">
               <span class="workflow-step-num">2023</span>
               <span class="workflow-step-badge" data-i18n="about_journey_1_badge">Founded</span>
@@ -210,13 +217,18 @@
               >
             </p>
           </div>
+          <div class="workflow-step-marker">
+            <div class="workflow-step-dot"><i class="ph-fill ph-flag"></i></div>
+          </div>
+          <div class="journey-spacer"></div>
         </div>
 
-        <div class="workflow-step reveal-on-scroll" data-step="2">
+        <div class="workflow-step journey-row journey-row-left reveal-on-scroll" data-step="2">
+          <div class="journey-spacer"></div>
           <div class="workflow-step-marker">
             <div class="workflow-step-dot"><i class="ph-fill ph-users-three"></i></div>
           </div>
-          <div class="workflow-step-card">
+          <div class="journey-card">
             <div class="workflow-step-head">
               <span class="workflow-step-num">2024</span>
               <span class="workflow-step-badge" data-i18n="about_journey_2_badge">Growth</span>
@@ -233,11 +245,8 @@
           </div>
         </div>
 
-        <div class="workflow-step reveal-on-scroll" data-step="3">
-          <div class="workflow-step-marker">
-            <div class="workflow-step-dot"><i class="ph-fill ph-magic-wand"></i></div>
-          </div>
-          <div class="workflow-step-card">
+        <div class="workflow-step journey-row journey-row-right reveal-on-scroll" data-step="3">
+          <div class="journey-card">
             <div class="workflow-step-head">
               <span class="workflow-step-num">2025</span>
               <span class="workflow-step-badge" data-i18n="about_journey_3_badge">Innovation</span>
@@ -252,13 +261,18 @@
               >
             </p>
           </div>
+          <div class="workflow-step-marker">
+            <div class="workflow-step-dot"><i class="ph-fill ph-magic-wand"></i></div>
+          </div>
+          <div class="journey-spacer"></div>
         </div>
 
-        <div class="workflow-step reveal-on-scroll" data-step="4">
+        <div class="workflow-step journey-row journey-row-left reveal-on-scroll" data-step="4">
+          <div class="journey-spacer"></div>
           <div class="workflow-step-marker">
             <div class="workflow-step-dot"><i class="ph-fill ph-star"></i></div>
           </div>
-          <div class="workflow-step-card">
+          <div class="journey-card">
             <div class="workflow-step-head">
               <span class="workflow-step-num">2026</span>
               <span class="workflow-step-badge" data-i18n="about_journey_4_badge">Today</span>
@@ -292,98 +306,109 @@
           Our Leadership
         </h2>
       </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal-on-scroll">
-        <div class="team-card">
-          <div class="team-avatar-wrap">
-            <div
-              class="team-avatar"
-              style="background: linear-gradient(135deg, var(--primary), var(--chart-2))"
-            >
-              YS
+        <div class="team-flip-card">
+          <div class="team-flip-inner">
+            <div class="team-flip-front">
+              <div
+                class="team-avatar"
+                style="background: linear-gradient(135deg, var(--primary), var(--chart-2))"
+              >
+                YS
+              </div>
+              <h4 class="font-bold text-lg mt-4">Yasir Syarif</h4>
+              <p class="text-sm text-muted-foreground" data-i18n="about_role_1">Founder & CEO</p>
             </div>
-            <div class="team-socials">
-              <a href="#" class="team-social-btn" aria-label="LinkedIn"
-                ><i class="ph-fill ph-linkedin-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="GitHub"
-                ><i class="ph-fill ph-github-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="Email"
-                ><i class="ph-fill ph-envelope"></i
-              ></a>
+            <div class="team-flip-back">
+              <p class="text-sm leading-relaxed mb-4">
+                8+ tahun membangun produk digital, fokus pada strategi bisnis & arsitektur teknis.
+              </p>
+              <div class="team-socials-flat">
+                <a href="#" aria-label="LinkedIn"><i class="ph-fill ph-linkedin-logo"></i></a>
+                <a href="#" aria-label="GitHub"><i class="ph-fill ph-github-logo"></i></a>
+                <a href="#" aria-label="Email"><i class="ph-fill ph-envelope"></i></a>
+              </div>
             </div>
           </div>
-          <h4 class="font-bold text-lg mt-4">Yasir Syarif</h4>
-          <p class="text-sm text-muted-foreground" data-i18n="about_role_1">Founder & CEO</p>
         </div>
 
-        <div class="team-card">
-          <div class="team-avatar-wrap">
-            <div
-              class="team-avatar"
-              style="background: linear-gradient(135deg, var(--chart-5), var(--chart-2))"
-            >
-              RA
+        <div class="team-flip-card">
+          <div class="team-flip-inner">
+            <div class="team-flip-front">
+              <div
+                class="team-avatar"
+                style="background: linear-gradient(135deg, var(--chart-5), var(--chart-2))"
+              >
+                RA
+              </div>
+              <h4 class="font-bold text-lg mt-4">Rina Amelia</h4>
+              <p class="text-sm text-muted-foreground" data-i18n="about_role_2">
+                Head of Engineering
+              </p>
             </div>
-            <div class="team-socials">
-              <a href="#" class="team-social-btn" aria-label="LinkedIn"
-                ><i class="ph-fill ph-linkedin-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="GitHub"
-                ><i class="ph-fill ph-github-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="Email"
-                ><i class="ph-fill ph-envelope"></i
-              ></a>
+            <div class="team-flip-back">
+              <p class="text-sm leading-relaxed mb-4">
+                Memimpin tim engineering dengan fokus pada arsitektur scalable dan clean code.
+              </p>
+              <div class="team-socials-flat">
+                <a href="#" aria-label="LinkedIn"><i class="ph-fill ph-linkedin-logo"></i></a>
+                <a href="#" aria-label="GitHub"><i class="ph-fill ph-github-logo"></i></a>
+                <a href="#" aria-label="Email"><i class="ph-fill ph-envelope"></i></a>
+              </div>
             </div>
           </div>
-          <h4 class="font-bold text-lg mt-4">Rina Amelia</h4>
-          <p class="text-sm text-muted-foreground" data-i18n="about_role_2">Head of Engineering</p>
         </div>
 
-        <div class="team-card">
-          <div class="team-avatar-wrap">
-            <div
-              class="team-avatar"
-              style="background: linear-gradient(135deg, var(--chart-3), var(--chart-4))"
-            >
-              DW
+        <div class="team-flip-card">
+          <div class="team-flip-inner">
+            <div class="team-flip-front">
+              <div
+                class="team-avatar"
+                style="background: linear-gradient(135deg, var(--chart-3), var(--chart-4))"
+              >
+                DW
+              </div>
+              <h4 class="font-bold text-lg mt-4">Dimas Wicaksono</h4>
+              <p class="text-sm text-muted-foreground" data-i18n="about_role_3">Lead Designer</p>
             </div>
-            <div class="team-socials">
-              <a href="#" class="team-social-btn" aria-label="LinkedIn"
-                ><i class="ph-fill ph-linkedin-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="Behance"
-                ><i class="ph-fill ph-behance-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="Email"
-                ><i class="ph-fill ph-envelope"></i
-              ></a>
+            <div class="team-flip-back">
+              <p class="text-sm leading-relaxed mb-4">
+                Mengubah ide kompleks jadi antarmuka yang simpel, indah, dan mudah dipakai.
+              </p>
+              <div class="team-socials-flat">
+                <a href="#" aria-label="LinkedIn"><i class="ph-fill ph-linkedin-logo"></i></a>
+                <a href="#" aria-label="Behance"><i class="ph-fill ph-behance-logo"></i></a>
+                <a href="#" aria-label="Email"><i class="ph-fill ph-envelope"></i></a>
+              </div>
             </div>
           </div>
-          <h4 class="font-bold text-lg mt-4">Dimas Wicaksono</h4>
-          <p class="text-sm text-muted-foreground" data-i18n="about_role_3">Lead Designer</p>
         </div>
 
-        <div class="team-card">
-          <div class="team-avatar-wrap">
-            <div
-              class="team-avatar"
-              style="background: linear-gradient(135deg, var(--chart-4), var(--chart-5))"
-            >
-              NF
+        <div class="team-flip-card">
+          <div class="team-flip-inner">
+            <div class="team-flip-front">
+              <div
+                class="team-avatar"
+                style="background: linear-gradient(135deg, var(--chart-4), var(--chart-5))"
+              >
+                NF
+              </div>
+              <h4 class="font-bold text-lg mt-4">Nadia Fitria</h4>
+              <p class="text-sm text-muted-foreground" data-i18n="about_role_4">
+                Head of Operations
+              </p>
             </div>
-            <div class="team-socials">
-              <a href="#" class="team-social-btn" aria-label="LinkedIn"
-                ><i class="ph-fill ph-linkedin-logo"></i
-              ></a>
-              <a href="#" class="team-social-btn" aria-label="Email"
-                ><i class="ph-fill ph-envelope"></i
-              ></a>
+            <div class="team-flip-back">
+              <p class="text-sm leading-relaxed mb-4">
+                Memastikan setiap proyek berjalan lancar, tepat waktu, dan sesuai ekspektasi klien.
+              </p>
+              <div class="team-socials-flat">
+                <a href="#" aria-label="LinkedIn"><i class="ph-fill ph-linkedin-logo"></i></a>
+                <a href="#" aria-label="Email"><i class="ph-fill ph-envelope"></i></a>
+              </div>
             </div>
           </div>
-          <h4 class="font-bold text-lg mt-4">Nadia Fitria</h4>
-          <p class="text-sm text-muted-foreground" data-i18n="about_role_4">Head of Operations</p>
         </div>
       </div>
     </div>
