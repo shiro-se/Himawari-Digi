@@ -175,7 +175,6 @@
         </div>
       </a>
 
-      <!-- Portfolio: toggle popup instead of direct link -->
       <button
         type="button"
         class="dock-item"
@@ -201,7 +200,7 @@
         </div>
       </a>
 
-      <!-- Portfolio Popup Sheet -->
+      <!-- Portfolio Popup Sheet — masih boleh di dalam nav karena tidak fixed full-screen -->
       <div class="dock-popup" id="dock-portfolio-popup" role="menu">
         <div class="dock-popup-arrow"></div>
         <a href="/portfolio/web" class="dock-popup-item" data-link role="menuitem">
@@ -232,9 +231,10 @@
           </div>
         </a>
       </div>
-
-      <div class="dock-popup-overlay" id="dock-popup-overlay"></div>
     </nav>
+
+    <!-- Overlay dipindah KELUAR dari .mobile-dock, jadi sibling -->
+    <div class="dock-popup-overlay" id="dock-popup-overlay"></div>
 
     <!-- Main Content Container (Dynamic) -->
     <main id="app-content" class="grow min-h-screen transition-opacity duration-300"></main>
