@@ -644,9 +644,22 @@ body {
   border: none;
   background: none;
   padding: 0;
+  margin: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
   position: relative;
+  font: inherit;
+  color: inherit;
+}
+
+.dock-item:focus,
+.dock-item:focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: none;
 }
 
 .dock-item:active {
@@ -671,21 +684,6 @@ body {
     box-shadow 0.28s ease;
 }
 
-/* Small active-state dot indicator, replaces the old text label */
-.dock-icon-wrap::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%) scale(0);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
 .dock-item:not(.active):hover .dock-icon-wrap {
   color: var(--foreground);
   background: color-mix(in srgb, var(--muted) 80%, transparent);
@@ -700,10 +698,6 @@ body {
     0 6px 18px color-mix(in srgb, var(--primary) 42%, transparent),
     0 2px 6px color-mix(in srgb, var(--primary) 22%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-.dock-item.active .dock-icon-wrap::after {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
 }
 
 .dark .dock-item.active .dock-icon-wrap {
@@ -2272,7 +2266,7 @@ footer {
 .floating-chat-btn {
   position: fixed;
   right: 1rem;
-  bottom: 7.5rem;
+  bottom: 1.5rem;
   z-index: 9999;
   display: flex;
   align-items: center;

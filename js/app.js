@@ -422,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
       dockPortfolioPopup.classList.add('is-open');
       dockPopupOverlay.classList.add('is-open');
       dockPortfolioBtn.setAttribute('aria-expanded', 'true');
+      // TIDAK ada dockPortfolioBtn.classList.add('active') di sini
     };
     const closeDockPopup = () => {
       dockPortfolioPopup.classList.remove('is-open');
@@ -436,12 +437,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dockPopupOverlay.addEventListener('click', closeDockPopup);
 
-    // Tutup popup begitu salah satu sub-link diklik (sebelum navigasi SPA)
     dockPortfolioPopup.querySelectorAll('[data-link]').forEach((link) => {
       link.addEventListener('click', closeDockPopup);
     });
 
-    // Tutup popup saat pindah halaman lewat cara lain (back/forward, dsb)
     window.addEventListener('popstate', closeDockPopup);
   }
 
