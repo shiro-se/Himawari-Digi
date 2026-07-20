@@ -4202,19 +4202,7 @@ footer {
 
 @media (max-width: 640px) {
   .mv-flip-card {
-    height: auto;
-    min-height: 300px;
-  }
-
-  .mv-flip-inner {
-    height: auto;
-    min-height: 300px;
-  }
-
-  .mv-flip-front,
-  .mv-flip-back {
-    position: relative;
-    min-height: 300px;
+    height: 340px;
   }
 
   .team-flip-card {
@@ -4245,6 +4233,7 @@ footer {
   }
   .workflow-step.journey-row .workflow-step-marker {
     grid-column: 1;
+    grid-row: 1;
     justify-self: start;
   }
   .workflow-step.journey-row-right .journey-card,
